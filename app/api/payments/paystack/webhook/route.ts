@@ -26,6 +26,7 @@ type PaystackWebhookEvent = {
           organization_id?: string;
           gross_amount?: number;
           platform_fee_amount?: number;
+          platform_fee_percentage?: number;
         }
       | string
       | null;
@@ -48,6 +49,7 @@ type PaystackVerifyResponse = {
           organization_id?: string;
           gross_amount?: number;
           platform_fee_amount?: number;
+          platform_fee_percentage?: number;
         }
       | string
       | null;
@@ -113,6 +115,7 @@ function metadataObject(
         organization_id?: string;
         gross_amount?: number;
         platform_fee_amount?: number;
+        platform_fee_percentage?: number;
       }
     | string
     | null
@@ -281,6 +284,16 @@ export async function POST(
         transaction.metadata
       );
 
+    const frozenPlatformFeeAmount =
+      metadata?.platform_fee_amount !== undefined
+        ? Number(metadata.platform_fee_amount)
+        : null;
+
+    const frozenPlatformFeePercentage =
+      metadata?.platform_fee_percentage !== undefined
+        ? Number(metadata.platform_fee_percentage)
+        : null;
+
     const participantId =
       String(
         metadata?.participant_id ??
@@ -439,6 +452,10 @@ export async function POST(
           reference,
         p_processor_fee_amount:
           processorFeeMajor,
+        p_platform_fee_amount:
+          frozenPlatformFeeAmount,
+        p_platform_fee_percentage:
+          frozenPlatformFeePercentage,
       }
     );
 
@@ -475,5 +492,8 @@ export async function POST(
     );
   }
 }
+
+
+
 
 

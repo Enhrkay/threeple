@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import {
   randomUUID,
@@ -334,6 +334,8 @@ export async function startParticipantPayment(
             .settlement_subaccount_code,
         platformFeeMajor:
           platformFee,
+        platformFeePercentage:
+          feePercentage,
         reference,
         callbackUrl,
         participantId:
@@ -376,3 +378,4 @@ export async function startParticipantPayment(
     );
   }
 }
+

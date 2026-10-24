@@ -1,4 +1,4 @@
-import {
+﻿import {
   supabaseAdmin,
 } from "@/lib/supabase/admin";
 
@@ -18,6 +18,7 @@ type InitializePaystackSplitPaymentInput = {
   currency: string;
   subaccountCode: string;
   platformFeeMajor: number;
+  platformFeePercentage: number;
   reference: string;
   callbackUrl: string;
   participantId: string;
@@ -294,6 +295,7 @@ export async function initializePaystackSplitPayment(
     currency,
     subaccountCode,
     platformFeeMajor,
+    platformFeePercentage,
     reference,
     callbackUrl,
     participantId,
@@ -381,6 +383,8 @@ export async function initializePaystackSplitPayment(
               amountMajor,
             platform_fee_amount:
               platformFeeMajor,
+            platform_fee_percentage:
+              platformFeePercentage,
           },
         }),
       }
@@ -412,3 +416,4 @@ export async function initializePaystackSplitPayment(
       result.data.reference,
   };
 }
+
