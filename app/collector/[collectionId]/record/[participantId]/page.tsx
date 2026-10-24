@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import {
   notFound,
   redirect,
@@ -49,7 +49,7 @@ function money(
     value === null ||
     value === undefined
   ) {
-    return "—";
+    return "â€”";
   }
 
   return new Intl.NumberFormat(
@@ -303,7 +303,13 @@ export default async function RecordContributionPage({
           </div>
         </section>
 
-        <ThreepleAlert
+                <Link
+          href={`/collector/${collectionId}/offline-record/${participantId}`}
+          className="tp-btn tp-btn-secondary mt-5 w-full sm:w-auto"
+        >
+          Save offline instead
+        </Link>
+<ThreepleAlert
           tone="warning"
           className="mt-5"
         >
@@ -402,11 +408,11 @@ export default async function RecordContributionPage({
                 </option>
 
                 <option value="bank_transfer_manual">
-                  Bank transfer — manually confirmed
+                  Bank transfer â€” manually confirmed
                 </option>
 
                 <option value="pos_manual">
-                  POS — manually confirmed
+                  POS â€” manually confirmed
                 </option>
 
                 <option value="other_manual">
@@ -458,3 +464,4 @@ export default async function RecordContributionPage({
     </ThreepleAppShell>
   );
 }
+
