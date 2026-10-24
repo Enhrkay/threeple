@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 import {
   notFound,
@@ -11,6 +11,7 @@ import {
 
 import {
   seedRotationMembers,
+  saveRotationOrder,
   generateRotationSchedule,
 } from "./actions";
 
@@ -38,7 +39,7 @@ function formatMoney(
     amount === null ||
     amount === undefined
   ) {
-    return "—";
+    return "â€”";
   }
 
   const numeric =
@@ -49,7 +50,7 @@ function formatMoney(
       numeric
     )
   ) {
-    return "—";
+    return "â€”";
   }
 
   return new Intl.NumberFormat(
@@ -69,7 +70,7 @@ function friendlyText(
     | undefined
 ) {
   if (!value) {
-    return "—";
+    return "â€”";
   }
 
   return value
@@ -90,6 +91,33 @@ function resultMessage(
           "Rotation members were prepared successfully.",
       };
 
+    case "order_saved":
+      return {
+        type: "success",
+        text:
+          "Recipient order saved successfully.",
+      };
+
+    case "order_invalid":
+      return {
+        type: "error",
+        text:
+          "Each rotation member must have one unique recipient position.",
+      };
+
+    case "order_locked":
+      return {
+        type: "error",
+        text:
+          "Recipient order is locked because rotation cycles already exist.",
+      };
+
+    case "order_failed":
+      return {
+        type: "error",
+        text:
+          "Threeple could not save the recipient order.",
+      };
     case "schedule_generated":
       return {
         type: "success",
@@ -380,7 +408,7 @@ export default async function RotationPage({
             href={`/dashboard/collections/${collection.id}`}
             className="text-sm font-medium text-neutral-600 hover:text-black"
           >
-            ← Collection
+            â† Collection
           </Link>
         </div>
       </header>
@@ -554,56 +582,121 @@ export default async function RotationPage({
             )}
           </div>
 
-          <div className="mt-6 overflow-hidden rounded-2xl border">
-            {(members?.length ?? 0) === 0 ? (
-              <div className="p-6 text-sm text-neutral-500">
-                No rotation members have been prepared yet.
-              </div>
-            ) : (
-              <div className="divide-y">
-                {members?.map(
-                  (member) => {
-                    const participant =
-                      Array.isArray(
-                        member.participants
-                      )
-                        ? member.participants[0]
-                        : member.participants;
+          {(members?.length ?? 0) === 0 ? (
+            <div className="mt-6 overflow-hidden rounded-2xl border p-6 text-sm text-neutral-500">
+              No rotation members have been prepared yet.
+            </div>
+          ) : (
+            <form
+              action={saveRotationOrder}
+              className="mt-6"
+            >
+              <input
+                type="hidden"
+                name="collection_id"
+                value={collection.id}
+              />
 
-                    return (
-                      <div
-                        key={member.id}
-                        className="grid grid-cols-[70px_1fr_auto] items-center gap-4 px-4 py-4"
-                      >
-                        <span className="font-mono text-sm text-neutral-400">
-                          #{member.recipient_position}
-                        </span>
+              <div className="overflow-hidden rounded-2xl border">
+                <div className="grid grid-cols-[1fr_130px] gap-4 border-b bg-neutral-50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-400">
+                  <span>
+                    Member
+                  </span>
 
-                        <div>
-                          <p className="font-medium">
-                            {participant?.full_name ??
-                              "Participant"}
-                          </p>
+                  <span>
+                    Recipient position
+                  </span>
+                </div>
 
-                          <p className="mt-1 text-xs text-neutral-400">
-                            Recipient position{" "}
-                            {member.recipient_position}
-                          </p>
+                <div className="divide-y">
+                  {members?.map(
+                    (member) => {
+                      const participant =
+                        Array.isArray(
+                          member.participants
+                        )
+                          ? member.participants[0]
+                          : member.participants;
+
+                      return (
+                        <div
+                          key={member.id}
+                          className="grid grid-cols-[1fr_130px] items-center gap-4 px-4 py-4"
+                        >
+                          <div>
+                            <input
+                              type="hidden"
+                              name="participant_id"
+                              value={
+                                member.participant_id
+                              }
+                            />
+
+                            <p className="font-medium">
+                              {participant?.full_name ??
+                                "Participant"}
+                            </p>
+
+                            <p className="mt-1 text-xs text-neutral-400">
+                              Current position #
+                              {member.recipient_position}
+                            </p>
+                          </div>
+
+                          <select
+                            name={`position_${member.participant_id}`}
+                            defaultValue={
+                              member.recipient_position
+                            }
+                            disabled={
+                              scheduleExists
+                            }
+                            className="rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-black disabled:bg-neutral-100"
+                          >
+                            {members?.map(
+                              (_, index) => (
+                                <option
+                                  key={
+                                    index + 1
+                                  }
+                                  value={
+                                    index + 1
+                                  }
+                                >
+                                  {index + 1}
+                                </option>
+                              )
+                            )}
+                          </select>
                         </div>
-
-                        <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-semibold text-neutral-600">
-                          {friendlyText(
-                            participant?.participation_status
-                          )}
-                        </span>
-                      </div>
-                    );
-                  }
-                )}
+                      );
+                    }
+                  )}
+                </div>
               </div>
-            )}
-          </div>
 
+              {!scheduleExists && (
+                <div className="mt-4 flex flex-wrap items-center gap-3">
+                  <button
+                    type="submit"
+                    className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 text-sm font-semibold hover:bg-neutral-50"
+                  >
+                    Save recipient order
+                  </button>
+
+                  <p className="text-xs leading-5 text-neutral-400">
+                    Every position must be unique before saving.
+                  </p>
+                </div>
+              )}
+
+              {scheduleExists && (
+                <p className="mt-4 text-xs leading-5 text-neutral-400">
+                  Recipient order is locked because the rotation schedule has already been generated.
+                </p>
+              )}
+            </form>
+          )}
           {!scheduleExists &&
             memberOrderReady && (
               <form
@@ -739,3 +832,4 @@ export default async function RotationPage({
     </main>
   );
 }
+

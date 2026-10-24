@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -228,6 +228,164 @@ export async function seedRotationMembers(
   );
 }
 
+export async function saveRotationOrder(
+  formData: FormData
+) {
+  const collectionId =
+    String(
+      formData.get(
+        "collection_id"
+      ) ?? ""
+    ).trim();
+
+  if (!collectionId) {
+    throw new Error(
+      "Collection ID is missing."
+    );
+  }
+
+  const {
+    collection,
+  } =
+    await requireRotationManager(
+      collectionId
+    );
+
+  if (collection.archived_at) {
+    returnToRotation(
+      collectionId,
+      "collection_archived"
+    );
+  }
+
+  const {
+    data: cycleCheck,
+  } = await supabaseAdmin
+    .from("rotation_cycles")
+    .select("id")
+    .eq(
+      "collection_id",
+      collectionId
+    )
+    .limit(1);
+
+  if (
+    (cycleCheck?.length ?? 0) > 0
+  ) {
+    returnToRotation(
+      collectionId,
+      "order_locked"
+    );
+  }
+
+  const participantIds =
+    formData
+      .getAll("participant_id")
+      .map((value) =>
+        String(value).trim()
+      )
+      .filter(Boolean);
+
+  if (participantIds.length < 2) {
+    returnToRotation(
+      collectionId,
+      "order_invalid"
+    );
+  }
+
+  const requested =
+    participantIds.map(
+      (participantId) => {
+        const rawPosition =
+          String(
+            formData.get(
+              `position_${participantId}`
+            ) ?? ""
+          ).trim();
+
+        const position =
+          Number(rawPosition);
+
+        return {
+          participantId,
+          position,
+        };
+      }
+    );
+
+  const validPositions =
+    requested.every(
+      (item) =>
+        Number.isInteger(
+          item.position
+        ) &&
+        item.position >= 1 &&
+        item.position <=
+          participantIds.length
+    );
+
+  const distinctPositions =
+    new Set(
+      requested.map(
+        (item) =>
+          item.position
+      )
+    );
+
+  if (
+    !validPositions ||
+    distinctPositions.size !==
+      participantIds.length
+  ) {
+    returnToRotation(
+      collectionId,
+      "order_invalid"
+    );
+  }
+
+  const orderedParticipantIds =
+    requested
+      .sort(
+        (a, b) =>
+          a.position -
+          b.position
+      )
+      .map(
+        (item) =>
+          item.participantId
+      );
+
+  const {
+    error,
+  } =
+    await supabaseAdmin.rpc(
+      "reorder_rotation_members",
+      {
+        p_collection_id:
+          collectionId,
+
+        p_participant_ids:
+          orderedParticipantIds,
+      }
+    );
+
+  if (error) {
+    console.error(
+      "SAVE ROTATION ORDER FAILED:",
+      error
+    );
+
+    returnToRotation(
+      collectionId,
+      "order_failed"
+    );
+  }
+
+  returnToRotation(
+    collectionId,
+    "order_saved"
+  );
+}
 export async function generateRotationSchedule(
   formData: FormData
 ) {
@@ -286,3 +444,4 @@ export async function generateRotationSchedule(
     "schedule_generated"
   );
 }
+
