@@ -29,6 +29,23 @@ type PublicCollection = {
   access_mode: string;
 };
 
+type PublicCapacity = {
+  collection_id: string;
+  expected_participant_count: number | null;
+  joined_participants: number;
+  remaining_slots: number | null;
+  is_full: boolean;
+  contribution_amount_policy: string | null;
+  calculated_contribution_amount:
+    | number
+    | string
+    | null;
+  default_amount:
+    | number
+    | string
+    | null;
+};
+
 function prettyText(value: string) {
   return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
@@ -71,6 +88,10 @@ export default async function JoinPage({ searchParams }: PageProps) {
   const { data: { user } } = await supabase.auth.getUser();
 
   let collection: PublicCollection | null = null;
+
+  let capacity:
+    | PublicCapacity
+    | null = null;
   let lookupError = false;
 
   if (code) {
@@ -83,6 +104,29 @@ export default async function JoinPage({ searchParams }: PageProps) {
       lookupError = true;
     } else if (data && data.length > 0) {
       collection = data[0] as PublicCollection;
+
+      const {
+        data: capacityData,
+        error: capacityError,
+      } = await supabase.rpc(
+        "lookup_collection_capacity_by_code",
+        {
+          p_join_code: code,
+        }
+      );
+
+      if (capacityError) {
+        console.error(
+          "THREEPLE CAPACITY LOOKUP ERROR:",
+          capacityError
+        );
+      } else if (
+        capacityData &&
+        capacityData.length > 0
+      ) {
+        capacity =
+          capacityData[0] as PublicCapacity;
+      }
     }
   }
 
@@ -247,7 +291,64 @@ export default async function JoinPage({ searchParams }: PageProps) {
               </div>
             </div>
 
-            {targetAmount > 0 && (
+                        {/* CAPACITY SUMMARY */}
+
+            {capacity && (
+              <div className="grid gap-4 border-t px-6 py-6 sm:grid-cols-3 md:px-8">
+                {capacity.expected_participant_count !== null && (
+                  <div className="rounded-2xl bg-neutral-50 p-5">
+                    <p className="text-sm text-neutral-500">Planned participants</p>
+                    <p className="mt-2 text-xl font-semibold">
+                      {capacity.expected_participant_count}
+                    </p>
+                  </div>
+                )}
+
+                <div className="rounded-2xl bg-neutral-50 p-5">
+                  <p className="text-sm text-neutral-500">Joined</p>
+                  <p className="mt-2 text-xl font-semibold">
+                    {capacity.joined_participants}
+                  </p>
+                </div>
+
+                {capacity.remaining_slots !== null && (
+                  <div className="rounded-2xl bg-neutral-50 p-5">
+                    <p className="text-sm text-neutral-500">Remaining slots</p>
+                    <p className="mt-2 text-xl font-semibold">
+                      {capacity.remaining_slots}
+                    </p>
+                  </div>
+                )}
+
+                {capacity.contribution_amount_policy ===
+                  "calculated_equal_share" && (
+                  <div className="rounded-2xl bg-black p-5 text-white sm:col-span-3">
+                    <p className="text-sm text-white/55">Required contribution</p>
+                    <p className="mt-2 text-2xl font-semibold">
+                      {formatMoney(
+                        capacity.calculated_contribution_amount ??
+                          capacity.default_amount,
+                        collection.currency
+                      )}
+                    </p>
+                    <p className="mt-2 text-xs text-white/50">
+                      Equal amount required from each participant.
+                    </p>
+                  </div>
+                )}
+
+                {capacity.is_full && (
+                  <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 sm:col-span-3">
+                    <p className="font-semibold text-amber-900">This Collection is full</p>
+                    <p className="mt-1 text-sm text-amber-800">
+                      All planned participant slots have been taken.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+{targetAmount > 0 && (
               <div className="px-6 pb-8 md:px-8">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-black/45">Collection progress</span>
@@ -413,6 +514,7 @@ export default async function JoinPage({ searchParams }: PageProps) {
     </main>
   );
 }
+
 
 
 
