@@ -323,6 +323,40 @@ export async function createCollection(
         "visibility"
       ) ?? "private"
     );
+  const rotationFrequency =
+    String(
+      formData.get(
+        "rotation_frequency"
+      ) ?? ""
+    ).trim();
+
+  const rotationStartDate =
+    String(
+      formData.get(
+        "rotation_start_date"
+      ) ?? ""
+    ).trim();
+
+  const coordinatorFeeMode =
+    String(
+      formData.get(
+        "coordinator_fee_mode"
+      ) ?? "none"
+    ).trim();
+
+  const coordinatorFeeValueRaw =
+    String(
+      formData.get(
+        "coordinator_fee_value"
+      ) ?? ""
+    ).trim();
+
+  const coordinatorFeeValue =
+    coordinatorFeeValueRaw
+      ? Number(
+          coordinatorFeeValueRaw
+        )
+      : 0;
 
   if (
     title.length < 3
@@ -383,6 +417,65 @@ export async function createCollection(
       "This Collection requires an amount per participant."
     );
   }
+  if (
+    collectionMode ===
+      "rotating_pool"
+  ) {
+    if (
+      ![
+        "weekly",
+        "biweekly",
+        "monthly",
+      ].includes(
+        rotationFrequency
+      )
+    ) {
+      throw new Error(
+        "Select a valid rotational contribution frequency."
+      );
+    }
+
+    if (!rotationStartDate) {
+      throw new Error(
+        "Rotational contributions require a start date."
+      );
+    }
+
+    if (
+      ![
+        "none",
+        "fixed",
+        "percentage",
+      ].includes(
+        coordinatorFeeMode
+      )
+    ) {
+      throw new Error(
+        "Select a valid coordinator fee type."
+      );
+    }
+
+    if (
+      !Number.isFinite(
+        coordinatorFeeValue
+      ) ||
+      coordinatorFeeValue < 0
+    ) {
+      throw new Error(
+        "Coordinator fee must be zero or greater."
+      );
+    }
+
+    if (
+      coordinatorFeeMode ===
+        "percentage" &&
+      coordinatorFeeValue > 100
+    ) {
+      throw new Error(
+        "Coordinator percentage cannot exceed 100%."
+      );
+    }
+  }
 
   const deadline =
     deadlineRaw
@@ -394,6 +487,7 @@ export async function createCollection(
   // -------------------------------------------------------
 
   const {
+    data: createdCollection,
     error: insertError,
   } =
     await supabase
@@ -454,7 +548,9 @@ export async function createCollection(
 
         status:
           "draft",
-      });
+      })
+      .select("id")
+      .single();
 
   if (insertError) {
     console.error(
@@ -466,6 +562,72 @@ export async function createCollection(
       `Collection could not be created: ${insertError.message}`
     );
   }
+  if (
+    !createdCollection?.id
+  ) {
+    throw new Error(
+      "Threeple created the Collection but could not confirm its ID."
+    );
+  }
+
+  if (
+    collectionMode ===
+      "rotating_pool"
+  ) {
+    const {
+      error: rotationError,
+    } =
+      await supabase
+        .from(
+          "rotation_settings"
+        )
+        .insert({
+          collection_id:
+            createdCollection.id,
+
+          contribution_amount:
+            normalizedDefaultAmount,
+
+          frequency:
+            rotationFrequency,
+
+          start_date:
+            rotationStartDate,
+
+          coordinator_fee_mode:
+            coordinatorFeeMode,
+
+          coordinator_fee_value:
+            coordinatorFeeMode ===
+              "none"
+              ? 0
+              : coordinatorFeeValue,
+
+          status:
+            "draft",
+        });
+
+    if (rotationError) {
+      console.error(
+        "CREATE ROTATION SETTINGS ERROR:",
+        rotationError
+      );
+
+      await supabase
+        .from(
+          "collections"
+        )
+        .delete()
+        .eq(
+          "id",
+          createdCollection.id
+        );
+
+      throw new Error(
+        `Rotational settings could not be created: ${rotationError.message}`
+      );
+    }
+  }
 
   // -------------------------------------------------------
   // 7. Refresh dashboard and return
@@ -474,6 +636,15 @@ export async function createCollection(
   revalidatePath(
     "/dashboard"
   );
+
+  if (
+    collectionMode ===
+      "rotating_pool"
+  ) {
+    redirect(
+      `/dashboard/collections/${createdCollection.id}`
+    );
+  }
 
   redirect(
     "/dashboard"

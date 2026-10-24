@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -14,7 +14,7 @@ type CollectionMode =
   | "rotating_pool";
 
 function money(value: number, currency: string) {
-  if (!Number.isFinite(value) || value <= 0) return "—";
+  if (!Number.isFinite(value) || value <= 0) return "â€”";
 
   return new Intl.NumberFormat("en-NG", {
     style: "currency",
@@ -29,6 +29,7 @@ export default function NewCollectionPage() {
   const [targetAmount, setTargetAmount] = useState("");
   const [expectedCount, setExpectedCount] = useState("");
   const [defaultAmount, setDefaultAmount] = useState("");
+  const [coordinatorFeeMode, setCoordinatorFeeMode] = useState("none");
 
   const calculatedShare = useMemo(() => {
     const target = Number(targetAmount);
@@ -67,7 +68,7 @@ export default function NewCollectionPage() {
               href="/dashboard"
               className="text-sm font-semibold text-black/45 transition hover:text-black"
             >
-              ← Dashboard
+              â† Dashboard
             </Link>
 
             <p className="mt-7 text-xs font-bold uppercase tracking-[0.18em] text-black/35">
@@ -100,7 +101,7 @@ export default function NewCollectionPage() {
 
           <section className="rounded-[2rem] border border-black/10 bg-white p-6 md:p-8">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-black/35">
-              01 · Collection
+              01 Â· Collection
             </p>
             <h2 className="mt-2 text-xl font-black">
               What are you contributing towards?
@@ -181,7 +182,7 @@ export default function NewCollectionPage() {
 
           <section className="rounded-[2rem] border border-black/10 bg-white p-6 md:p-8">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-black/35">
-              02 · Contribution model
+              02 Â· Contribution model
             </p>
             <h2 className="mt-2 text-xl font-black">
               How should the group contribute?
@@ -213,22 +214,22 @@ export default function NewCollectionPage() {
                   Select contribution model
                 </option>
                 <option value="target">
-                  Shared target — Threeple divides the target equally
+                  Shared target â€” Threeple divides the target equally
                 </option>
                 <option value="fixed_per_person">
-                  Fixed amount — organizer sets what each person pays
+                  Fixed amount â€” organizer sets what each person pays
                 </option>
                 <option value="event_fee">
-                  Event fee — fixed amount required from each attendee
+                  Event fee â€” fixed amount required from each attendee
                 </option>
                 <option value="flexible">
-                  Flexible target — participants may contribute different amounts
+                  Flexible target â€” participants may contribute different amounts
                 </option>
                 <option value="recurring_dues">
-                  Recurring dues — weekly/monthly group contribution
+                  Recurring dues â€” weekly/monthly group contribution
                 </option>
                 <option value="rotating_pool">
-                  Rotational contribution — Ajo / Esusu style
+                  Rotational contribution â€” Ajo / Esusu style
                 </option>
               </select>
             </div>
@@ -362,18 +363,14 @@ export default function NewCollectionPage() {
               </div>
             )}
 
-            {(mode === "recurring_dues" ||
-              mode === "rotating_pool") && (
+            {mode === "recurring_dues" && (
               <div className="mt-6 rounded-3xl border border-black/10 bg-[#f7f7f5] p-5">
                 <p className="font-bold">
-                  {mode === "rotating_pool"
-                    ? "Rotational contribution"
-                    : "Recurring contribution"}
+                  Recurring contribution
                 </p>
+
                 <p className="mt-2 text-sm leading-6 text-black/50">
-                  Set the base contribution per cycle now. In the next build
-                  layer, Threeple will add frequency, cycles and recipient
-                  sequencing.
+                  Set the base contribution per cycle. Recurring scheduling will be configured in its dedicated workflow.
                 </p>
 
                 <div className="mt-4">
@@ -383,6 +380,7 @@ export default function NewCollectionPage() {
                   >
                     Contribution per cycle
                   </label>
+
                   <input
                     id="default_amount"
                     name="default_amount"
@@ -400,11 +398,153 @@ export default function NewCollectionPage() {
                 </div>
               </div>
             )}
+
+            {mode === "rotating_pool" && (
+              <div className="mt-6 rounded-3xl border border-black/10 bg-[#f7f7f5] p-5 md:p-6">
+                <p className="font-bold">
+                  Rotational contribution
+                </p>
+
+                <p className="mt-2 text-sm leading-6 text-black/50">
+                  Configure the Ajo / Esusu cycle. Members join first; then you arrange recipient order and generate the schedule.
+                </p>
+
+                <div className="mt-5 grid gap-5 md:grid-cols-2">
+                  <div>
+                    <label
+                      htmlFor="default_amount"
+                      className="mb-2 block text-sm font-semibold"
+                    >
+                      Contribution per member, per cycle
+                    </label>
+
+                    <input
+                      id="default_amount"
+                      name="default_amount"
+                      type="number"
+                      min="1"
+                      step="0.01"
+                      required
+                      value={defaultAmount}
+                      onChange={(event) =>
+                        setDefaultAmount(event.target.value)
+                      }
+                      placeholder="e.g. 50000"
+                      className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none focus:border-black"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="rotation_frequency"
+                      className="mb-2 block text-sm font-semibold"
+                    >
+                      Cycle frequency
+                    </label>
+
+                    <select
+                      id="rotation_frequency"
+                      name="rotation_frequency"
+                      required
+                      defaultValue="monthly"
+                      className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none focus:border-black"
+                    >
+                      <option value="weekly">Weekly</option>
+                      <option value="biweekly">Every 2 weeks</option>
+                      <option value="monthly">Monthly</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="rotation_start_date"
+                      className="mb-2 block text-sm font-semibold"
+                    >
+                      First cycle date
+                    </label>
+
+                    <input
+                      id="rotation_start_date"
+                      name="rotation_start_date"
+                      type="date"
+                      required
+                      className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none focus:border-black"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="coordinator_fee_mode"
+                      className="mb-2 block text-sm font-semibold"
+                    >
+                      Coordinator fee
+                    </label>
+
+                    <select
+                      id="coordinator_fee_mode"
+                      name="coordinator_fee_mode"
+                      value={coordinatorFeeMode}
+                      onChange={(event) =>
+                        setCoordinatorFeeMode(event.target.value)
+                      }
+                      className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none focus:border-black"
+                    >
+                      <option value="none">
+                        No coordinator fee
+                      </option>
+                      <option value="fixed">
+                        Fixed amount per cycle
+                      </option>
+                      <option value="percentage">
+                        Percentage of cycle pot
+                      </option>
+                    </select>
+                  </div>
+
+                  {coordinatorFeeMode !== "none" && (
+                    <div className="md:col-span-2">
+                      <label
+                        htmlFor="coordinator_fee_value"
+                        className="mb-2 block text-sm font-semibold"
+                      >
+                        {coordinatorFeeMode === "percentage"
+                          ? "Coordinator percentage"
+                          : "Coordinator amount per cycle"}
+                      </label>
+
+                      <input
+                        id="coordinator_fee_value"
+                        name="coordinator_fee_value"
+                        type="number"
+                        min="0"
+                        max={
+                          coordinatorFeeMode === "percentage"
+                            ? "100"
+                            : undefined
+                        }
+                        step="0.01"
+                        required
+                        placeholder={
+                          coordinatorFeeMode === "percentage"
+                            ? "e.g. 2.5"
+                            : "e.g. 5000"
+                        }
+                        className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none focus:border-black"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-5 rounded-2xl bg-white p-4 text-xs leading-5 text-black/45">
+                  Threeple tracks recipient order, cycles and contribution obligations. Paystack continues to handle the actual settlement of funds.
+                </div>
+              </div>
+            )}
           </section>
 
           <section className="rounded-[2rem] border border-black/10 bg-white p-6 md:p-8">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-black/35">
-              03 · Timing & access
+              03 Â· Timing & access
             </p>
 
             <div className="mt-6 grid gap-5 md:grid-cols-2">
@@ -424,11 +564,11 @@ export default function NewCollectionPage() {
                   }
                   className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none focus:border-black"
                 >
-                  <option value="NGN">NGN — Nigerian Naira</option>
-                  <option value="GBP">GBP — British Pound</option>
-                  <option value="USD">USD — US Dollar</option>
-                  <option value="EUR">EUR — Euro</option>
-                  <option value="CAD">CAD — Canadian Dollar</option>
+                  <option value="NGN">NGN â€” Nigerian Naira</option>
+                  <option value="GBP">GBP â€” British Pound</option>
+                  <option value="USD">USD â€” US Dollar</option>
+                  <option value="EUR">EUR â€” Euro</option>
+                  <option value="CAD">CAD â€” Canadian Dollar</option>
                 </select>
               </div>
 
@@ -464,10 +604,10 @@ export default function NewCollectionPage() {
                   className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none focus:border-black"
                 >
                   <option value="private">
-                    Private — join code required
+                    Private â€” join code required
                   </option>
                   <option value="public">
-                    Public — discoverable collection
+                    Public â€” discoverable collection
                   </option>
                 </select>
               </div>
@@ -527,3 +667,4 @@ export default function NewCollectionPage() {
     </main>
   );
 }
+
