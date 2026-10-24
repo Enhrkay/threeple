@@ -1026,7 +1026,7 @@ export default async function AdminCollectionProfilePage({
                 href={`/admin/users/${collection.created_by}`}
                 className="mt-4 inline-flex text-sm font-semibold hover:underline"
               >
-                View User â†’
+                View User →
               </Link>
 
             </div>
@@ -1183,7 +1183,7 @@ export default async function AdminCollectionProfilePage({
                               href={`/admin/users/${participant.user_id}`}
                               className="mt-2 inline-flex text-xs font-semibold hover:underline"
                             >
-                              View account â†’
+                              View account →
                             </Link>
                           )}
 
@@ -1432,3 +1432,4 @@ export default async function AdminCollectionProfilePage({
     </main>
   );
 }
+

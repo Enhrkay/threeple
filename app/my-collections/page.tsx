@@ -541,7 +541,7 @@ export default async function MyCollectionsPage() {
                           href={`/my-collections/${participant.id}`}
                           className="text-sm font-semibold hover:underline"
                         >
-                          View Collection â†’
+                          View Collection →
                         </Link>
 
                       </div>
@@ -588,3 +588,4 @@ export default async function MyCollectionsPage() {
     </main>
   );
 }
+

@@ -354,7 +354,7 @@ export default async function AdminOrganizationPage({
                     href={`/admin/trust-safety/${activeRestriction.trust_safety_report_id}`}
                     className="mt-2 inline-block font-semibold text-red-950 underline underline-offset-4"
                   >
-                    Open Case â†’
+                    Open Case →
                   </Link>
                 ) : (
                   <p className="mt-2 font-semibold text-red-950">—</p>
@@ -431,7 +431,7 @@ export default async function AdminOrganizationPage({
               href={`/admin/users/${organization.owner_id}`}
               className="mt-4 inline-flex h-10 items-center justify-center rounded-xl border border-neutral-300 px-4 text-sm font-semibold hover:bg-neutral-50"
             >
-              View Owner â†’
+              View Owner →
             </Link>
           </div>
         </section>
@@ -601,4 +601,5 @@ export default async function AdminOrganizationPage({
     </main>
   );
 }
+
 

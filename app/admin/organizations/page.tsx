@@ -432,7 +432,7 @@ export default async function AdminOrganizationsPage({
                               href={`/admin/organizations/${organization.id}`}
                               className="font-semibold hover:underline"
                             >
-                              View Organization â†’
+                              View Organization →
                             </Link>
                           </td>
                         </tr>
@@ -448,4 +448,5 @@ export default async function AdminOrganizationsPage({
     </main>
   );
 }
+
 

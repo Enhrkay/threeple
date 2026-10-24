@@ -732,7 +732,7 @@ export default async function ReportsPage({
               href={`/dashboard/collections/${collection.id}/participants`}
               className="text-sm font-semibold hover:underline"
             >
-              Manage Participants â†’
+              Manage Participants →
             </Link>
 
           </div>
@@ -921,3 +921,4 @@ export default async function ReportsPage({
     </main>
   );
 }
+

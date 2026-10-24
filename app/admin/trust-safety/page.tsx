@@ -1216,7 +1216,7 @@ export default async function TrustSafetyDashboardPage({
                             href={`/admin/trust-safety/${report.id}`}
                             className="inline-flex h-9 items-center justify-center rounded-lg border border-neutral-300 bg-white px-4 text-sm font-semibold hover:bg-neutral-100"
                           >
-                            View Case â†’
+                            View Case →
                           </Link>
 
                         </div>
@@ -1289,7 +1289,7 @@ export default async function TrustSafetyDashboardPage({
                 )}
                 className="inline-flex h-10 items-center justify-center rounded-xl border border-neutral-300 bg-white px-4 text-sm font-semibold hover:bg-neutral-50"
               >
-                Next â†’
+                Next →
               </Link>
             ) : (
               <div />
@@ -1329,3 +1329,4 @@ export default async function TrustSafetyDashboardPage({
     </main>
   );
 }
+

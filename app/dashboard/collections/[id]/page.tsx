@@ -867,7 +867,7 @@ const platformRevenue =
               </p>
 
               <p className="mt-5 text-sm font-medium">
-                Manage participants â†’
+                Manage participants →
               </p>
             </Link>
 
@@ -889,7 +889,7 @@ const platformRevenue =
                 </p>
 
                 <p className="mt-5 text-sm font-medium">
-                  Edit Collection â†’
+                  Edit Collection →
                 </p>
               </Link>
             ) : (
@@ -928,7 +928,7 @@ const platformRevenue =
                 </p>
 
                 <p className="mt-5 text-sm font-medium">
-                  Invite people â†’
+                  Invite people →
                 </p>
               </Link>
             ) : (
@@ -966,7 +966,7 @@ const platformRevenue =
                 </p>
 
                 <p className="mt-5 text-sm font-medium text-blue-950">
-                  Manage rotation â†’
+                  Manage rotation →
                 </p>
               </Link>
             )}
@@ -987,7 +987,7 @@ const platformRevenue =
               </p>
 
               <p className="mt-5 text-sm font-medium">
-                View reports â†’
+                View reports →
               </p>
             </Link>
 
@@ -1008,7 +1008,7 @@ const platformRevenue =
               </p>
 
               <p className="mt-5 text-sm font-medium">
-                View activity â†’
+                View activity →
               </p>
             </Link>
 
@@ -1387,5 +1387,6 @@ const platformRevenue =
     </main>
   );
 }
+
 
 

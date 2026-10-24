@@ -333,7 +333,7 @@ export default async function AdminUsersPage({
                               href={`/admin/users/${user.id}`}
                               className="font-semibold hover:underline"
                             >
-                              View User â†’
+                              View User →
                             </Link>
                           </td>
                         </tr>
@@ -349,4 +349,5 @@ export default async function AdminUsersPage({
     </main>
   );
 }
+
 

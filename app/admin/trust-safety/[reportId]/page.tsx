@@ -1697,7 +1697,7 @@ export default async function TrustSafetyCasePage({
               }
               className="mt-5 inline-flex h-10 items-center justify-center rounded-xl border border-neutral-300 px-4 text-sm font-semibold hover:bg-neutral-50"
             >
-              View Subject â†’
+              View Subject →
             </Link>
           )}
 
@@ -1757,7 +1757,7 @@ export default async function TrustSafetyCasePage({
                   href={`/admin/users/${report.reporter_user_id}`}
                   className="mt-1 inline-flex text-sm font-semibold hover:underline"
                 >
-                  View Threeple Account â†’
+                  View Threeple Account →
                 </Link>
               ) : (
                 <p className="mt-1 text-sm font-medium">
@@ -2225,3 +2225,4 @@ export default async function TrustSafetyCasePage({
     </main>
   );
 }
+

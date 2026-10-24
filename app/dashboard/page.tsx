@@ -1007,7 +1007,7 @@ export default async function DashboardPage() {
                     Create Collection
                   </span>
 
-                  <span>â†’</span>
+                  <span>→</span>
                 </Link>
 
                 <Link
@@ -1018,7 +1018,7 @@ export default async function DashboardPage() {
                     Join with a Code
                   </span>
 
-                  <span>â†’</span>
+                  <span>→</span>
                 </Link>
 
               </div>
@@ -1245,3 +1245,4 @@ export default async function DashboardPage() {
     </main>
   );
 }
+

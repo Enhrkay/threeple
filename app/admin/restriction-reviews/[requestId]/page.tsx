@@ -572,7 +572,7 @@ export default async function RestrictionReviewDetailPage({
                   href={`/admin/trust-safety/${activeRestriction.trust_safety_report_id}`}
                   className="mt-4 inline-flex text-sm font-semibold text-red-900 hover:underline"
                 >
-                  Open Trust & Safety Case â†’
+                  Open Trust & Safety Case →
                 </Link>
               )}
             </div>
@@ -606,7 +606,7 @@ export default async function RestrictionReviewDetailPage({
                   href={`/admin/trust-safety/${restrictionRecord.trust_safety_report_id}`}
                   className="mt-4 inline-flex text-sm font-semibold text-green-900 hover:underline"
                 >
-                  Open Trust & Safety Case â†’
+                  Open Trust & Safety Case →
                 </Link>
               )}
             </div>
@@ -782,4 +782,5 @@ export default async function RestrictionReviewDetailPage({
     </main>
   );
 }
+
 

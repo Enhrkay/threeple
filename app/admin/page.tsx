@@ -81,7 +81,7 @@ function metricCard(
               : "text-neutral-900"
           }`}
         >
-          Open â†’
+          Open →
         </p>
       )}
     </div>
@@ -535,7 +535,7 @@ export default async function AdminDashboardPage() {
               href="/admin/trust-safety"
               className="text-sm font-semibold hover:underline"
             >
-              Open Trust & Safety â†’
+              Open Trust & Safety →
             </Link>
           </div>
 
@@ -656,7 +656,7 @@ export default async function AdminDashboardPage() {
               </p>
 
               <p className="mt-5 text-sm font-semibold text-neutral-900">
-                Open Users â†’
+                Open Users →
               </p>
             </Link>
 
@@ -690,7 +690,7 @@ export default async function AdminDashboardPage() {
               </p>
 
               <p className="mt-5 text-sm font-semibold text-neutral-900">
-                Open Organizations â†’
+                Open Organizations →
               </p>
             </Link>
 
@@ -724,7 +724,7 @@ export default async function AdminDashboardPage() {
               </p>
 
               <p className="mt-5 text-sm font-semibold text-neutral-900">
-                Open Collections â†’
+                Open Collections →
               </p>
             </Link>
 
@@ -758,7 +758,7 @@ export default async function AdminDashboardPage() {
               </p>
 
               <p className="mt-5 text-sm font-semibold text-neutral-900">
-                Open Trust & Safety â†’
+                Open Trust & Safety →
               </p>
             </Link>
 
@@ -769,4 +769,5 @@ export default async function AdminDashboardPage() {
     </main>
   );
 }
+
 

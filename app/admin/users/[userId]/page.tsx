@@ -443,7 +443,7 @@ export default async function AdminUserPage({
                     href={`/admin/trust-safety/${activeRestriction.trust_safety_report_id}`}
                     className="mt-2 inline-block font-semibold text-red-950 underline underline-offset-4"
                   >
-                    Open Case â†’
+                    Open Case →
                   </Link>
                 ) : (
                   <p className="mt-2 font-semibold text-red-950">
@@ -832,7 +832,7 @@ export default async function AdminUserPage({
                         href={`/admin/trust-safety/${restriction.trust_safety_report_id}`}
                         className="mt-4 inline-block text-sm font-semibold underline underline-offset-4"
                       >
-                        Open Trust & Safety Case â†’
+                        Open Trust & Safety Case →
                       </Link>
                     )}
 
@@ -867,4 +867,5 @@ export default async function AdminUserPage({
     </main>
   );
 }
+
 

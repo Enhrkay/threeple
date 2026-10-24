@@ -374,7 +374,7 @@ export default async function AdminCollectionsPage({
                               href={`/admin/collections/${collection.id}`}
                               className="font-semibold hover:underline"
                             >
-                              View Collection â†’
+                              View Collection →
                             </Link>
                           </td>
                         </tr>
@@ -390,4 +390,5 @@ export default async function AdminCollectionsPage({
     </main>
   );
 }
+
 
