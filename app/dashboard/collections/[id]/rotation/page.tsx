@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 import {
   notFound,
@@ -39,14 +39,14 @@ function formatMoney(
     amount === null ||
     amount === undefined
   ) {
-    return "—";
+    return "â€”";
   }
 
   const numeric =
     Number(amount);
 
   if (!Number.isFinite(numeric)) {
-    return "—";
+    return "â€”";
   }
 
   return new Intl.NumberFormat(
@@ -66,7 +66,7 @@ function friendlyText(
     | undefined
 ) {
   if (!value) {
-    return "—";
+    return "â€”";
   }
 
   return value
@@ -85,7 +85,7 @@ function formatDate(
     | undefined
 ) {
   if (!value) {
-    return "—";
+    return "â€”";
   }
 
   const date =
@@ -96,7 +96,7 @@ function formatDate(
       date.getTime()
     )
   ) {
-    return "—";
+    return "â€”";
   }
 
   return date.toLocaleDateString(
@@ -513,7 +513,7 @@ export default async function RotationPage({
 
   return (
     <main className="min-h-screen bg-[#f7f7f5] text-[#171717]">
-      <header className="border-b border-black/10 bg-white">
+      <header className="border-b border-[var(--tp-border)] bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
           <div>
             <Link
@@ -530,17 +530,17 @@ export default async function RotationPage({
 
           <Link
             href={`/dashboard/collections/${collection.id}`}
-            className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold transition hover:bg-black/5"
+            className="rounded-full border border-[var(--tp-border)] px-4 py-2 text-sm font-semibold transition hover:bg-[var(--tp-primary)]/5"
           >
             Back to collection
           </Link>
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-6 py-10">
+      <div className="mx-auto max-w-7xl px-4 pb-28 pt-6 sm:px-6 sm:pb-10 sm:pt-8 lg:px-8 lg:py-10">
         {message && (
           <div
-            className={`mb-6 rounded-2xl border p-4 text-sm font-medium ${
+            className={`mb-6 rounded-[1.5rem] border border-[var(--tp-border)] p-4 text-sm font-medium ${
               message.type ===
               "success"
                 ? "border-green-200 bg-green-50 text-green-800"
@@ -567,14 +567,14 @@ export default async function RotationPage({
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <span className="rounded-full bg-black px-4 py-2 text-sm font-bold text-white">
+            <span className="rounded-full bg-[var(--tp-primary)] px-4 py-2 text-sm font-bold text-white">
               {friendlyText(
                 settings?.status ??
                   collection.status
               )}
             </span>
 
-            <span className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold">
+            <span className="rounded-full border border-[var(--tp-border)] bg-white px-4 py-2 text-sm font-semibold">
               {friendlyText(
                 settings?.frequency
               )}
@@ -583,7 +583,7 @@ export default async function RotationPage({
         </section>
 
         <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-[1.75rem] border border-black/10 bg-white p-6">
+          <div className="rounded-[1.75rem] border border-[var(--tp-border)] bg-white p-6">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-black/35">
               Contribution / cycle
             </p>
@@ -596,7 +596,7 @@ export default async function RotationPage({
             </p>
           </div>
 
-          <div className="rounded-[1.75rem] border border-black/10 bg-white p-6">
+          <div className="rounded-[1.75rem] border border-[var(--tp-border)] bg-white p-6">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-black/35">
               Members
             </p>
@@ -607,7 +607,7 @@ export default async function RotationPage({
             </p>
           </div>
 
-          <div className="rounded-[1.75rem] border border-black/10 bg-white p-6">
+          <div className="rounded-[1.75rem] border border-[var(--tp-border)] bg-white p-6">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-black/35">
               Cycles completed
             </p>
@@ -616,12 +616,12 @@ export default async function RotationPage({
               {completedCycles}
               <span className="text-base font-semibold text-black/30">
                 {" "}
-                / {cycleList.length || "—"}
+                / {cycleList.length || "â€”"}
               </span>
             </p>
           </div>
 
-          <div className="rounded-[1.75rem] border border-black/10 bg-white p-6">
+          <div className="rounded-[1.75rem] border border-[var(--tp-border)] bg-white p-6">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-black/35">
               First cycle
             </p>
@@ -640,11 +640,11 @@ export default async function RotationPage({
               <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
                 <div className="max-w-2xl">
                   <div className="flex flex-wrap items-center gap-3">
-                    <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-white/70">
+                    <span className="rounded-full bg-[var(--tp-surface-soft)] px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-[var(--tp-ink-soft)]">
                       Current round
                     </span>
 
-                    <span className="text-sm font-semibold text-white/45">
+                    <span className="text-sm font-semibold text-[var(--tp-faint)]">
                       Cycle{" "}
                       {currentCycle.cycle_number}
                       {" "}
@@ -653,7 +653,7 @@ export default async function RotationPage({
                     </span>
                   </div>
 
-                  <p className="mt-6 text-sm font-semibold text-white/45">
+                  <p className="mt-6 text-sm font-semibold text-[var(--tp-faint)]">
                     Receiving this round
                   </p>
 
@@ -662,7 +662,7 @@ export default async function RotationPage({
                       "Recipient"}
                   </h2>
 
-                  <p className="mt-3 text-white/50">
+                  <p className="mt-3 text-[var(--tp-muted)]">
                     Scheduled for{" "}
                     {formatDate(
                       currentCycle.scheduled_date
@@ -670,7 +670,7 @@ export default async function RotationPage({
                   </p>
 
                   {nextCycle && (
-                    <p className="mt-5 text-sm text-white/45">
+                    <p className="mt-5 text-sm text-[var(--tp-faint)]">
                       Next:{" "}
                       <span className="font-bold text-white">
                         {nextCycle.recipient_name}
@@ -684,8 +684,8 @@ export default async function RotationPage({
                 </div>
 
                 <div className="grid min-w-0 gap-3 sm:grid-cols-2 lg:w-[420px]">
-                  <div className="rounded-2xl bg-white/10 p-5">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-white/45">
+                  <div className="rounded-2xl bg-[var(--tp-surface-soft)] p-5">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[var(--tp-faint)]">
                       Expected pot
                     </p>
 
@@ -697,8 +697,8 @@ export default async function RotationPage({
                     </p>
                   </div>
 
-                  <div className="rounded-2xl bg-white/10 p-5">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-white/45">
+                  <div className="rounded-2xl bg-[var(--tp-surface-soft)] p-5">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[var(--tp-faint)]">
                       Collected
                     </p>
 
@@ -710,8 +710,8 @@ export default async function RotationPage({
                     </p>
                   </div>
 
-                  <div className="rounded-2xl bg-white/10 p-5">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-white/45">
+                  <div className="rounded-2xl bg-[var(--tp-surface-soft)] p-5">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[var(--tp-faint)]">
                       Paid members
                     </p>
 
@@ -724,8 +724,8 @@ export default async function RotationPage({
                     </p>
                   </div>
 
-                  <div className="rounded-2xl bg-white/10 p-5">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-white/45">
+                  <div className="rounded-2xl bg-[var(--tp-surface-soft)] p-5">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[var(--tp-faint)]">
                       Outstanding
                     </p>
 
@@ -738,7 +738,7 @@ export default async function RotationPage({
 
               <div className="mt-9">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="font-semibold text-white/45">
+                  <span className="font-semibold text-[var(--tp-faint)]">
                     Round progress
                   </span>
 
@@ -747,7 +747,7 @@ export default async function RotationPage({
                   </span>
                 </div>
 
-                <div className="mt-3 h-3 overflow-hidden rounded-full bg-white/10">
+                <div className="mt-3 h-3 overflow-hidden rounded-full bg-[var(--tp-surface-soft)]">
                   <div
                     className="h-full rounded-full bg-white transition-all"
                     style={{
@@ -756,7 +756,7 @@ export default async function RotationPage({
                   />
                 </div>
 
-                <div className="mt-3 flex flex-wrap justify-between gap-2 text-xs text-white/40">
+                <div className="mt-3 flex flex-wrap justify-between gap-2 text-xs text-[var(--tp-faint)]">
                   <span>
                     {formatMoney(
                       currentCycle.collected_amount,
@@ -777,7 +777,7 @@ export default async function RotationPage({
             </div>
           </section>
         ) : (
-          <section className="mt-8 rounded-[2rem] border border-dashed border-black/15 bg-white p-8 md:p-10">
+          <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] border-dashed border-black/15 bg-white p-8 md:p-10">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-black/35">
               No active round yet
             </p>
@@ -793,11 +793,11 @@ export default async function RotationPage({
         )}
 
         <section className="mt-8 grid gap-8 xl:grid-cols-[1.05fr_.95fr]">
-          <div className="rounded-[2rem] border border-black/10 bg-white p-6 md:p-8">
+          <div className="rounded-[2rem] border border-[var(--tp-border)] bg-white p-6 md:p-8">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-black/35">
-                  Rotation order
+                  Ajo order
                 </p>
 
                 <h2 className="mt-2 text-2xl font-black">
@@ -825,7 +825,7 @@ export default async function RotationPage({
 
                   <button
                     type="submit"
-                    className="h-11 rounded-full border border-black/10 bg-white px-5 text-sm font-bold transition hover:bg-black/5"
+                    className="h-11 rounded-full border border-[var(--tp-border)] bg-white px-5 text-sm font-bold transition hover:bg-[var(--tp-primary)]/5"
                   >
                     {memberOrderReady
                       ? "Refresh members"
@@ -890,10 +890,10 @@ export default async function RotationPage({
                           key={
                             member.id
                           }
-                          className={`grid gap-4 rounded-2xl border p-4 sm:grid-cols-[52px_1fr_120px] sm:items-center ${
+                          className={`grid gap-4 rounded-[1.5rem] border border-[var(--tp-border)] p-4 sm:grid-cols-[52px_1fr_120px] sm:items-center ${
                             isCurrent
-                              ? "border-black bg-black text-white"
-                              : "border-black/10 bg-white"
+                              ? "border-black bg-[var(--tp-primary)] text-white"
+                              : "border-[var(--tp-border)] bg-white"
                           }`}
                         >
                           <div
@@ -937,14 +937,14 @@ export default async function RotationPage({
                             <p
                               className={`mt-1 text-xs ${
                                 isCurrent
-                                  ? "text-white/45"
+                                  ? "text-[var(--tp-faint)]"
                                   : "text-black/40"
                               }`}
                             >
                               {memberCycle
                                 ? `${formatDate(
                                     memberCycle.scheduled_date
-                                  )} · ${friendlyText(
+                                  )} Â· ${friendlyText(
                                     memberCycle.status
                                   )}`
                                 : `Recipient position ${member.recipient_position}`}
@@ -961,8 +961,8 @@ export default async function RotationPage({
                             }
                             className={`rounded-xl border px-3 py-2 text-sm font-semibold outline-none ${
                               isCurrent
-                                ? "border-white/20 bg-white/10 text-white"
-                                : "border-black/10 bg-white text-black"
+                                ? "border-white/20 bg-[var(--tp-surface-soft)] text-white"
+                                : "border-[var(--tp-border)] bg-white text-black"
                             } disabled:cursor-not-allowed disabled:opacity-60`}
                           >
                             {memberList.map(
@@ -998,7 +998,7 @@ export default async function RotationPage({
                   <div className="mt-5 flex flex-wrap items-center gap-3">
                     <button
                       type="submit"
-                      className="h-11 rounded-full border border-black/10 bg-white px-5 text-sm font-bold transition hover:bg-black/5"
+                      className="h-11 rounded-full border border-[var(--tp-border)] bg-white px-5 text-sm font-bold transition hover:bg-[var(--tp-primary)]/5"
                     >
                       Save recipient order
                     </button>
@@ -1021,7 +1021,7 @@ export default async function RotationPage({
                   action={
                     generateRotationSchedule
                   }
-                  className="mt-6 border-t border-black/10 pt-6"
+                  className="mt-6 border-t border-[var(--tp-border)] pt-6"
                 >
                   <input
                     type="hidden"
@@ -1033,7 +1033,7 @@ export default async function RotationPage({
 
                   <button
                     type="submit"
-                    className="h-12 w-full rounded-full bg-black px-6 text-sm font-bold text-white transition hover:opacity-85"
+                    className="h-12 w-full rounded-full bg-[var(--tp-primary)] px-6 text-sm font-bold text-white transition hover:opacity-85"
                   >
                     Generate Ajo schedule
                   </button>
@@ -1042,9 +1042,9 @@ export default async function RotationPage({
           </div>
 
           <div className="space-y-8">
-            <section className="rounded-[2rem] border border-black/10 bg-white p-6 md:p-8">
+            <section className="rounded-[2rem] border border-[var(--tp-border)] bg-white p-6 md:p-8">
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-black/35">
-                Round economics
+                This round at a glance
               </p>
 
               <h2 className="mt-2 text-2xl font-black">
@@ -1053,7 +1053,7 @@ export default async function RotationPage({
 
               {currentCycle ? (
                 <div className="mt-6 space-y-4">
-                  <div className="flex items-center justify-between gap-4 border-b border-black/10 pb-4">
+                  <div className="flex items-center justify-between gap-4 border-b border-[var(--tp-border)] pb-4">
                     <span className="text-sm text-black/45">
                       Gross pot
                     </span>
@@ -1066,7 +1066,7 @@ export default async function RotationPage({
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between gap-4 border-b border-black/10 pb-4">
+                  <div className="flex items-center justify-between gap-4 border-b border-[var(--tp-border)] pb-4">
                     <span className="text-sm text-black/45">
                       Coordinator fee
                     </span>
@@ -1079,7 +1079,7 @@ export default async function RotationPage({
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between gap-4 border-b border-black/10 pb-4">
+                  <div className="flex items-center justify-between gap-4 border-b border-[var(--tp-border)] pb-4">
                     <span className="text-sm text-black/45">
                       Threeple fee
                     </span>
@@ -1092,7 +1092,7 @@ export default async function RotationPage({
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between gap-4 border-b border-black/10 pb-4">
+                  <div className="flex items-center justify-between gap-4 border-b border-[var(--tp-border)] pb-4">
                     <span className="text-sm text-black/45">
                       Processor fee
                     </span>
@@ -1120,14 +1120,14 @@ export default async function RotationPage({
                 </div>
               ) : (
                 <p className="mt-5 text-sm leading-6 text-black/45">
-                  Round economics will appear after the schedule is generated.
+                  This round at a glance will appear after the schedule is generated.
                 </p>
               )}
             </section>
 
-            <section className="rounded-[2rem] border border-black/10 bg-white p-6 md:p-8">
+            <section className="rounded-[2rem] border border-[var(--tp-border)] bg-white p-6 md:p-8">
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-black/35">
-                Ajo settings
+                Ajo setup
               </p>
 
               <div className="mt-5 space-y-4">
@@ -1169,7 +1169,7 @@ export default async function RotationPage({
                           settings?.coordinator_fee_mode
                         )}: ${
                           settings?.coordinator_fee_value ??
-                          "—"
+                          "â€”"
                         }`}
                   </span>
                 </div>
@@ -1178,11 +1178,11 @@ export default async function RotationPage({
           </div>
         </section>
 
-        <section className="mt-8 rounded-[2rem] border border-black/10 bg-white p-6 md:p-8">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-white p-6 md:p-8">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-black/35">
-                Cycle history
+                Ajo history
               </p>
 
               <h2 className="mt-2 text-2xl font-black">
@@ -1241,10 +1241,10 @@ export default async function RotationPage({
                       key={
                         cycle.cycle_id
                       }
-                      className={`rounded-2xl border p-5 ${
+                      className={`rounded-[1.5rem] border border-[var(--tp-border)] p-5 ${
                         isCurrent
                           ? "border-black bg-[#f7f7f5]"
-                          : "border-black/10"
+                          : "border-[var(--tp-border)]"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-4">
@@ -1269,13 +1269,13 @@ export default async function RotationPage({
                         <span
                           className={`rounded-full px-3 py-1 text-xs font-bold ${
                             isCurrent
-                              ? "bg-black text-white"
+                              ? "bg-[var(--tp-primary)] text-white"
                               : cycle.status ===
                                     "settled" ||
                                   cycle.status ===
                                     "completed"
-                                ? "bg-green-100 text-green-700"
-                                : "bg-black/5 text-black/55"
+                                ? "bg-[var(--tp-success-soft)] text-[var(--tp-success)]"
+                                : "bg-[var(--tp-primary)]/5 text-black/55"
                           }`}
                         >
                           {isCurrent
@@ -1301,9 +1301,9 @@ export default async function RotationPage({
                         </span>
                       </div>
 
-                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-black/5">
+                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--tp-primary)]/5">
                         <div
-                          className="h-full rounded-full bg-black"
+                          className="h-full rounded-full bg-[var(--tp-primary)]"
                           style={{
                             width: `${cycleProgress}%`,
                           }}
@@ -1348,3 +1348,4 @@ export default async function RotationPage({
     </main>
   );
 }
+
