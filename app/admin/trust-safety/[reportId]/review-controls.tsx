@@ -1,4 +1,4 @@
-import {
+﻿import {
   startTrustSafetyReview,
 } from "./actions";
 
@@ -14,12 +14,12 @@ export default function ReviewControls({
   return (
     <section className="mt-8 rounded-3xl border border-amber-200 bg-amber-50 p-6 md:p-8">
 
-      <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">
+      <p className="text-xs font-black uppercase tracking-[0.14em] text-amber-700">
         Investigation Control
       </p>
 
-      <h2 className="mt-2 text-xl font-semibold text-amber-950">
-        Start Review
+      <h2 className="mt-2 text-xl font-black tracking-tight text-amber-950">
+        Start review
       </h2>
 
       <p className="mt-2 max-w-3xl text-sm leading-6 text-amber-800">
@@ -119,7 +119,7 @@ export default function ReviewControls({
 
           <div className="mt-4 rounded-2xl border border-amber-300 bg-white p-5">
 
-            <p className="text-sm leading-6 text-neutral-700">
+            <p className="text-sm leading-6 text-[var(--tp-ink-soft)]">
               This will assign the
               case to your admin
               account and change its
@@ -131,9 +131,9 @@ export default function ReviewControls({
 
             <button
               type="submit"
-              className="mt-4 inline-flex h-11 items-center justify-center rounded-xl bg-black px-5 text-sm font-semibold text-white hover:bg-neutral-800"
+              className="mt-4 inline-flex h-11 items-center justify-center rounded-xl bg-[var(--tp-primary)] px-5 text-sm font-semibold text-white hover:bg-neutral-800"
             >
-              Start Review
+              Start review
             </button>
 
           </div>

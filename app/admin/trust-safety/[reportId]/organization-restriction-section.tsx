@@ -225,7 +225,7 @@ export default function OrganizationRestrictionSection({
             Active Organization Restriction
           </p>
 
-          <h2 className="mt-2 text-xl font-semibold text-red-950">
+          <h2 className="mt-2 text-xl font-black tracking-tight text-red-950">
             Organization Restricted
           </h2>
 
@@ -239,7 +239,7 @@ export default function OrganizationRestrictionSection({
         <div className="px-6 py-6 md:px-8">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                 Restriction Type
               </p>
 
@@ -251,7 +251,7 @@ export default function OrganizationRestrictionSection({
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                 Imposed
               </p>
 
@@ -263,22 +263,22 @@ export default function OrganizationRestrictionSection({
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                 Restriction ID
               </p>
 
-              <p className="mt-2 break-all font-mono text-xs text-neutral-500">
+              <p className="mt-2 break-all font-mono text-xs text-[var(--tp-muted)]">
                 {restriction.id}
               </p>
             </div>
           </div>
 
-          <div className="mt-6 rounded-2xl border bg-neutral-50 p-5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+          <div className="mt-6 rounded-2xl border bg-[var(--tp-bg-soft)] p-5">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
               Reason
             </p>
 
-            <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-neutral-700">
+            <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[var(--tp-ink-soft)]">
               {restriction.reason}
             </p>
           </div>
@@ -323,7 +323,7 @@ export default function OrganizationRestrictionSection({
               className="mt-2 min-h-28 w-full rounded-2xl border px-4 py-3 text-sm outline-none focus:border-neutral-500"
             />
 
-            <label className="mt-4 flex items-start gap-3 text-sm text-neutral-700">
+            <label className="mt-4 flex items-start gap-3 text-sm text-[var(--tp-ink-soft)]">
               <input
                 type="checkbox"
                 checked={
@@ -369,11 +369,11 @@ export default function OrganizationRestrictionSection({
         Organization Enforcement
       </p>
 
-      <h2 className="mt-2 text-xl font-semibold">
+      <h2 className="mt-2 text-xl font-black tracking-tight">
         Restrict Organization
       </h2>
 
-      <p className="mt-2 max-w-3xl text-sm leading-6 text-neutral-600">
+      <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--tp-ink-soft)]">
         Apply a scoped platform
         restriction to {organizationLabel}.
       </p>
@@ -426,7 +426,7 @@ export default function OrganizationRestrictionSection({
           </option>
         </select>
 
-        <div className="mt-4 rounded-2xl border bg-neutral-50 p-4 text-sm leading-6 text-neutral-600">
+        <div className="mt-4 rounded-2xl border bg-[var(--tp-bg-soft)] p-4 text-sm leading-6 text-[var(--tp-ink-soft)]">
           <strong>
             New Collection Block:
           </strong>{" "}
@@ -462,7 +462,7 @@ export default function OrganizationRestrictionSection({
           className="mt-2 min-h-28 w-full rounded-2xl border px-4 py-3 text-sm outline-none focus:border-neutral-500"
         />
 
-        <label className="mt-4 flex items-start gap-3 text-sm text-neutral-700">
+        <label className="mt-4 flex items-start gap-3 text-sm text-[var(--tp-ink-soft)]">
           <input
             type="checkbox"
             checked={
@@ -493,4 +493,5 @@ export default function OrganizationRestrictionSection({
     </section>
   );
 }
+
 

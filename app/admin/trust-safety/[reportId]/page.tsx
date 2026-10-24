@@ -81,22 +81,22 @@ function statusStyle(
 ) {
   switch (status) {
     case "open":
-      return "bg-blue-100 text-blue-700";
+      return "bg-[var(--tp-info-soft)] text-[var(--tp-info)]";
 
     case "under_review":
-      return "bg-amber-100 text-amber-700";
+      return "bg-[var(--tp-warning-soft)] text-[var(--tp-warning)]";
 
     case "action_required":
-      return "bg-red-100 text-red-700";
+      return "bg-[var(--tp-danger-soft)] text-[var(--tp-danger)]";
 
     case "resolved":
-      return "bg-green-100 text-green-700";
+      return "bg-[var(--tp-success-soft)] text-[var(--tp-success)]";
 
     case "dismissed":
-      return "bg-neutral-200 text-neutral-600";
+      return "bg-neutral-200 text-[var(--tp-ink-soft)]";
 
     default:
-      return "bg-neutral-100 text-neutral-600";
+      return "bg-[var(--tp-bg-soft)] text-[var(--tp-ink-soft)]";
   }
 }
 
@@ -105,19 +105,19 @@ function priorityStyle(
 ) {
   switch (priority) {
     case "urgent":
-      return "bg-red-700 text-white";
+      return "bg-[var(--tp-danger)] text-white";
 
     case "high":
-      return "bg-red-100 text-red-700";
+      return "bg-[var(--tp-danger-soft)] text-[var(--tp-danger)]";
 
     case "normal":
-      return "bg-blue-100 text-blue-700";
+      return "bg-[var(--tp-info-soft)] text-[var(--tp-info)]";
 
     case "low":
-      return "bg-neutral-100 text-neutral-600";
+      return "bg-[var(--tp-bg-soft)] text-[var(--tp-ink-soft)]";
 
     default:
-      return "bg-neutral-100 text-neutral-600";
+      return "bg-[var(--tp-bg-soft)] text-[var(--tp-ink-soft)]";
   }
 }
 
@@ -174,7 +174,7 @@ function resultMessage(
       return {
         type: "success",
         text:
-          "Investigation completed. This case is now marked Action Required.",
+          "Investigation completed. This case is now marked Action required.",
       };
 
     case "resolved":
@@ -440,7 +440,7 @@ function resultMessage(
       return {
         type: "info",
         text:
-          "This case is no longer eligible for resolution from the Action Required stage.",
+          "This case is no longer eligible for resolution from the Action required stage.",
       };
 
     case "active_restriction_remaining":
@@ -467,13 +467,13 @@ function resultStyle(
 ) {
   switch (type) {
     case "success":
-      return "border-green-200 bg-green-50 text-green-800";
+      return "border-green-200 bg-[var(--tp-success-soft)] text-[var(--tp-success)]";
 
     case "error":
-      return "border-red-200 bg-red-50 text-red-700";
+      return "border-red-200 bg-[var(--tp-danger-soft)] text-[var(--tp-danger)]";
 
     default:
-      return "border-blue-200 bg-blue-50 text-blue-700";
+      return "border-blue-200 bg-[var(--tp-info-soft)] text-[var(--tp-info)]";
   }
 }
 
@@ -1239,13 +1239,13 @@ export default async function TrustSafetyCasePage({
   // =======================================================
 
   return (
-    <main className="min-h-screen bg-neutral-50 text-neutral-900">
+    <main className="min-h-screen bg-[var(--tp-bg)] text-[var(--tp-ink)]">
 
       {/* ================================================= */}
       {/* HEADER */}
       {/* ================================================= */}
 
-      <header className="border-b bg-neutral-950 text-white">
+      <header className="border-b border-[var(--tp-border)] bg-[var(--tp-surface)] text-[var(--tp-ink)]">
 
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
 
@@ -1253,12 +1253,12 @@ export default async function TrustSafetyCasePage({
             href="/admin"
           >
 
-            <div className="text-2xl font-bold tracking-tight">
+            <div className="text-2xl font-black tracking-tight text-[var(--tp-primary)]">
               Threeple
             </div>
 
-            <p className="text-xs text-neutral-400">
-              Platform Administration
+            <p className="text-xs text-[var(--tp-faint)]">
+              Threeple Operations
             </p>
 
           </Link>
@@ -1269,7 +1269,7 @@ export default async function TrustSafetyCasePage({
               {admin.fullName}
             </p>
 
-            <p className="mt-0.5 text-xs text-neutral-400">
+            <p className="mt-0.5 text-xs text-[var(--tp-faint)]">
               {friendlyText(
                 admin.role
               )}
@@ -1281,7 +1281,7 @@ export default async function TrustSafetyCasePage({
 
       </header>
 
-      <div className="mx-auto max-w-7xl px-6 py-10">
+      <div className="mx-auto max-w-7xl px-4 pb-28 pt-6 sm:px-6 sm:pb-10 sm:pt-8 lg:px-8 lg:py-10">
 
         {/* ================================================= */}
         {/* BACK */}
@@ -1289,7 +1289,7 @@ export default async function TrustSafetyCasePage({
 
         <Link
           href="/admin/trust-safety"
-          className="text-sm font-medium text-neutral-500 hover:text-black"
+          className="text-sm font-medium text-[var(--tp-muted)] hover:text-black"
         >
           ← Trust & Safety Cases
         </Link>
@@ -1350,11 +1350,11 @@ export default async function TrustSafetyCasePage({
 
               </div>
 
-              <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-neutral-400">
+              <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--tp-faint)]">
                 Trust & Safety Case
               </p>
 
-              <h1 className="mt-3 font-mono text-2xl font-semibold tracking-tight md:text-3xl">
+              <h1 className="mt-3 font-mono text-2xl font-black tracking-tight tracking-tight md:text-3xl">
                 {
                   report.report_reference
                 }
@@ -1368,9 +1368,9 @@ export default async function TrustSafetyCasePage({
 
             </div>
 
-            <div className="rounded-2xl border bg-white p-5 lg:min-w-[260px]">
+            <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5 lg:min-w-[260px]">
 
-              <p className="text-xs uppercase tracking-wide text-neutral-400">
+              <p className="text-xs uppercase tracking-wide text-[var(--tp-faint)]">
                 Case Created
               </p>
 
@@ -1380,7 +1380,7 @@ export default async function TrustSafetyCasePage({
                 )}
               </p>
 
-              <p className="mt-4 text-xs uppercase tracking-wide text-neutral-400">
+              <p className="mt-4 text-xs uppercase tracking-wide text-[var(--tp-faint)]">
                 Last Updated
               </p>
 
@@ -1431,12 +1431,12 @@ export default async function TrustSafetyCasePage({
           "action_required" && (
           <section className="mt-8 rounded-3xl border border-red-200 bg-red-50 p-6 md:p-8">
 
-            <p className="text-xs font-semibold uppercase tracking-wide text-red-700">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-red-700">
               Platform Intervention
             </p>
 
-            <h2 className="mt-2 text-xl font-semibold text-red-950">
-              Action Required
+            <h2 className="mt-2 text-xl font-black tracking-tight text-red-950">
+              Action required
             </h2>
 
             <p className="mt-2 max-w-3xl text-sm leading-6 text-red-800">
@@ -1563,17 +1563,17 @@ export default async function TrustSafetyCasePage({
         {/* DESCRIPTION */}
         {/* ================================================= */}
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
 
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
             Report
           </p>
 
-          <h2 className="mt-2 text-xl font-semibold">
+          <h2 className="mt-2 text-xl font-black tracking-tight">
             Reported Concern
           </h2>
 
-          <p className="mt-5 whitespace-pre-wrap leading-7 text-neutral-700">
+          <p className="mt-5 whitespace-pre-wrap leading-7 text-[var(--tp-ink-soft)]">
             {report.description}
           </p>
 
@@ -1585,9 +1585,9 @@ export default async function TrustSafetyCasePage({
 
         <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
-          <div className="rounded-2xl border bg-white p-5">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5">
 
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
+            <p className="text-xs uppercase tracking-wide text-[var(--tp-faint)]">
               Status
             </p>
 
@@ -1599,9 +1599,9 @@ export default async function TrustSafetyCasePage({
 
           </div>
 
-          <div className="rounded-2xl border bg-white p-5">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5">
 
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
+            <p className="text-xs uppercase tracking-wide text-[var(--tp-faint)]">
               Priority
             </p>
 
@@ -1613,9 +1613,9 @@ export default async function TrustSafetyCasePage({
 
           </div>
 
-          <div className="rounded-2xl border bg-white p-5">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5">
 
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
+            <p className="text-xs uppercase tracking-wide text-[var(--tp-faint)]">
               Subject Type
             </p>
 
@@ -1627,9 +1627,9 @@ export default async function TrustSafetyCasePage({
 
           </div>
 
-          <div className="rounded-2xl border bg-white p-5">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5">
 
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
+            <p className="text-xs uppercase tracking-wide text-[var(--tp-faint)]">
               Assignment
             </p>
 
@@ -1650,19 +1650,19 @@ export default async function TrustSafetyCasePage({
         {/* SUBJECT */}
         {/* ================================================= */}
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
 
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
             Subject
           </p>
 
-          <h2 className="mt-2 text-xl font-semibold">
+          <h2 className="mt-2 text-xl font-black tracking-tight">
             Reported Entity
           </h2>
 
           <div className="mt-6">
 
-            <p className="text-xs text-neutral-400">
+            <p className="text-xs text-[var(--tp-faint)]">
               Type
             </p>
 
@@ -1676,7 +1676,7 @@ export default async function TrustSafetyCasePage({
 
           <div className="mt-5">
 
-            <p className="text-xs text-neutral-400">
+            <p className="text-xs text-[var(--tp-faint)]">
               Name
             </p>
 
@@ -1686,7 +1686,7 @@ export default async function TrustSafetyCasePage({
 
           </div>
 
-          <p className="mt-3 break-all font-mono text-xs text-neutral-400">
+          <p className="mt-3 break-all font-mono text-xs text-[var(--tp-faint)]">
             {report.subject_id}
           </p>
 
@@ -1695,7 +1695,7 @@ export default async function TrustSafetyCasePage({
               href={
                 subjectLink
               }
-              className="mt-5 inline-flex h-10 items-center justify-center rounded-xl border border-neutral-300 px-4 text-sm font-semibold hover:bg-neutral-50"
+              className="mt-5 inline-flex h-10 items-center justify-center rounded-xl border border-[var(--tp-border-strong)] px-4 text-sm font-semibold hover:bg-[var(--tp-bg-soft)]"
             >
               View Subject →
             </Link>
@@ -1707,13 +1707,13 @@ export default async function TrustSafetyCasePage({
         {/* REPORTER */}
         {/* ================================================= */}
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
 
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
             Reporter
           </p>
 
-          <h2 className="mt-2 text-xl font-semibold">
+          <h2 className="mt-2 text-xl font-black tracking-tight">
             Reporter Information
           </h2>
 
@@ -1721,7 +1721,7 @@ export default async function TrustSafetyCasePage({
 
             <div>
 
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Name
               </p>
 
@@ -1735,7 +1735,7 @@ export default async function TrustSafetyCasePage({
 
             <div>
 
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Email
               </p>
 
@@ -1748,7 +1748,7 @@ export default async function TrustSafetyCasePage({
 
             <div>
 
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Account
               </p>
 
@@ -1776,17 +1776,17 @@ export default async function TrustSafetyCasePage({
         {/* ================================================= */}
 
         {collection && (
-          <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
+          <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 
               <div>
 
-                <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+                <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                   Linked Collection
                 </p>
 
-                <h2 className="mt-2 text-xl font-semibold">
+                <h2 className="mt-2 text-xl font-black tracking-tight">
                   {collection.title}
                 </h2>
 
@@ -1804,7 +1804,7 @@ export default async function TrustSafetyCasePage({
 
               <div>
 
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-[var(--tp-faint)]">
                   Threeple Code
                 </p>
 
@@ -1817,7 +1817,7 @@ export default async function TrustSafetyCasePage({
 
               <div>
 
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-[var(--tp-faint)]">
                   Type
                 </p>
 
@@ -1831,7 +1831,7 @@ export default async function TrustSafetyCasePage({
 
               <div>
 
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-[var(--tp-faint)]">
                   Status
                 </p>
 
@@ -1847,7 +1847,7 @@ export default async function TrustSafetyCasePage({
 
               <div>
 
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-[var(--tp-faint)]">
                   Organizer
                 </p>
 
@@ -1864,14 +1864,14 @@ export default async function TrustSafetyCasePage({
 
               <Link
                 href={`/admin/collections/${collection.id}`}
-                className="inline-flex h-10 items-center justify-center rounded-xl bg-black px-4 text-sm font-semibold text-white"
+                className="inline-flex h-10 items-center justify-center rounded-xl bg-[var(--tp-primary)] px-4 text-sm font-semibold text-white"
               >
                 View Collection
               </Link>
 
               <Link
                 href={`/admin/users/${collection.created_by}`}
-                className="inline-flex h-10 items-center justify-center rounded-xl border border-neutral-300 px-4 text-sm font-semibold hover:bg-neutral-50"
+                className="inline-flex h-10 items-center justify-center rounded-xl border border-[var(--tp-border-strong)] px-4 text-sm font-semibold hover:bg-[var(--tp-bg-soft)]"
               >
                 View Organizer
               </Link>
@@ -1885,14 +1885,14 @@ export default async function TrustSafetyCasePage({
         {/* ASSIGNMENT */}
         {/* ================================================= */}
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
 
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-            Case Assignment
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
+            Case ownership
           </p>
 
-          <h2 className="mt-2 text-xl font-semibold">
-            Investigation Ownership
+          <h2 className="mt-2 text-xl font-black tracking-tight">
+            Investigation owner
           </h2>
 
           {assignedAdmin ? (
@@ -1903,13 +1903,13 @@ export default async function TrustSafetyCasePage({
                   "Threeple Admin"}
               </p>
 
-              <p className="mt-1 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-[var(--tp-muted)]">
                 {friendlyText(
                   assignedAdmin.role
                 )}
               </p>
 
-              <p className="mt-2 text-xs text-neutral-400">
+              <p className="mt-2 text-xs text-[var(--tp-faint)]">
                 {assignedAdmin.is_active
                   ? "Admin account active"
                   : "Admin account inactive"}
@@ -1942,13 +1942,13 @@ export default async function TrustSafetyCasePage({
           "resolved" ||
           report.status ===
             "dismissed") && (
-          <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
+          <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
 
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
               Resolution
             </p>
 
-            <h2 className="mt-2 text-xl font-semibold">
+            <h2 className="mt-2 text-xl font-black tracking-tight">
               Case Outcome
             </h2>
 
@@ -1956,7 +1956,7 @@ export default async function TrustSafetyCasePage({
 
               <div>
 
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-[var(--tp-faint)]">
                   Outcome
                 </p>
 
@@ -1970,7 +1970,7 @@ export default async function TrustSafetyCasePage({
 
               <div>
 
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-[var(--tp-faint)]">
                   Completed
                 </p>
 
@@ -1984,7 +1984,7 @@ export default async function TrustSafetyCasePage({
 
               <div>
 
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-[var(--tp-faint)]">
                   Completed By
                 </p>
 
@@ -1999,11 +1999,11 @@ export default async function TrustSafetyCasePage({
 
             <div className="mt-6">
 
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Resolution Notes
               </p>
 
-              <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-neutral-700">
+              <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[var(--tp-ink-soft)]">
                 {report.resolution_notes ||
                   "No resolution notes recorded."}
               </p>
@@ -2018,7 +2018,7 @@ export default async function TrustSafetyCasePage({
         {/* ================================================= */}
 
         {collection && (
-          <section className="mt-8 overflow-hidden rounded-3xl border bg-white">
+          <section className="mt-8 overflow-hidden rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)]">
 
             <div className="border-b px-6 py-5">
 
@@ -2026,7 +2026,7 @@ export default async function TrustSafetyCasePage({
                 Related Collection Activity
               </h2>
 
-              <p className="mt-1 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-[var(--tp-muted)]">
                 Recent Collection
                 events that may help
                 with this investigation.
@@ -2057,7 +2057,7 @@ export default async function TrustSafetyCasePage({
                             )}
                           </p>
 
-                          <p className="mt-2 text-sm leading-6 text-neutral-600">
+                          <p className="mt-2 text-sm leading-6 text-[var(--tp-ink-soft)]">
                             {event.description ||
                               event.subject_label ||
                               "Collection activity"}
@@ -2065,7 +2065,7 @@ export default async function TrustSafetyCasePage({
 
                         </div>
 
-                        <time className="whitespace-nowrap text-xs text-neutral-400">
+                        <time className="whitespace-nowrap text-xs text-[var(--tp-faint)]">
                           {formatDateTime(
                             event.created_at
                           )}
@@ -2079,7 +2079,7 @@ export default async function TrustSafetyCasePage({
 
               </div>
             ) : (
-              <div className="px-6 py-10 text-sm text-neutral-500">
+              <div className="px-6 py-10 text-sm text-[var(--tp-muted)]">
                 No related Collection
                 activity recorded.
               </div>
@@ -2092,7 +2092,7 @@ export default async function TrustSafetyCasePage({
         {/* ADMIN ACTION HISTORY */}
         {/* ================================================= */}
 
-        <section className="mt-8 overflow-hidden rounded-3xl border bg-white">
+        <section className="mt-8 overflow-hidden rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)]">
 
           <div className="border-b px-6 py-5">
 
@@ -2100,7 +2100,7 @@ export default async function TrustSafetyCasePage({
               Administrative Action History
             </h2>
 
-            <p className="mt-1 text-sm text-neutral-500">
+            <p className="mt-1 text-sm text-[var(--tp-muted)]">
               Audited administrative
               actions associated with
               this case.
@@ -2131,11 +2131,11 @@ export default async function TrustSafetyCasePage({
                           )}
                         </p>
 
-                        <p className="mt-2 text-sm leading-6 text-neutral-600">
+                        <p className="mt-2 text-sm leading-6 text-[var(--tp-ink-soft)]">
                           {action.reason}
                         </p>
 
-                        <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-neutral-400">
+                        <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-[var(--tp-faint)]">
 
                           <span>
                             By{" "}
@@ -2158,7 +2158,7 @@ export default async function TrustSafetyCasePage({
 
                       </div>
 
-                      <time className="whitespace-nowrap text-xs text-neutral-400">
+                      <time className="whitespace-nowrap text-xs text-[var(--tp-faint)]">
                         {formatDateTime(
                           action.created_at
                         )}
@@ -2179,7 +2179,7 @@ export default async function TrustSafetyCasePage({
                 actions recorded
               </p>
 
-              <p className="mt-2 text-sm text-neutral-500">
+              <p className="mt-2 text-sm text-[var(--tp-muted)]">
                 Administrative actions
                 will appear here when
                 an authorized Threeple
@@ -2195,17 +2195,17 @@ export default async function TrustSafetyCasePage({
         {/* SAFETY BOUNDARY */}
         {/* ================================================= */}
 
-        <section className="mt-8 rounded-3xl bg-neutral-950 p-6 text-white md:p-8">
+        <section className="mt-8 rounded-3xl bg-[var(--tp-primary)] p-6 text-white md:p-8">
 
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-            Administrative Boundary
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
+            Admin safeguard
           </p>
 
-          <h2 className="mt-2 text-xl font-semibold">
-            Investigation does not automatically equal enforcement
+          <h2 className="mt-2 text-xl font-black tracking-tight">
+            Investigation and enforcement remain separate
           </h2>
 
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-neutral-300">
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--tp-ink-soft)]">
             Starting or triaging a
             Trust & Safety case does
             not automatically suspend
@@ -2225,4 +2225,5 @@ export default async function TrustSafetyCasePage({
     </main>
   );
 }
+
 

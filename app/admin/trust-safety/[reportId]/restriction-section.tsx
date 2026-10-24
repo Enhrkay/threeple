@@ -297,7 +297,7 @@ export default function RestrictionSection({
                 Active Platform Restriction
               </p>
 
-              <h2 className="mt-2 text-xl font-semibold text-red-950">
+              <h2 className="mt-2 text-xl font-black tracking-tight text-red-950">
                 Collection Restricted
               </h2>
 
@@ -333,11 +333,11 @@ export default function RestrictionSection({
 
             <div>
 
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                 Restriction Type
               </p>
 
-              <p className="mt-2 text-sm font-semibold text-neutral-900">
+              <p className="mt-2 text-sm font-semibold text-[var(--tp-ink)]">
                 {friendlyText(
                   restriction.restriction_type
                 )}
@@ -347,11 +347,11 @@ export default function RestrictionSection({
 
             <div>
 
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                 Imposed
               </p>
 
-              <p className="mt-2 text-sm font-semibold text-neutral-900">
+              <p className="mt-2 text-sm font-semibold text-[var(--tp-ink)]">
                 {formatDateTime(
                   restriction.imposed_at
                 )}
@@ -361,11 +361,11 @@ export default function RestrictionSection({
 
             <div>
 
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                 Restriction ID
               </p>
 
-              <p className="mt-2 break-all font-mono text-xs text-neutral-500">
+              <p className="mt-2 break-all font-mono text-xs text-[var(--tp-muted)]">
                 {restriction.id}
               </p>
 
@@ -377,13 +377,13 @@ export default function RestrictionSection({
           {/* ORIGINAL REASON */}
           {/* ============================================= */}
 
-          <div className="mt-6 rounded-2xl border bg-neutral-50 p-5">
+          <div className="mt-6 rounded-2xl border bg-[var(--tp-bg-soft)] p-5">
 
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
               Reason for Restriction
             </p>
 
-            <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-neutral-700">
+            <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[var(--tp-ink-soft)]">
               {restriction.reason}
             </p>
 
@@ -395,7 +395,7 @@ export default function RestrictionSection({
 
           <div className="mt-8 border-t pt-8">
 
-            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-neutral-400">
+            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--tp-faint)]">
               Administrative Action
             </p>
 
@@ -403,7 +403,7 @@ export default function RestrictionSection({
               Lift Collection Restriction
             </h3>
 
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-neutral-600">
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--tp-ink-soft)]">
               Only lift this restriction
               after confirming that the
               underlying Trust & Safety
@@ -461,12 +461,12 @@ export default function RestrictionSection({
 
                 <label
                   htmlFor="lift-restriction-reason"
-                  className="text-sm font-semibold text-neutral-900"
+                  className="text-sm font-semibold text-[var(--tp-ink)]"
                 >
                   Reason for lifting the restriction
                 </label>
 
-                <p className="mt-1 text-xs leading-5 text-neutral-500">
+                <p className="mt-1 text-xs leading-5 text-[var(--tp-muted)]">
                   Required. State why the
                   Collection can safely
                   return to normal
@@ -497,10 +497,10 @@ export default function RestrictionSection({
                     5
                   }
                   placeholder="Example: Investigation completed. The identified issue has been addressed and the Collection can safely resume normal operation."
-                  className="mt-3 w-full resize-y rounded-2xl border border-neutral-300 bg-white px-4 py-3 text-sm leading-6 text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+                  className="mt-3 w-full resize-y rounded-2xl border border-[var(--tp-border-strong)] bg-white px-4 py-3 text-sm leading-6 text-[var(--tp-ink)] outline-none transition placeholder:text-[var(--tp-faint)] focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
                 />
 
-                <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-neutral-400">
+                <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--tp-faint)]">
 
                   <span>
                     Minimum 10 characters
@@ -516,7 +516,7 @@ export default function RestrictionSection({
 
               </div>
 
-              <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-4">
+              <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-2xl border border-[var(--tp-border)] bg-[var(--tp-bg-soft)] p-4">
 
                 <input
                   type="checkbox"
@@ -535,11 +535,11 @@ export default function RestrictionSection({
 
                 <span>
 
-                  <span className="block text-sm font-semibold text-neutral-900">
+                  <span className="block text-sm font-semibold text-[var(--tp-ink)]">
                     Confirm administrative decision
                   </span>
 
-                  <span className="mt-1 block text-sm leading-6 text-neutral-600">
+                  <span className="mt-1 block text-sm leading-6 text-[var(--tp-ink-soft)]">
                     I have reviewed this
                     Trust & Safety case and
                     understand that lifting
@@ -558,7 +558,7 @@ export default function RestrictionSection({
 
                 <LiftRestrictionButton />
 
-                <p className="text-xs leading-5 text-neutral-400">
+                <p className="text-xs leading-5 text-[var(--tp-faint)]">
                   This action is audited
                   and cannot erase the
                   original restriction
@@ -604,13 +604,13 @@ export default function RestrictionSection({
               Platform Intervention
             </p>
 
-            <h2 className="mt-2 text-xl font-semibold text-amber-950">
+            <h2 className="mt-2 text-xl font-black tracking-tight text-amber-950">
               Restrict Collection
             </h2>
 
             <p className="mt-2 max-w-3xl text-sm leading-6 text-amber-800">
               This Trust & Safety case
-              is marked Action Required.
+              is marked Action required.
               An authorized administrator
               may now apply a temporary
               Collection restriction if
@@ -621,7 +621,7 @@ export default function RestrictionSection({
           </div>
 
           <span className="inline-flex w-fit rounded-full bg-amber-700 px-3 py-1 text-xs font-semibold text-white">
-            Action Required
+            Action required
           </span>
 
         </div>
@@ -634,7 +634,7 @@ export default function RestrictionSection({
 
       <div className="px-6 py-6 md:px-8">
 
-        <p className="text-xs font-semibold uppercase tracking-[0.15em] text-neutral-400">
+        <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--tp-faint)]">
           Administrative Enforcement
         </p>
 
@@ -642,7 +642,7 @@ export default function RestrictionSection({
           Apply Collection Restriction
         </h3>
 
-        <p className="mt-2 max-w-3xl text-sm leading-6 text-neutral-600">
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--tp-ink-soft)]">
           Choose the minimum restriction
           necessary to address the
           identified Trust & Safety
@@ -685,12 +685,12 @@ export default function RestrictionSection({
 
             <label
               htmlFor="restriction-type"
-              className="text-sm font-semibold text-neutral-900"
+              className="text-sm font-semibold text-[var(--tp-ink)]"
             >
               Restriction Type
             </label>
 
-            <p className="mt-1 text-xs leading-5 text-neutral-500">
+            <p className="mt-1 text-xs leading-5 text-[var(--tp-muted)]">
               Select the scope of the
               platform intervention.
             </p>
@@ -709,7 +709,7 @@ export default function RestrictionSection({
                 )
               }
               required
-              className="mt-3 h-12 w-full rounded-xl border border-neutral-300 bg-white px-4 text-sm font-medium text-neutral-900 outline-none transition focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+              className="mt-3 h-12 w-full rounded-xl border border-[var(--tp-border-strong)] bg-white px-4 text-sm font-medium text-[var(--tp-ink)] outline-none transition focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
             >
               <option value="join_block">
                 Join Block
@@ -730,16 +730,16 @@ export default function RestrictionSection({
           {/* TYPE EXPLANATION */}
           {/* ============================================= */}
 
-          <div className="mt-4 rounded-2xl border bg-neutral-50 p-5">
+          <div className="mt-4 rounded-2xl border bg-[var(--tp-bg-soft)] p-5">
 
             {restrictionType ===
               "join_block" && (
               <>
-                <p className="text-sm font-semibold text-neutral-900">
+                <p className="text-sm font-semibold text-[var(--tp-ink)]">
                   Join Block
                 </p>
 
-                <p className="mt-1 text-sm leading-6 text-neutral-600">
+                <p className="mt-1 text-sm leading-6 text-[var(--tp-ink-soft)]">
                   Prevents new participants
                   from joining the
                   Collection while allowing
@@ -752,11 +752,11 @@ export default function RestrictionSection({
             {restrictionType ===
               "organizer_changes_block" && (
               <>
-                <p className="text-sm font-semibold text-neutral-900">
+                <p className="text-sm font-semibold text-[var(--tp-ink)]">
                   Organizer Changes Block
                 </p>
 
-                <p className="mt-1 text-sm leading-6 text-neutral-600">
+                <p className="mt-1 text-sm leading-6 text-[var(--tp-ink-soft)]">
                   Prevents organizer-side
                   administrative changes
                   while the investigation or
@@ -768,11 +768,11 @@ export default function RestrictionSection({
             {restrictionType ===
               "full_collection" && (
               <>
-                <p className="text-sm font-semibold text-neutral-900">
+                <p className="text-sm font-semibold text-[var(--tp-ink)]">
                   Full Collection
                 </p>
 
-                <p className="mt-1 text-sm leading-6 text-neutral-600">
+                <p className="mt-1 text-sm leading-6 text-[var(--tp-ink-soft)]">
                   Applies the strongest
                   Collection-level
                   restriction. Use only when
@@ -793,12 +793,12 @@ export default function RestrictionSection({
 
             <label
               htmlFor="restrict-collection-reason"
-              className="text-sm font-semibold text-neutral-900"
+              className="text-sm font-semibold text-[var(--tp-ink)]"
             >
               Reason for restriction
             </label>
 
-            <p className="mt-1 text-xs leading-5 text-neutral-500">
+            <p className="mt-1 text-xs leading-5 text-[var(--tp-muted)]">
               Required. Explain why this
               specific restriction is
               justified by the Trust &
@@ -829,10 +829,10 @@ export default function RestrictionSection({
                 5
               }
               placeholder="Example: Investigation confirmed a material risk requiring a temporary Collection restriction while corrective action is completed."
-              className="mt-3 w-full resize-y rounded-2xl border border-neutral-300 bg-white px-4 py-3 text-sm leading-6 text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+              className="mt-3 w-full resize-y rounded-2xl border border-[var(--tp-border-strong)] bg-white px-4 py-3 text-sm leading-6 text-[var(--tp-ink)] outline-none transition placeholder:text-[var(--tp-faint)] focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
             />
 
-            <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-neutral-400">
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--tp-faint)]">
 
               <span>
                 Minimum 10 characters
@@ -872,7 +872,7 @@ export default function RestrictionSection({
           {/* CONFIRMATION */}
           {/* ============================================= */}
 
-          <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-4">
+          <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-2xl border border-[var(--tp-border)] bg-[var(--tp-bg-soft)] p-4">
 
             <input
               type="checkbox"
@@ -891,11 +891,11 @@ export default function RestrictionSection({
 
             <span>
 
-              <span className="block text-sm font-semibold text-neutral-900">
+              <span className="block text-sm font-semibold text-[var(--tp-ink)]">
                 Confirm enforcement decision
               </span>
 
-              <span className="mt-1 block text-sm leading-6 text-neutral-600">
+              <span className="mt-1 block text-sm leading-6 text-[var(--tp-ink-soft)]">
                 I have reviewed this
                 Trust & Safety case,
                 confirmed that platform
@@ -917,7 +917,7 @@ export default function RestrictionSection({
 
             <RestrictCollectionButton />
 
-            <p className="text-xs leading-5 text-neutral-400">
+            <p className="text-xs leading-5 text-[var(--tp-faint)]">
               The restriction can later
               be lifted by an authorized
               administrator, but its audit
@@ -933,3 +933,4 @@ export default function RestrictionSection({
     </section>
   );
 }
+

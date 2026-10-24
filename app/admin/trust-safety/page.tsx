@@ -103,22 +103,22 @@ function statusStyle(
 ) {
   switch (status) {
     case "open":
-      return "bg-blue-100 text-blue-700";
+      return "bg-[var(--tp-info-soft)] text-[var(--tp-info)]";
 
     case "under_review":
-      return "bg-amber-100 text-amber-700";
+      return "bg-[var(--tp-warning-soft)] text-[var(--tp-warning)]";
 
     case "action_required":
-      return "bg-red-100 text-red-700";
+      return "bg-[var(--tp-danger-soft)] text-[var(--tp-danger)]";
 
     case "resolved":
-      return "bg-green-100 text-green-700";
+      return "bg-[var(--tp-success-soft)] text-[var(--tp-success)]";
 
     case "dismissed":
-      return "bg-neutral-200 text-neutral-600";
+      return "bg-neutral-200 text-[var(--tp-ink-soft)]";
 
     default:
-      return "bg-neutral-100 text-neutral-600";
+      return "bg-[var(--tp-bg-soft)] text-[var(--tp-ink-soft)]";
   }
 }
 
@@ -127,19 +127,19 @@ function priorityStyle(
 ) {
   switch (priority) {
     case "urgent":
-      return "bg-red-700 text-white";
+      return "bg-[var(--tp-danger)] text-white";
 
     case "high":
-      return "bg-red-100 text-red-700";
+      return "bg-[var(--tp-danger-soft)] text-[var(--tp-danger)]";
 
     case "normal":
-      return "bg-blue-100 text-blue-700";
+      return "bg-[var(--tp-info-soft)] text-[var(--tp-info)]";
 
     case "low":
-      return "bg-neutral-100 text-neutral-600";
+      return "bg-[var(--tp-bg-soft)] text-[var(--tp-ink-soft)]";
 
     default:
-      return "bg-neutral-100 text-neutral-600";
+      return "bg-[var(--tp-bg-soft)] text-[var(--tp-ink-soft)]";
   }
 }
 
@@ -147,8 +147,8 @@ function filterStyle(
   active: boolean
 ) {
   return active
-    ? "bg-black text-white"
-    : "border border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50";
+    ? "bg-[var(--tp-primary)] text-white"
+    : "border border-[var(--tp-border-strong)] bg-white text-[var(--tp-ink-soft)] hover:bg-[var(--tp-bg-soft)]";
 }
 
 function buildCaseUrl(
@@ -706,23 +706,23 @@ export default async function TrustSafetyDashboardPage({
   // =======================================================
 
   return (
-    <main className="min-h-screen bg-neutral-50 text-neutral-900">
+    <main className="min-h-screen bg-[var(--tp-bg)] text-[var(--tp-ink)]">
 
       {/* HEADER */}
 
-      <header className="border-b bg-neutral-950 text-white">
+      <header className="border-b border-[var(--tp-border)] bg-[var(--tp-surface)] text-[var(--tp-ink)]">
 
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
 
           <Link
             href="/admin"
           >
-            <div className="text-2xl font-bold tracking-tight">
+            <div className="text-2xl font-black tracking-tight text-[var(--tp-primary)]">
               Threeple
             </div>
 
-            <p className="text-xs text-neutral-400">
-              Platform Administration
+            <p className="text-xs text-[var(--tp-faint)]">
+              Threeple Operations
             </p>
           </Link>
 
@@ -732,7 +732,7 @@ export default async function TrustSafetyDashboardPage({
               {admin.fullName}
             </p>
 
-            <p className="mt-0.5 text-xs text-neutral-400">
+            <p className="mt-0.5 text-xs text-[var(--tp-faint)]">
               {friendlyText(
                 admin.role
               )}
@@ -744,13 +744,13 @@ export default async function TrustSafetyDashboardPage({
 
       </header>
 
-      <div className="mx-auto max-w-7xl px-6 py-10">
+      <div className="mx-auto max-w-7xl px-4 pb-28 pt-6 sm:px-6 sm:pb-10 sm:pt-8 lg:px-8 lg:py-10">
 
         {/* BACK */}
 
         <Link
           href="/admin"
-          className="text-sm font-medium text-neutral-500 hover:text-black"
+          className="text-sm font-medium text-[var(--tp-muted)] hover:text-black"
         >
           ← Admin Dashboard
         </Link>
@@ -759,15 +759,15 @@ export default async function TrustSafetyDashboardPage({
 
         <section className="mt-6">
 
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-neutral-400">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--tp-faint)]">
             Trust & Safety
           </p>
 
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
+          <h1 className="mt-3 text-3xl font-black tracking-tight tracking-tight md:text-4xl">
             Case Management
           </h1>
 
-          <p className="mt-3 max-w-3xl leading-7 text-neutral-600">
+          <p className="mt-3 max-w-3xl leading-7 text-[var(--tp-ink-soft)]">
             Review reports involving
             users, organizations,
             Collections and
@@ -782,25 +782,25 @@ export default async function TrustSafetyDashboardPage({
 
         <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
 
-          <div className="rounded-2xl border bg-white p-5">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5">
 
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
               Open
             </p>
 
-            <p className="mt-3 text-3xl font-semibold">
+            <p className="mt-3 text-3xl font-black tracking-tight">
               {openCases}
             </p>
 
           </div>
 
-          <div className="rounded-2xl border bg-white p-5">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5">
 
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
               Under Review
             </p>
 
-            <p className="mt-3 text-3xl font-semibold">
+            <p className="mt-3 text-3xl font-black tracking-tight">
               {underReviewCases}
             </p>
 
@@ -815,35 +815,35 @@ export default async function TrustSafetyDashboardPage({
             }`}
           >
 
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-              Action Required
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
+              Action required
             </p>
 
-            <p className="mt-3 text-3xl font-semibold">
+            <p className="mt-3 text-3xl font-black tracking-tight">
               {actionRequiredCases}
             </p>
 
           </div>
 
-          <div className="rounded-2xl border bg-white p-5">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5">
 
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
               Resolved
             </p>
 
-            <p className="mt-3 text-3xl font-semibold">
+            <p className="mt-3 text-3xl font-black tracking-tight">
               {resolvedCases}
             </p>
 
           </div>
 
-          <div className="rounded-2xl border bg-white p-5">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5">
 
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
               Dismissed
             </p>
 
-            <p className="mt-3 text-3xl font-semibold">
+            <p className="mt-3 text-3xl font-black tracking-tight">
               {dismissedCases}
             </p>
 
@@ -857,11 +857,11 @@ export default async function TrustSafetyDashboardPage({
             }`}
           >
 
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
               Urgent Active
             </p>
 
-            <p className="mt-3 text-3xl font-semibold">
+            <p className="mt-3 text-3xl font-black tracking-tight">
               {urgentCases}
             </p>
 
@@ -871,7 +871,7 @@ export default async function TrustSafetyDashboardPage({
 
         {/* SEARCH */}
 
-        <section className="mt-8 rounded-3xl border bg-white p-6">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6">
 
           <form
             action="/admin/trust-safety"
@@ -896,7 +896,7 @@ export default async function TrustSafetyDashboardPage({
                   searchTerm
                 }
                 placeholder="Search reference, reporter or description..."
-                className="h-11 w-full rounded-xl border border-neutral-300 px-4 text-sm outline-none focus:border-black"
+                className="h-11 w-full rounded-xl border border-[var(--tp-border-strong)] px-4 text-sm outline-none focus:border-black"
               />
 
             </div>
@@ -925,7 +925,7 @@ export default async function TrustSafetyDashboardPage({
 
             <button
               type="submit"
-              className="inline-flex h-11 items-center justify-center rounded-xl bg-black px-5 text-sm font-semibold text-white hover:bg-neutral-800"
+              className="inline-flex h-11 items-center justify-center rounded-xl bg-[var(--tp-primary)] px-5 text-sm font-semibold text-white hover:bg-neutral-800"
             >
               Search
             </button>
@@ -937,7 +937,7 @@ export default async function TrustSafetyDashboardPage({
                 "all") && (
               <Link
                 href="/admin/trust-safety"
-                className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-300 px-5 text-sm font-semibold hover:bg-neutral-50"
+                className="inline-flex h-11 items-center justify-center rounded-xl border border-[var(--tp-border-strong)] px-5 text-sm font-semibold hover:bg-[var(--tp-bg-soft)]"
               >
                 Clear
               </Link>
@@ -951,7 +951,7 @@ export default async function TrustSafetyDashboardPage({
 
         <section className="mt-5">
 
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-neutral-400">
+          <p className="mb-3 text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
             Status
           </p>
 
@@ -966,7 +966,7 @@ export default async function TrustSafetyDashboardPage({
               ],
               [
                 "action_required",
-                "Action Required",
+                "Action required",
               ],
               [
                 "resolved",
@@ -1004,7 +1004,7 @@ export default async function TrustSafetyDashboardPage({
 
         <section className="mt-5">
 
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-neutral-400">
+          <p className="mb-3 text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
             Priority
           </p>
 
@@ -1042,7 +1042,7 @@ export default async function TrustSafetyDashboardPage({
 
         {/* CASES */}
 
-        <section className="mt-8 overflow-hidden rounded-3xl border bg-white">
+        <section className="mt-8 overflow-hidden rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)]">
 
           <div className="flex flex-col gap-2 border-b px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
 
@@ -1052,7 +1052,7 @@ export default async function TrustSafetyDashboardPage({
                 Trust & Safety Cases
               </h2>
 
-              <p className="mt-1 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-[var(--tp-muted)]">
                 Review and investigate
                 reported platform
                 concerns.
@@ -1060,7 +1060,7 @@ export default async function TrustSafetyDashboardPage({
 
             </div>
 
-            <p className="text-xs text-neutral-400">
+            <p className="text-xs text-[var(--tp-faint)]">
               Page{" "}
               {currentPage}
             </p>
@@ -1089,13 +1089,13 @@ export default async function TrustSafetyDashboardPage({
                           "resolved" ||
                         report.status ===
                           "dismissed"
-                          ? "bg-neutral-50/70 hover:bg-neutral-100"
+                          ? "bg-[var(--tp-bg-soft)]/70 hover:bg-[var(--tp-bg-soft)]"
                           : report.status ===
                               "action_required" ||
                             report.priority ===
                               "urgent"
                             ? "bg-red-50/40 hover:bg-red-50"
-                            : "hover:bg-neutral-50"
+                            : "hover:bg-[var(--tp-bg-soft)]"
                       }`}
                     >
 
@@ -1138,7 +1138,7 @@ export default async function TrustSafetyDashboardPage({
                               "resolved" ||
                               report.status ===
                                 "dismissed") && (
-                              <span className="rounded-full border border-neutral-300 bg-white px-2.5 py-1 text-xs font-semibold text-neutral-500">
+                              <span className="rounded-full border border-[var(--tp-border-strong)] bg-white px-2.5 py-1 text-xs font-semibold text-[var(--tp-muted)]">
                                 Closed
                               </span>
                             )}
@@ -1151,13 +1151,13 @@ export default async function TrustSafetyDashboardPage({
                             )}
                           </h3>
 
-                          <p className="mt-2 line-clamp-2 max-w-3xl text-sm leading-6 text-neutral-600">
+                          <p className="mt-2 line-clamp-2 max-w-3xl text-sm leading-6 text-[var(--tp-ink-soft)]">
                             {
                               report.description
                             }
                           </p>
 
-                          <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs text-neutral-500">
+                          <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs text-[var(--tp-muted)]">
 
                             <span>
                               Subject:{" "}
@@ -1197,7 +1197,7 @@ export default async function TrustSafetyDashboardPage({
 
                           <div>
 
-                            <p className="text-xs text-neutral-400 lg:text-right">
+                            <p className="text-xs text-[var(--tp-faint)] lg:text-right">
                               Assigned to
                             </p>
 
@@ -1214,7 +1214,7 @@ export default async function TrustSafetyDashboardPage({
 
                           <Link
                             href={`/admin/trust-safety/${report.id}`}
-                            className="inline-flex h-9 items-center justify-center rounded-lg border border-neutral-300 bg-white px-4 text-sm font-semibold hover:bg-neutral-100"
+                            className="inline-flex h-9 items-center justify-center rounded-lg border border-[var(--tp-border-strong)] bg-white px-4 text-sm font-semibold hover:bg-[var(--tp-bg-soft)]"
                           >
                             View Case →
                           </Link>
@@ -1232,7 +1232,7 @@ export default async function TrustSafetyDashboardPage({
           ) : (
             <div className="px-6 py-14 text-center">
 
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-neutral-100">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--tp-bg-soft)]">
                 ✓
               </div>
 
@@ -1240,7 +1240,7 @@ export default async function TrustSafetyDashboardPage({
                 No cases found
               </h3>
 
-              <p className="mt-2 text-sm text-neutral-500">
+              <p className="mt-2 text-sm text-[var(--tp-muted)]">
                 There are no Trust
                 & Safety reports
                 matching the current
@@ -1266,7 +1266,7 @@ export default async function TrustSafetyDashboardPage({
                   priorityFilter,
                   currentPage - 1
                 )}
-                className="inline-flex h-10 items-center justify-center rounded-xl border border-neutral-300 bg-white px-4 text-sm font-semibold hover:bg-neutral-50"
+                className="inline-flex h-10 items-center justify-center rounded-xl border border-[var(--tp-border-strong)] bg-white px-4 text-sm font-semibold hover:bg-[var(--tp-bg-soft)]"
               >
                 ← Previous
               </Link>
@@ -1274,7 +1274,7 @@ export default async function TrustSafetyDashboardPage({
               <div />
             )}
 
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-[var(--tp-muted)]">
               Page{" "}
               {currentPage}
             </p>
@@ -1287,7 +1287,7 @@ export default async function TrustSafetyDashboardPage({
                   priorityFilter,
                   currentPage + 1
                 )}
-                className="inline-flex h-10 items-center justify-center rounded-xl border border-neutral-300 bg-white px-4 text-sm font-semibold hover:bg-neutral-50"
+                className="inline-flex h-10 items-center justify-center rounded-xl border border-[var(--tp-border-strong)] bg-white px-4 text-sm font-semibold hover:bg-[var(--tp-bg-soft)]"
               >
                 Next →
               </Link>
@@ -1300,17 +1300,17 @@ export default async function TrustSafetyDashboardPage({
 
         {/* SAFETY */}
 
-        <section className="mt-8 rounded-3xl bg-neutral-950 p-6 text-white md:p-8">
+        <section className="mt-8 rounded-3xl bg-[var(--tp-primary)] p-6 text-white md:p-8">
 
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
             Trust & Safety Principle
           </p>
 
-          <h2 className="mt-2 text-xl font-semibold">
+          <h2 className="mt-2 text-xl font-black tracking-tight">
             Case first. Action second.
           </h2>
 
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-neutral-300">
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--tp-ink-soft)]">
             Threeple administrative
             intervention should be
             based on documented
@@ -1329,4 +1329,5 @@ export default async function TrustSafetyDashboardPage({
     </main>
   );
 }
+
 

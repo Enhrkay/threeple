@@ -1,4 +1,4 @@
-import {
+﻿import {
   triageTrustSafetyCase,
 } from "./actions";
 
@@ -12,11 +12,11 @@ export default function TriageControls({
   return (
     <section className="mt-8 rounded-3xl border border-blue-200 bg-blue-50 p-6 md:p-8">
 
-      <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">
+      <p className="text-xs font-black uppercase tracking-[0.14em] text-blue-700">
         Investigation Outcome
       </p>
 
-      <h2 className="mt-2 text-xl font-semibold text-blue-950">
+      <h2 className="mt-2 text-xl font-black tracking-tight text-blue-950">
         Triage Case
       </h2>
 
@@ -67,15 +67,15 @@ export default function TriageControls({
             </option>
 
             <option value="action_required">
-              Action Required
+              Action required
             </option>
 
             <option value="resolved">
-              Resolve Case
+              Resolve case
             </option>
 
             <option value="dismissed">
-              Dismiss Case
+              Dismiss case
             </option>
 
           </select>
@@ -116,11 +116,11 @@ export default function TriageControls({
             Outcome meanings
           </p>
 
-          <div className="mt-3 space-y-3 text-sm leading-6 text-neutral-600">
+          <div className="mt-3 space-y-3 text-sm leading-6 text-[var(--tp-ink-soft)]">
 
             <p>
               <strong>
-                Action Required:
+                Action required:
               </strong>{" "}
               the investigation found
               an issue that may require
@@ -157,7 +157,7 @@ export default function TriageControls({
 
           <div className="mt-4 rounded-2xl border border-blue-300 bg-white p-5">
 
-            <p className="text-sm leading-6 text-neutral-700">
+            <p className="text-sm leading-6 text-[var(--tp-ink-soft)]">
               Confirm only after you
               have completed the case
               review. This action will
@@ -167,7 +167,7 @@ export default function TriageControls({
 
             <button
               type="submit"
-              className="mt-4 inline-flex h-11 items-center justify-center rounded-xl bg-black px-5 text-sm font-semibold text-white hover:bg-neutral-800"
+              className="mt-4 inline-flex h-11 items-center justify-center rounded-xl bg-[var(--tp-primary)] px-5 text-sm font-semibold text-white hover:bg-neutral-800"
             >
               Record Outcome
             </button>
