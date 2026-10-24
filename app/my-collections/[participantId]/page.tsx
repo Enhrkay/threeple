@@ -85,7 +85,7 @@ function participationStyle(
   active: boolean
 ) {
   if (!active) {
-    return "bg-neutral-200 text-neutral-600";
+    return "bg-neutral-200 text-[var(--tp-ink-soft)]";
   }
 
   switch (status) {
@@ -98,9 +98,9 @@ function participationStyle(
     case "declined":
       return "bg-red-100 text-red-700";
     case "cancelled":
-      return "bg-neutral-200 text-neutral-600";
+      return "bg-neutral-200 text-[var(--tp-ink-soft)]";
     default:
-      return "bg-neutral-100 text-neutral-600";
+      return "bg-neutral-100 text-[var(--tp-ink-soft)]";
   }
 }
 
@@ -117,7 +117,7 @@ function collectionStatusStyle(
     case "cancelled":
       return "bg-red-100 text-red-700";
     default:
-      return "bg-neutral-100 text-neutral-600";
+      return "bg-neutral-100 text-[var(--tp-ink-soft)]";
   }
 }
 
@@ -197,7 +197,7 @@ function paymentMessageStyle(
   if (
     type === "error"
   ) {
-    return "border-red-200 bg-red-50 text-red-700";
+    return "border-[var(--tp-danger-border)] bg-[var(--tp-danger-soft)] text-red-700";
   }
 
   return "border-blue-200 bg-blue-50 text-blue-700";
@@ -580,31 +580,31 @@ export default async function ParticipantCollectionPage({
     );
 
   return (
-    <main className="min-h-screen bg-neutral-50 text-neutral-900">
-      <header className="border-b bg-white">
+    <main className="min-h-screen bg-[var(--tp-bg)] text-[var(--tp-ink)]">
+      <header className="border-b border-[var(--tp-border)] bg-[var(--tp-surface)]">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
           <Link
             href="/my-collections"
           >
-            <div className="text-2xl font-bold tracking-tight">
+            <div className="text-2xl font-black tracking-tight text-[var(--tp-primary)]">
               Threeple
             </div>
 
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-[var(--tp-muted)]">
               Collect. Coordinate. Track.
             </p>
           </Link>
 
           <Link
             href="/my-collections"
-            className="text-sm font-medium text-neutral-600 hover:text-black"
+            className="text-sm font-bold text-[var(--tp-ink-soft)] hover:text-[var(--tp-primary)]"
           >
             ← My Collections
           </Link>
         </div>
       </header>
 
-      <div className="mx-auto max-w-5xl px-6 py-10">
+      <div className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:px-6 sm:pb-10 sm:pt-8 lg:px-8 lg:py-10">
         {message && (
           <div
             className={`mb-6 rounded-2xl border p-4 text-sm ${paymentMessageStyle(
@@ -616,12 +616,12 @@ export default async function ParticipantCollectionPage({
         )}
 
         {archived && (
-          <section className="mb-6 rounded-2xl border bg-neutral-100 p-5">
+          <section className="mb-6 rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-bg-soft)] p-5">
             <p className="font-semibold">
               This Collection is archived
             </p>
 
-            <p className="mt-2 text-sm leading-6 text-neutral-600">
+            <p className="mt-2 text-sm leading-6 text-[var(--tp-ink-soft)]">
               The organizer has archived this Collection. Your historical participation record remains available.
             </p>
           </section>
@@ -659,28 +659,28 @@ export default async function ParticipantCollectionPage({
             )}
           </div>
 
-          <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-neutral-400">
+          <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--tp-faint)]">
             My Collection
           </p>
 
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
+          <h1 className="mt-2 text-3xl font-black tracking-[-0.035em] text-[var(--tp-ink)] md:text-4xl">
             {collection.title}
           </h1>
 
           {collection.description && (
-            <p className="mt-4 max-w-2xl leading-7 text-neutral-600">
+            <p className="mt-4 max-w-2xl leading-7 text-[var(--tp-ink-soft)]">
               {collection.description}
             </p>
           )}
         </section>
 
-        <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl border bg-white p-5">
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
-              My Status
+        <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] p-5 shadow-[var(--tp-shadow-sm)]">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
+              Your status
             </p>
 
-            <p className="mt-3 text-lg font-semibold">
+            <p className="mt-3 text-lg font-black text-[var(--tp-ink)]">
               {participant.is_active
                 ? friendlyText(
                     participant.participation_status
@@ -689,12 +689,12 @@ export default async function ParticipantCollectionPage({
             </p>
           </div>
 
-          <div className="rounded-2xl border bg-white p-5">
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] p-5 shadow-[var(--tp-shadow-sm)]">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
               Expected
             </p>
 
-            <p className="mt-3 text-lg font-semibold">
+            <p className="mt-3 text-lg font-black text-[var(--tp-ink)]">
               {formatMoney(
                 expectedAmount,
                 collection.currency
@@ -702,24 +702,24 @@ export default async function ParticipantCollectionPage({
             </p>
           </div>
 
-          <div className="rounded-2xl border bg-white p-5">
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
-              Contribution Status
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] p-5 shadow-[var(--tp-shadow-sm)]">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
+              Contribution status
             </p>
 
-            <p className="mt-3 text-lg font-semibold">
+            <p className="mt-3 text-lg font-black text-[var(--tp-ink)]">
               {friendlyText(
                 participant.payment_status
               )}
             </p>
           </div>
 
-          <div className="rounded-2xl border bg-white p-5">
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
-              Joined Via
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] p-5 shadow-[var(--tp-shadow-sm)]">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
+              Joined via
             </p>
 
-            <p className="mt-3 text-lg font-semibold">
+            <p className="mt-3 text-lg font-black text-[var(--tp-ink)]">
               {friendlyText(
                 participant.join_method
               )}
@@ -730,12 +730,12 @@ export default async function ParticipantCollectionPage({
         {participant.participation_status ===
           "approval_pending" &&
           participant.is_active && (
-            <section className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-              <h2 className="font-semibold text-amber-950">
+            <section className="mt-6 rounded-2xl border border-[var(--tp-warning-border)] bg-[var(--tp-warning-soft)] p-5">
+              <h2 className="font-semibold text-[var(--tp-warning)]">
                 Awaiting organizer approval
               </h2>
 
-              <p className="mt-2 text-sm leading-6 text-amber-800">
+              <p className="mt-2 text-sm leading-6 text-[var(--tp-warning)]">
                 The organizer must approve your participation before payment can be started.
               </p>
             </section>
@@ -743,41 +743,41 @@ export default async function ParticipantCollectionPage({
 
         {participant.participation_status ===
           "declined" && (
-            <section className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-5">
-              <h2 className="font-semibold text-red-900">
+            <section className="mt-6 rounded-2xl border border-[var(--tp-danger-border)] bg-[var(--tp-danger-soft)] p-5">
+              <h2 className="font-semibold text-[var(--tp-danger)]">
                 Participation declined
               </h2>
 
-              <p className="mt-2 text-sm leading-6 text-red-800">
+              <p className="mt-2 text-sm leading-6 text-[var(--tp-danger)]">
                 The organizer has not approved your participation in this Collection.
               </p>
             </section>
           )}
 
         {!participant.is_active && (
-          <section className="mt-6 rounded-2xl border bg-neutral-100 p-5">
+          <section className="mt-6 rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-bg-soft)] p-5">
             <h2 className="font-semibold">
               Participation inactive
             </h2>
 
-            <p className="mt-2 text-sm leading-6 text-neutral-600">
+            <p className="mt-2 text-sm leading-6 text-[var(--tp-ink-soft)]">
               Your participant record is preserved, but your participation is not currently active.
             </p>
           </section>
         )}
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-            Collection Details
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] p-5 shadow-[var(--tp-shadow-sm)] sm:p-6 md:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
+            Collection overview
           </p>
 
-          <h2 className="mt-2 text-xl font-semibold">
-            About this Collection
+          <h2 className="mt-2 text-xl font-black tracking-tight text-[var(--tp-ink)]">
+            About this collection
           </h2>
 
           <div className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-2">
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Collection Type
               </p>
 
@@ -789,7 +789,7 @@ export default async function ParticipantCollectionPage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Collection Mode
               </p>
 
@@ -801,7 +801,7 @@ export default async function ParticipantCollectionPage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Organizer
               </p>
 
@@ -812,7 +812,7 @@ export default async function ParticipantCollectionPage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Workspace Type
               </p>
 
@@ -824,7 +824,7 @@ export default async function ParticipantCollectionPage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Deadline
               </p>
 
@@ -840,7 +840,7 @@ export default async function ParticipantCollectionPage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Access Type
               </p>
 
@@ -853,18 +853,18 @@ export default async function ParticipantCollectionPage({
           </div>
         </section>
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-            My Participation
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] p-5 shadow-[var(--tp-shadow-sm)] sm:p-6 md:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
+            Your participation
           </p>
 
-          <h2 className="mt-2 text-xl font-semibold">
-            Participant details
+          <h2 className="mt-2 text-xl font-black tracking-tight text-[var(--tp-ink)]">
+            Your place in this collection
           </h2>
 
           <div className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-2">
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Name
               </p>
 
@@ -874,7 +874,7 @@ export default async function ParticipantCollectionPage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Email
               </p>
 
@@ -885,7 +885,7 @@ export default async function ParticipantCollectionPage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Phone
               </p>
 
@@ -896,7 +896,7 @@ export default async function ParticipantCollectionPage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Joined
               </p>
 
@@ -911,26 +911,26 @@ export default async function ParticipantCollectionPage({
           </div>
         </section>
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] p-5 shadow-[var(--tp-shadow-sm)] sm:p-6 md:p-8">
           <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                 Contributions
               </p>
 
-              <h2 className="mt-2 text-xl font-semibold">
-                Pay contribution
+              <h2 className="mt-2 text-xl font-black tracking-tight text-[var(--tp-ink)]">
+                Your contribution
               </h2>
 
-              <p className="mt-2 max-w-xl text-sm leading-6 text-neutral-500">
-                Payments are processed by Paystack. The organizer receives settlement through their connected Paystack subaccount; Threeple does not hold the organizer&apos;s funds for later payout.
+              <p className="mt-2 max-w-xl text-sm leading-6 text-[var(--tp-muted)]">
+                See what is expected from you and your current contribution status. Electronic payments are processed securely through Paystack; Threeple keeps the contribution record and transparency layer.
               </p>
 
               {collection.collection_mode ===
                 "rotating_pool" &&
                 currentRotationObligation && (
                 <div className="mt-4 rounded-2xl bg-neutral-50 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+                  <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                     Current rotation cycle
                   </p>
 
@@ -942,7 +942,7 @@ export default async function ParticipantCollectionPage({
                       "Participant"}
                   </p>
 
-                  <p className="mt-1 text-xs text-neutral-500">
+                  <p className="mt-1 text-xs text-[var(--tp-muted)]">
                     Scheduled{" "}
                     {new Date(
                       currentRotationObligation.scheduled_date
@@ -955,7 +955,7 @@ export default async function ParticipantCollectionPage({
                   </p>
                 </div>
               )}
-              <p className="mt-4 text-2xl font-semibold">
+              <p className="mt-4 text-3xl font-black tracking-tight text-[var(--tp-primary)]">
                 {formatMoney(
                   expectedAmount,
                   collection.currency
@@ -965,7 +965,7 @@ export default async function ParticipantCollectionPage({
 
             {collection.collection_mode !== "rotating_pool" &&
             participant.payment_status === "paid" ? (
-              <span className="w-fit rounded-full bg-green-100 px-4 py-2 text-sm font-semibold text-green-700">
+              <span className="w-fit rounded-full bg-[var(--tp-success-soft)] px-4 py-2 text-sm font-black text-[var(--tp-success)]">
                 Paid
               </span>
             ) : paymentReady ? (
@@ -998,10 +998,10 @@ export default async function ParticipantCollectionPage({
 
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
             <div className="rounded-2xl bg-neutral-50 p-5">
-              <p className="text-xs uppercase tracking-wide text-neutral-400">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                 Required
               </p>
-              <p className="mt-2 text-xl font-semibold">
+              <p className="mt-2 text-xl font-black tracking-tight text-[var(--tp-ink)]">
                 {formatMoney(
                   expectedAmount,
                   collection.currency
@@ -1010,10 +1010,10 @@ export default async function ParticipantCollectionPage({
             </div>
 
             <div className="rounded-2xl bg-neutral-50 p-5">
-              <p className="text-xs uppercase tracking-wide text-neutral-400">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                 Verified paid
               </p>
-              <p className="mt-2 text-xl font-semibold">
+              <p className="mt-2 text-xl font-black tracking-tight text-[var(--tp-ink)]">
                 {formatMoney(
                   paidAmount,
                   collection.currency
@@ -1022,10 +1022,10 @@ export default async function ParticipantCollectionPage({
             </div>
 
             <div className="rounded-2xl bg-neutral-50 p-5">
-              <p className="text-xs uppercase tracking-wide text-neutral-400">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                 Outstanding
               </p>
-              <p className="mt-2 text-xl font-semibold">
+              <p className="mt-2 text-xl font-black tracking-tight text-[var(--tp-ink)]">
                 {formatMoney(
                   outstandingAmount,
                   collection.currency
@@ -1038,7 +1038,7 @@ export default async function ParticipantCollectionPage({
             dashboard?.target_amount !== undefined && (
               <div className="mt-6 rounded-2xl bg-neutral-50 p-5">
                 <div className="flex items-center justify-between gap-4 text-sm">
-                  <span className="text-neutral-500">
+                  <span className="text-[var(--tp-muted)]">
                     Collection progress
                   </span>
                   <span className="font-semibold">
@@ -1060,7 +1060,7 @@ export default async function ParticipantCollectionPage({
                   />
                 </div>
 
-                <div className="mt-3 flex flex-wrap justify-between gap-2 text-xs text-neutral-500">
+                <div className="mt-3 flex flex-wrap justify-between gap-2 text-xs text-[var(--tp-muted)]">
                   <span>
                     {formatMoney(
                       collectionRaised,
@@ -1081,7 +1081,7 @@ export default async function ParticipantCollectionPage({
           {dashboard && (
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
               <div className="rounded-2xl border p-4">
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-[var(--tp-faint)]">
                   Joined participants
                 </p>
                 <p className="mt-1 font-semibold">
@@ -1090,7 +1090,7 @@ export default async function ParticipantCollectionPage({
               </div>
 
               <div className="rounded-2xl border p-4">
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-[var(--tp-faint)]">
                   Planned participants
                 </p>
                 <p className="mt-1 font-semibold">
@@ -1099,7 +1099,7 @@ export default async function ParticipantCollectionPage({
               </div>
 
               <div className="rounded-2xl border p-4">
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-[var(--tp-faint)]">
                   Remaining slots
                 </p>
                 <p className="mt-1 font-semibold">
@@ -1112,7 +1112,7 @@ export default async function ParticipantCollectionPage({
           {!paymentReady &&
             (collection.collection_mode === "rotating_pool" ||
       participant.payment_status !== "paid") && (
-              <div className="mt-5 rounded-2xl bg-neutral-50 p-4 text-sm leading-6 text-neutral-600">
+              <div className="mt-5 rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-bg-soft)] p-4 text-sm leading-6 text-[var(--tp-ink-soft)]">
                 {!participant.email
                   ? "Add an email address to this participant record before payment can begin."
                   : organization?.settlement_status !==
@@ -1129,32 +1129,32 @@ export default async function ParticipantCollectionPage({
             )}
         </section>
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] p-5 shadow-[var(--tp-shadow-sm)] sm:p-6 md:p-8">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                 Transparency
               </p>
-              <h2 className="mt-2 text-xl font-semibold">
+              <h2 className="mt-2 text-xl font-black tracking-tight text-[var(--tp-ink)]">
                 Contribution ledger
               </h2>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-500">
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--tp-muted)]">
                 See participation and contribution progress across this Collection. Names and amounts follow the organizer&apos;s privacy settings.
               </p>
             </div>
 
-            <span className="w-fit rounded-full bg-neutral-100 px-3 py-1.5 text-xs font-semibold text-neutral-600">
+            <span className="w-fit rounded-full bg-neutral-100 px-3 py-1.5 text-xs font-semibold text-[var(--tp-ink-soft)]">
               {ledger.length} participant{ledger.length === 1 ? "" : "s"}
             </span>
           </div>
 
           {ledger.length === 0 ? (
-            <div className="mt-6 rounded-2xl bg-neutral-50 p-5 text-sm text-neutral-500">
+            <div className="mt-6 rounded-2xl bg-neutral-50 p-5 text-sm text-[var(--tp-muted)]">
               No participant activity is available yet.
             </div>
           ) : (
             <div className="mt-6 overflow-hidden rounded-2xl border">
-              <div className="grid grid-cols-[1fr_auto] gap-4 border-b bg-neutral-50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-400 sm:grid-cols-[1.5fr_1fr_1fr]">
+              <div className="grid grid-cols-[1fr_auto] gap-4 border-b bg-neutral-50 px-4 py-3 text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)] sm:grid-cols-[1.5fr_1fr_1fr]">
                 <span>Participant</span>
                 <span>Status</span>
                 <span className="hidden sm:block">Contribution</span>
@@ -1184,7 +1184,7 @@ export default async function ParticipantCollectionPage({
                         </p>
                         {!entry.show_participant_names &&
                           !entry.is_self && (
-                            <p className="mt-1 text-xs text-neutral-400">
+                            <p className="mt-1 text-xs text-[var(--tp-faint)]">
                               Name hidden by organizer
                             </p>
                           )}
@@ -1205,7 +1205,7 @@ export default async function ParticipantCollectionPage({
                             )}
                           </span>
                         ) : (
-                          <span className="text-neutral-400">
+                          <span className="text-[var(--tp-faint)]">
                             Hidden
                           </span>
                         )}
@@ -1218,7 +1218,7 @@ export default async function ParticipantCollectionPage({
           )}
 
           {ledgerPrivacy && (
-            <div className="mt-4 text-xs leading-5 text-neutral-400">
+            <div className="mt-4 text-xs leading-5 text-[var(--tp-faint)]">
               {!ledgerPrivacy.show_participant_names &&
                 "Participant names are hidden. "}
               {!ledgerPrivacy.show_payment_amounts &&
@@ -1230,6 +1230,7 @@ export default async function ParticipantCollectionPage({
     </main>
   );
 }
+
 
 
 
