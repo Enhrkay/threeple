@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -24,6 +24,7 @@ export function SignUpForm({
   const [repeatPassword, setRepeatPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -49,7 +50,7 @@ export function SignUpForm({
 
       confirmUrl.searchParams.set("next", nextPath);
 
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -59,9 +60,13 @@ export function SignUpForm({
 
       if (error) throw error;
 
-      router.push(
-        `/auth/sign-up-success?next=${encodeURIComponent(nextPath)}`
-      );
+      if (data.session) {
+        router.replace(nextPath);
+        router.refresh();
+        return;
+      }
+
+      setNeedsEmailConfirmation(true);
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
@@ -89,7 +94,23 @@ export function SignUpForm({
         </p>
       </div>
 
-      <form onSubmit={handleSignUp} className="space-y-5">
+      {needsEmailConfirmation ? (
+        <div className="rounded-3xl border border-green-200 bg-green-50 p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-green-700">
+            Almost there
+          </p>
+
+          <h2 className="mt-2 text-xl font-black text-green-950">
+            Check your email to finish signing in
+          </h2>
+
+          <p className="mt-3 text-sm leading-6 text-green-800">
+            We sent a secure confirmation link to <strong>{email}</strong>.
+            After you confirm, Threeple will bring you straight back to where you were going.
+          </p>
+        </div>
+      ) : (
+<form onSubmit={handleSignUp} className="space-y-5">
         <div className="space-y-2">
           <label
             htmlFor="email"
@@ -159,6 +180,7 @@ export function SignUpForm({
           {isLoading ? "Creating account..." : "Create account"}
         </button>
       </form>
+      )}
 
       <p className="mt-6 text-center text-sm text-black/50">
         Already have an account?{" "}
@@ -172,3 +194,4 @@ export function SignUpForm({
     </div>
   );
 }
+
