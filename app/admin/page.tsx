@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 
 import {
   requirePlatformAdmin,
@@ -7,6 +7,15 @@ import {
 import {
   supabaseAdmin,
 } from "@/lib/supabase/admin";
+
+import {
+  ThreepleAppShell,
+} from "@/components/threeple/app-shell";
+
+import {
+  ThreepleBadge,
+  ThreepleStat,
+} from "@/components/threeple/design-system";
 
 export const instant = false;
 
@@ -22,86 +31,42 @@ function friendlyText(
 
   return value
     .replaceAll("_", " ")
-    .replaceAll(".", " ")
-    .replace(/\b\w/g, (character) =>
-      character.toUpperCase()
+    .replace(
+      /\b\w/g,
+      (character) =>
+        character.toUpperCase()
     );
 }
 
-function metricCard(
-  label: string,
-  value: number,
-  description: string,
-  href?: string,
-  alert = false
-) {
-  const card = (
-    <div
-      className={`h-full rounded-2xl border p-5 ${
-        alert
-          ? "border-red-200 bg-red-50"
-          : "bg-white"
-      }`}
-    >
-      <p
-        className={`text-xs font-semibold uppercase tracking-wide ${
-          alert
-            ? "text-red-600"
-            : "text-neutral-400"
-        }`}
-      >
-        {label}
-      </p>
+function caseTone(
+  value: string
+):
+  | "neutral"
+  | "primary"
+  | "success"
+  | "warning"
+  | "danger" {
+  switch (value) {
+    case "urgent":
+    case "action_required":
+      return "danger";
 
-      <p
-        className={`mt-3 text-3xl font-semibold ${
-          alert
-            ? "text-red-950"
-            : "text-neutral-950"
-        }`}
-      >
-        {value}
-      </p>
+    case "high":
+    case "under_review":
+      return "warning";
 
-      <p
-        className={`mt-2 text-xs ${
-          alert
-            ? "text-red-700"
-            : "text-neutral-500"
-        }`}
-      >
-        {description}
-      </p>
+    case "resolved":
+      return "success";
 
-      {href && (
-        <p
-          className={`mt-4 text-sm font-semibold ${
-            alert
-              ? "text-red-900"
-              : "text-neutral-900"
-          }`}
-        >
-          Open →
-        </p>
-      )}
-    </div>
-  );
+    case "open":
+      return "primary";
 
-  if (!href) {
-    return card;
+    default:
+      return "neutral";
   }
-
-  return (
-    <Link
-      href={href}
-      className="block transition hover:-translate-y-0.5"
-    >
-      {card}
-    </Link>
-  );
 }
 
-export default async function AdminDashboardPage() {
+export default async function AdminHomePage() {
   const admin =
     await requirePlatformAdmin();
 
@@ -111,17 +76,10 @@ export default async function AdminDashboardPage() {
     collectionsResult,
     activeCollectionsResult,
     participantsResult,
-    pendingParticipantsResult,
-    archivedCollectionsResult,
-    platformAdminsResult,
-    restrictedUsersResult,
-    restrictedOrganizationsResult,
-    restrictedCollectionsResult,
     openCasesResult,
-    actionRequiredCasesResult,
-    underReviewCasesResult,
+    urgentCasesResult,
+    recentCasesResult,
   ] = await Promise.all([
-
     supabaseAdmin
       .from("profiles")
       .select(
@@ -181,69 +139,8 @@ export default async function AdminDashboardPage() {
       ),
 
     supabaseAdmin
-      .from("participants")
-      .select(
-        "id",
-        {
-          count: "exact",
-          head: true,
-        }
-      )
-      .eq(
-        "participation_status",
-        "approval_pending"
-      )
-      .eq(
-        "is_active",
-        true
-      ),
-
-    supabaseAdmin
-      .from("collections")
-      .select(
-        "id",
-        {
-          count: "exact",
-          head: true,
-        }
-      )
-      .not(
-        "archived_at",
-        "is",
-        null
-      ),
-
-    supabaseAdmin
-      .from("platform_admins")
-      .select(
-        "id",
-        {
-          count: "exact",
-          head: true,
-        }
-      )
-      .eq(
-        "is_active",
-        true
-      ),
-
-    supabaseAdmin
-      .from("user_restrictions")
-      .select(
-        "id",
-        {
-          count: "exact",
-          head: true,
-        }
-      )
-      .is(
-        "lifted_at",
-        null
-      ),
-
-    supabaseAdmin
       .from(
-        "organization_restrictions"
+        "trust_safety_reports"
       )
       .select(
         "id",
@@ -252,25 +149,13 @@ export default async function AdminDashboardPage() {
           head: true,
         }
       )
-      .is(
-        "lifted_at",
-        null
-      ),
-
-    supabaseAdmin
-      .from(
-        "collection_restrictions"
-      )
-      .select(
-        "id",
-        {
-          count: "exact",
-          head: true,
-        }
-      )
-      .is(
-        "lifted_at",
-        null
+      .in(
+        "status",
+        [
+          "open",
+          "under_review",
+          "action_required",
+        ]
       ),
 
     supabaseAdmin
@@ -285,489 +170,389 @@ export default async function AdminDashboardPage() {
         }
       )
       .eq(
+        "priority",
+        "urgent"
+      )
+      .in(
         "status",
-        "open"
+        [
+          "open",
+          "under_review",
+          "action_required",
+        ]
       ),
 
     supabaseAdmin
       .from(
         "trust_safety_reports"
       )
-      .select(
-        "id",
+      .select(`
+        id,
+        report_reference,
+        category,
+        priority,
+        status,
+        reporter_name,
+        created_at
+      `)
+      .order(
+        "created_at",
         {
-          count: "exact",
-          head: true,
+          ascending: false,
         }
       )
-      .eq(
-        "status",
-        "action_required"
-      ),
-
-    supabaseAdmin
-      .from(
-        "trust_safety_reports"
-      )
-      .select(
-        "id",
-        {
-          count: "exact",
-          head: true,
-        }
-      )
-      .eq(
-        "status",
-        "under_review"
-      ),
+      .limit(5),
   ]);
 
   const totalUsers =
     usersResult.count ?? 0;
 
   const totalOrganizations =
-    organizationsResult.count ?? 0;
+    organizationsResult.count ??
+    0;
 
   const totalCollections =
-    collectionsResult.count ?? 0;
+    collectionsResult.count ??
+    0;
 
   const activeCollections =
     activeCollectionsResult.count ??
     0;
 
   const totalParticipants =
-    participantsResult.count ?? 0;
-
-  const pendingParticipants =
-    pendingParticipantsResult.count ??
-    0;
-
-  const archivedCollections =
-    archivedCollectionsResult.count ??
-    0;
-
-  const platformAdminCount =
-    platformAdminsResult.count ?? 0;
-
-  const restrictedUsers =
-    restrictedUsersResult.count ?? 0;
-
-  const restrictedOrganizations =
-    restrictedOrganizationsResult.count ??
-    0;
-
-  const restrictedCollections =
-    restrictedCollectionsResult.count ??
+    participantsResult.count ??
     0;
 
   const openCases =
-    openCasesResult.count ?? 0;
-
-  const actionRequiredCases =
-    actionRequiredCasesResult.count ??
+    openCasesResult.count ??
     0;
 
-  const underReviewCases =
-    underReviewCasesResult.count ?? 0;
+  const urgentCases =
+    urgentCasesResult.count ??
+    0;
 
-  const activeEnforcementTotal =
-    restrictedUsers +
-    restrictedOrganizations +
-    restrictedCollections;
-
-  const activeTrustSafetyWorkload =
-    openCases +
-    actionRequiredCases +
-    underReviewCases;
+  const recentCases =
+    recentCasesResult.data ??
+    [];
 
   return (
-    <main className="min-h-screen bg-neutral-50 text-neutral-900">
-
-      <header className="border-b bg-neutral-950 text-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-
-          <Link href="/admin">
-            <div className="text-2xl font-bold tracking-tight">
-              Threeple
-            </div>
-
-            <p className="text-xs text-neutral-400">
-              Platform Administration
-            </p>
-          </Link>
-
-          <div className="text-right">
-            <p className="text-sm font-medium">
-              {admin.fullName}
-            </p>
-
-            <p className="mt-0.5 text-xs text-neutral-400">
-              {friendlyText(
-                admin.role
-              )}
-            </p>
-          </div>
-
-        </div>
-      </header>
-
-      <div className="mx-auto max-w-7xl px-6 py-10">
-
-        <section className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+    <ThreepleAppShell
+      mode="admin"
+      title="Operations Overview"
+      subtitle="Threeple platform administration"
+      status={
+        <ThreepleBadge tone="primary">
+          {friendlyText(
+            admin.role
+          )}
+        </ThreepleBadge>
+      }
+    >
+      <section className="overflow-hidden rounded-[2rem] border border-[var(--tp-primary-border)] bg-[var(--tp-primary)] text-white shadow-[var(--tp-shadow-md)]">
+        <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.25fr_.75fr] lg:p-10">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-neutral-400">
-              Threeple Admin
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-white/50">
+              Threeple Operations
             </p>
 
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
-              Platform Overview
+            <h1 className="mt-3 max-w-3xl text-3xl font-black tracking-[-0.04em] sm:text-4xl lg:text-5xl">
+              See the platform clearly.
+              Act carefully.
             </h1>
 
-            <p className="mt-3 max-w-2xl leading-7 text-neutral-600">
-              Monitor platform growth, active enforcement and Trust & Safety workload across Threeple.
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-white/70 sm:text-base">
+              Monitor people, organizations, collections and trust activity from one operational workspace.
+            </p>
+
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/admin/users"
+                className="inline-flex min-h-12 items-center justify-center rounded-full bg-white px-6 text-sm font-black text-[var(--tp-primary)]"
+              >
+                Review users
+              </Link>
+
+              <Link
+                href="/admin/trust-safety"
+                className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 text-sm font-black text-white"
+              >
+                Trust & Safety
+              </Link>
+            </div>
+          </div>
+
+          <div className="rounded-[1.75rem] bg-white/10 p-6">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-white/50">
+              Attention
+            </p>
+
+            <div className="mt-5 flex items-end justify-between gap-4">
+              <div>
+                <p className="text-4xl font-black">
+                  {openCases}
+                </p>
+
+                <p className="mt-1 text-sm text-white/65">
+                  active safety cases
+                </p>
+              </div>
+
+              {urgentCases >
+                0 && (
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-[var(--tp-danger)]">
+                  {urgentCases} urgent
+                </span>
+              )}
+            </div>
+
+            <p className="mt-5 text-xs leading-5 text-white/55">
+              Administrative actions should remain traceable and proportionate to the issue being reviewed.
             </p>
           </div>
+        </div>
+      </section>
+
+      <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <ThreepleStat
+          label="Users"
+          value={
+            totalUsers
+          }
+          helper="Registered Threeple profiles."
+          tone="primary"
+        />
+
+        <ThreepleStat
+          label="Organizations"
+          value={
+            totalOrganizations
+          }
+          helper="Organizer workspaces on the platform."
+        />
+
+        <ThreepleStat
+          label="Collections"
+          value={
+            totalCollections
+          }
+          helper={`${activeCollections} active right now.`}
+          tone="success"
+        />
+
+        <ThreepleStat
+          label="Participants"
+          value={
+            totalParticipants
+          }
+          helper="Participant records across collections."
+          tone="warning"
+        />
+      </section>
+
+      <section className="mt-8">
+        <div>
+          <p className="tp-kicker">
+            Operations
+          </p>
+
+          <h2 className="tp-heading mt-2 text-2xl">
+            Platform controls.
+          </h2>
+
+          <p className="tp-body mt-2 max-w-2xl text-sm">
+            Use focused operational areas instead of managing everything from one overloaded screen.
+          </p>
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <Link
+            href="/admin/users"
+            className="tp-card tp-hover-card p-6"
+          >
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--tp-primary-soft)] font-black text-[var(--tp-primary)]">
+              U
+            </div>
+
+            <h3 className="tp-heading mt-5 text-lg">
+              Users
+            </h3>
+
+            <p className="tp-body mt-2 text-sm">
+              Review profiles, participation and account-level administrative state.
+            </p>
+
+            <p className="mt-5 text-sm font-black text-[var(--tp-primary)]">
+              Open user directory
+            </p>
+          </Link>
 
           <Link
-            href="/dashboard"
-            className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 text-sm font-semibold transition hover:bg-neutral-100"
+            href="/admin/organizations"
+            className="tp-card tp-hover-card p-6"
           >
-            Open Organizer Dashboard
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--tp-info-soft)] font-black text-[var(--tp-info)]">
+              O
+            </div>
+
+            <h3 className="tp-heading mt-5 text-lg">
+              Organizations
+            </h3>
+
+            <p className="tp-body mt-2 text-sm">
+              Inspect organizer workspaces, ownership, members and settlement state.
+            </p>
+
+            <p className="mt-5 text-sm font-black text-[var(--tp-primary)]">
+              Open organizations
+            </p>
           </Link>
-        </section>
 
-        <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {metricCard(
-            "Users",
-            totalUsers,
-            "Registered user profiles",
-            "/admin/users"
-          )}
-
-          {metricCard(
-            "Organizations",
-            totalOrganizations,
-            "Organizations on Threeple",
-            "/admin/organizations"
-          )}
-
-          {metricCard(
-            "Collections",
-            totalCollections,
-            `${activeCollections} currently active`,
-            "/admin/collections"
-          )}
-
-          {metricCard(
-            "Participants",
-            totalParticipants,
-            `${pendingParticipants} awaiting approval`
-          )}
-        </section>
-
-        <section className="mt-10">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-                Enforcement
-              </p>
-
-              <h2 className="mt-2 text-2xl font-semibold">
-                Active Restrictions
-              </h2>
-
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-500">
-                Live restrictions currently affecting users, organizations and Collections.
-              </p>
+          <Link
+            href="/admin/collections"
+            className="tp-card tp-hover-card p-6"
+          >
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--tp-success-soft)] font-black text-[var(--tp-success)]">
+              C
             </div>
 
-            <div className="rounded-full bg-red-100 px-4 py-2 text-sm font-semibold text-red-700">
-              {activeEnforcementTotal} active
+            <h3 className="tp-heading mt-5 text-lg">
+              Collections
+            </h3>
+
+            <p className="tp-body mt-2 text-sm">
+              Review contribution models, organizers, status and collection-level controls.
+            </p>
+
+            <p className="mt-5 text-sm font-black text-[var(--tp-primary)]">
+              Open collection directory
+            </p>
+          </Link>
+
+          <Link
+            href="/admin/trust-safety"
+            className="tp-card tp-hover-card p-6"
+          >
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--tp-warning-soft)] font-black text-[var(--tp-warning)]">
+              T
             </div>
-          </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {metricCard(
-              "Restricted Users",
-              restrictedUsers,
-              "Accounts with active user-level enforcement",
-              "/admin/users",
-              restrictedUsers > 0
-            )}
+            <h3 className="tp-heading mt-5 text-lg">
+              Trust & Safety
+            </h3>
 
-            {metricCard(
-              "Restricted Organizations",
-              restrictedOrganizations,
-              "Organizations with active enforcement",
-              "/admin/organizations",
-              restrictedOrganizations >
-                0
-            )}
+            <p className="tp-body mt-2 text-sm">
+              Review reports, investigations, restrictions and resolution history.
+            </p>
 
-            {metricCard(
-              "Restricted Collections",
-              restrictedCollections,
-              "Collections with active enforcement",
-              "/admin/collections",
-              restrictedCollections >
-                0
-            )}
-          </div>
-        </section>
+            <p className="mt-5 text-sm font-black text-[var(--tp-primary)]">
+              Review cases
+            </p>
+          </Link>
+        </div>
+      </section>
 
-        <section className="mt-10">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <section className="mt-8 grid gap-6 xl:grid-cols-[1.4fr_.6fr]">
+        <div className="tp-card p-5 sm:p-6">
+          <div className="flex items-end justify-between gap-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+              <p className="tp-kicker">
                 Trust & Safety
               </p>
 
-              <h2 className="mt-2 text-2xl font-semibold">
-                Investigation Workload
+              <h2 className="tp-heading mt-2 text-xl">
+                Recent cases
               </h2>
-
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-500">
-                Cases that still require review, investigation or enforcement action.
-              </p>
             </div>
 
             <Link
               href="/admin/trust-safety"
-              className="text-sm font-semibold hover:underline"
+              className="text-sm font-black text-[var(--tp-primary)]"
             >
-              Open Trust & Safety →
+              View all
             </Link>
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {metricCard(
-              "Open Cases",
-              openCases,
-              "Waiting to enter review",
-              "/admin/trust-safety?status=open",
-              openCases > 0
-            )}
+          {recentCases.length ===
+          0 ? (
+            <div className="mt-6 rounded-2xl bg-[var(--tp-bg-soft)] p-6 text-sm text-[var(--tp-muted)]">
+              No Trust & Safety cases are currently available.
+            </div>
+          ) : (
+            <div className="mt-5 divide-y divide-[var(--tp-border)]">
+              {recentCases.map(
+                (item) => (
+                  <Link
+                    key={
+                      item.id
+                    }
+                    href={`/admin/trust-safety/${item.id}`}
+                    className="flex flex-col gap-3 py-4 transition first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate font-black text-[var(--tp-ink)]">
+                        {item.report_reference}
+                      </p>
 
-            {metricCard(
-              "Under Review",
-              underReviewCases,
-              "Cases currently being investigated",
-              "/admin/trust-safety?status=under_review",
-              underReviewCases > 0
-            )}
+                      <p className="mt-1 truncate text-sm text-[var(--tp-muted)]">
+                        {friendlyText(
+                          item.category
+                        )}
+                        {item.reporter_name
+                          ? ` · ${item.reporter_name}`
+                          : ""}
+                      </p>
+                    </div>
 
-            {metricCard(
-              "Action Required",
-              actionRequiredCases,
-              "Cases requiring an admin decision",
-              "/admin/trust-safety?status=action_required",
-              actionRequiredCases > 0
-            )}
+                    <div className="flex shrink-0 flex-wrap gap-2">
+                      <ThreepleBadge
+                        tone={
+                          caseTone(
+                            item.priority
+                          )
+                        }
+                      >
+                        {friendlyText(
+                          item.priority
+                        )}
+                      </ThreepleBadge>
 
-            {metricCard(
-              "Active Workload",
-              activeTrustSafetyWorkload,
-              "Open + under review + action required",
-              "/admin/trust-safety",
-              activeTrustSafetyWorkload >
-                0
-            )}
-          </div>
-        </section>
+                      <ThreepleBadge
+                        tone={
+                          caseTone(
+                            item.status
+                          )
+                        }
+                      >
+                        {friendlyText(
+                          item.status
+                        )}
+                      </ThreepleBadge>
+                    </div>
+                  </Link>
+                )
+              )}
+            </div>
+          )}
+        </div>
 
-        <section className="mt-10">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-            Platform Health
+        <div className="tp-card p-6">
+          <p className="tp-kicker">
+            Admin principle
           </p>
 
-          <h2 className="mt-2 text-2xl font-semibold">
-            Operational Metrics
+          <h2 className="tp-heading mt-2 text-xl">
+            Protect history.
           </h2>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {metricCard(
-              "Active Collections",
-              activeCollections,
-              "Currently operating Collections",
-              "/admin/collections"
-            )}
-
-            {metricCard(
-              "Pending Participants",
-              pendingParticipants,
-              "Participation requests awaiting approval"
-            )}
-
-            {metricCard(
-              "Archived Collections",
-              archivedCollections,
-              "Historical Collections"
-            )}
-
-            {metricCard(
-              "Platform Admins",
-              platformAdminCount,
-              "Active admin accounts"
-            )}
-          </div>
-        </section>
-
-        <section className="mt-10">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-            Platform Operations
+          <p className="tp-body mt-3 text-sm">
+            Collection and user deletion should preserve financial and audit records where required. Normal operations should prefer archive, deactivate or anonymize over destructive removal.
           </p>
 
-          <h2 className="mt-2 text-2xl font-semibold">
-            Admin Control Center
-          </h2>
-
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-500">
-            Open the operational areas used to review users, organizations, Collections and Trust & Safety activity.
-          </p>
-
-          <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-
-            <Link
-              href="/admin/users"
-              className="group rounded-2xl border bg-white p-6 transition hover:-translate-y-0.5 hover:border-neutral-400 hover:shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg transition group-hover:bg-neutral-900 group-hover:text-white">
-                  ðŸ‘¤
-                </div>
-
-                {restrictedUsers > 0 ? (
-                  <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700">
-                    {restrictedUsers} Restricted
-                  </span>
-                ) : (
-                  <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
-                    Clear
-                  </span>
-                )}
-              </div>
-
-              <h3 className="mt-5 font-semibold">
-                Users
-              </h3>
-
-              <p className="mt-2 text-sm leading-6 text-neutral-500">
-                Review user accounts, admin status and enforcement history.
-              </p>
-
-              <p className="mt-5 text-sm font-semibold text-neutral-900">
-                Open Users →
-              </p>
-            </Link>
-
-            <Link
-              href="/admin/organizations"
-              className="group rounded-2xl border bg-white p-6 transition hover:-translate-y-0.5 hover:border-neutral-400 hover:shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg transition group-hover:bg-neutral-900 group-hover:text-white">
-                  â—«
-                </div>
-
-                {restrictedOrganizations >
-                0 ? (
-                  <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700">
-                    {restrictedOrganizations} Restricted
-                  </span>
-                ) : (
-                  <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
-                    Clear
-                  </span>
-                )}
-              </div>
-
-              <h3 className="mt-5 font-semibold">
-                Organizations
-              </h3>
-
-              <p className="mt-2 text-sm leading-6 text-neutral-500">
-                Review organization ownership, Collections and active restrictions.
-              </p>
-
-              <p className="mt-5 text-sm font-semibold text-neutral-900">
-                Open Organizations →
-              </p>
-            </Link>
-
-            <Link
-              href="/admin/collections"
-              className="group rounded-2xl border bg-white p-6 transition hover:-translate-y-0.5 hover:border-neutral-400 hover:shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg transition group-hover:bg-neutral-900 group-hover:text-white">
-                  â–¦
-                </div>
-
-                {restrictedCollections >
-                0 ? (
-                  <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700">
-                    {restrictedCollections} Restricted
-                  </span>
-                ) : (
-                  <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
-                    Clear
-                  </span>
-                )}
-              </div>
-
-              <h3 className="mt-5 font-semibold">
-                Collections
-              </h3>
-
-              <p className="mt-2 text-sm leading-6 text-neutral-500">
-                Monitor Collections, lifecycle state and enforcement.
-              </p>
-
-              <p className="mt-5 text-sm font-semibold text-neutral-900">
-                Open Collections →
-              </p>
-            </Link>
-
-            <Link
-              href="/admin/trust-safety"
-              className="group rounded-2xl border bg-white p-6 transition hover:-translate-y-0.5 hover:border-neutral-400 hover:shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg transition group-hover:bg-neutral-900 group-hover:text-white">
-                  âš‘
-                </div>
-
-                {activeTrustSafetyWorkload >
-                0 ? (
-                  <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700">
-                    {activeTrustSafetyWorkload} Active
-                  </span>
-                ) : (
-                  <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
-                    Clear
-                  </span>
-                )}
-              </div>
-
-              <h3 className="mt-5 font-semibold">
-                Trust & Safety
-              </h3>
-
-              <p className="mt-2 text-sm leading-6 text-neutral-500">
-                Investigate reports, apply enforcement and resolve cases.
-              </p>
-
-              <p className="mt-5 text-sm font-semibold text-neutral-900">
-                Open Trust & Safety →
-              </p>
-            </Link>
-
+          <div className="mt-5 rounded-2xl bg-[var(--tp-danger-soft)] p-4 text-sm leading-6 text-[var(--tp-danger)]">
+            Permanent destructive actions should remain restricted and explicitly confirmed.
           </div>
-        </section>
-
-      </div>
-    </main>
+        </div>
+      </section>
+    </ThreepleAppShell>
   );
 }
-
-
