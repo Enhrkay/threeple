@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -205,7 +205,24 @@ export async function joinCollection(formData: FormData) {
       collectionId: collection.id,
       errorCode: participantError?.code,
     });
-    joinError(joinCode, "join_failed");
+
+    if (
+      participantError?.message
+        ?.toLowerCase()
+        .includes(
+          "collection is full"
+        )
+    ) {
+      joinError(
+        joinCode,
+        "collection_full"
+      );
+    }
+
+    joinError(
+      joinCode,
+      "join_failed"
+    );
   }
 
   await logCollectionActivity({
@@ -227,3 +244,4 @@ export async function joinCollection(formData: FormData) {
 
   redirect(`/my-collections/${participant.id}`);
 }
+

@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { joinCollection } from "./actions";
 
@@ -52,6 +52,9 @@ function getErrorMessage(error?: string) {
       return "Please enter a valid contribution amount.";
     case "collection_unavailable":
       return "This Collection is no longer available for joining.";
+
+    case "collection_full":
+      return "This Collection is full. All available participant slots have been taken.";
     case "join_failed":
       return "We could not complete your request. Please try again.";
     default:
@@ -91,8 +94,8 @@ export default async function JoinPage({ searchParams }: PageProps) {
       : 0;
 
   const needsChosenAmount =
-    collection?.collection_mode === "target" ||
-    collection?.collection_mode === "flexible";
+    collection?.collection_mode ===
+      "flexible";
 
   const isRecurring =
     collection?.collection_mode === "recurring_dues" ||
@@ -225,7 +228,7 @@ export default async function JoinPage({ searchParams }: PageProps) {
 
               {collection.default_amount !== null && (
                 <div className="rounded-2xl bg-[#f7f7f5] p-5">
-                  <p className="text-sm text-black/45">Amount per person</p>
+                  <p className="text-sm text-black/45">Required contribution</p>
                   <p className="mt-2 text-xl font-bold">
                     {formatMoney(collection.default_amount, collection.currency)}
                   </p>
@@ -410,3 +413,6 @@ export default async function JoinPage({ searchParams }: PageProps) {
     </main>
   );
 }
+
+
+
