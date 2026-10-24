@@ -1,11 +1,19 @@
-﻿"use client";
+"use client";
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+
+function safeNext(value: string | null) {
+  if (!value || !value.startsWith("/") || value.startsWith("//")) {
+    return "/dashboard";
+  }
+
+  return value;
+}
 
 export function LoginForm({
   className,
@@ -16,6 +24,9 @@ export function LoginForm({
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const nextPath = safeNext(searchParams.get("next"));
 
   const handleLogin = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,13 +42,19 @@ export function LoginForm({
 
       if (error) throw error;
 
-      router.push("/dashboard");
+      router.push(nextPath);
+      router.refresh();
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setIsLoading(false);
     }
   };
+
+  const signUpHref =
+    nextPath === "/dashboard"
+      ? "/auth/sign-up"
+      : `/auth/sign-up?next=${encodeURIComponent(nextPath)}`;
 
   return (
     <div className={cn("w-full", className)} {...props}>
@@ -120,7 +137,7 @@ export function LoginForm({
       <p className="mt-6 text-center text-sm text-black/50">
         Don&apos;t have an account?{" "}
         <Link
-          href="/auth/sign-up"
+          href={signUpHref}
           className="font-bold text-black underline-offset-4 hover:underline"
         >
           Create one
@@ -129,4 +146,3 @@ export function LoginForm({
     </div>
   );
 }
-

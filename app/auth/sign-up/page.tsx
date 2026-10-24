@@ -1,5 +1,9 @@
+﻿import { Suspense } from "react";
 import { SignUpForm } from "@/components/sign-up-form";
 import Link from "next/link";
+
+export const instant = false;
+
 
 export default function SignUpPage() {
   return (
@@ -39,16 +43,18 @@ export default function SignUpPage() {
           </div>
 
           <p className="text-sm text-black/35">
-            Threeple · Transparent group contributions
+            Threeple Â· Transparent group contributions
           </p>
         </div>
 
         <div className="flex items-center justify-center px-6 py-14 sm:px-10">
           <div className="w-full max-w-md rounded-[2rem] border border-black/10 bg-white p-7 shadow-xl shadow-black/5 sm:p-10">
-            <SignUpForm />
+            <Suspense fallback={<div className="text-sm text-black/50">Loading...</div>}><SignUpForm /></Suspense>
           </div>
         </div>
       </section>
     </main>
   );
 }
+
+

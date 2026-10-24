@@ -1,11 +1,19 @@
-﻿"use client";
+"use client";
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+
+function safeNext(value: string | null) {
+  if (!value || !value.startsWith("/") || value.startsWith("//")) {
+    return "/dashboard";
+  }
+
+  return value;
+}
 
 export function SignUpForm({
   className,
@@ -17,6 +25,9 @@ export function SignUpForm({
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const nextPath = safeNext(searchParams.get("next"));
 
   const handleSignUp = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,23 +42,37 @@ export function SignUpForm({
     }
 
     try {
+      const confirmUrl = new URL(
+        "/auth/confirm",
+        window.location.origin
+      );
+
+      confirmUrl.searchParams.set("next", nextPath);
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: confirmUrl.toString(),
         },
       });
 
       if (error) throw error;
 
-      router.push("/auth/sign-up-success");
+      router.push(
+        `/auth/sign-up-success?next=${encodeURIComponent(nextPath)}`
+      );
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setIsLoading(false);
     }
   };
+
+  const loginHref =
+    nextPath === "/dashboard"
+      ? "/auth/login"
+      : `/auth/login?next=${encodeURIComponent(nextPath)}`;
 
   return (
     <div className={cn("w-full", className)} {...props}>
@@ -138,7 +163,7 @@ export function SignUpForm({
       <p className="mt-6 text-center text-sm text-black/50">
         Already have an account?{" "}
         <Link
-          href="/auth/login"
+          href={loginHref}
           className="font-bold text-black underline-offset-4 hover:underline"
         >
           Sign in
@@ -147,4 +172,3 @@ export function SignUpForm({
     </div>
   );
 }
-
