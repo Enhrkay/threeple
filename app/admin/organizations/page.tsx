@@ -234,13 +234,13 @@ export default async function AdminOrganizationsPage({
   }
 
   return (
-    <main className="min-h-screen bg-neutral-50 text-neutral-950">
+    <main className="min-h-screen bg-[var(--tp-bg-soft)] text-neutral-950">
       <div className="mx-auto max-w-7xl px-5 py-8 md:px-8 md:py-10">
 
         <div className="flex flex-wrap items-center gap-3 text-sm">
           <Link
             href="/admin"
-            className="font-semibold text-neutral-500 hover:text-neutral-950"
+            className="font-semibold text-[var(--tp-muted)] hover:text-neutral-950"
           >
             Admin
           </Link>
@@ -256,15 +256,15 @@ export default async function AdminOrganizationsPage({
 
         <div className="mt-6 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-neutral-400">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--tp-faint)]">
               Platform Operations
             </p>
 
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight">
+            <h1 className="mt-2 text-3xl font-black tracking-tight tracking-tight">
               Organizations
             </h1>
 
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-500">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--tp-muted)]">
               Review organizations, ownership, Collection activity and active Trust & Safety restrictions.
             </p>
           </div>
@@ -279,7 +279,7 @@ export default async function AdminOrganizationsPage({
                 searchTerm
               }
               placeholder="Search organizations"
-              className="h-11 min-w-0 flex-1 rounded-xl border border-neutral-300 bg-white px-4 text-sm outline-none focus:border-neutral-500"
+              className="h-11 min-w-0 flex-1 rounded-xl border border-[var(--tp-border-strong)] bg-white px-4 text-sm outline-none focus:border-neutral-500"
             />
 
             <button
@@ -291,33 +291,33 @@ export default async function AdminOrganizationsPage({
           </form>
         </div>
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                 Directory
               </p>
 
-              <h2 className="mt-2 text-xl font-semibold">
+              <h2 className="mt-2 text-xl font-black tracking-tight">
                 Platform Organizations
               </h2>
             </div>
 
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-[var(--tp-muted)]">
               {organizationRows.length} shown
             </p>
           </div>
 
           {organizationRows.length ===
           0 ? (
-            <p className="mt-6 text-sm text-neutral-500">
+            <p className="mt-6 text-sm text-[var(--tp-muted)]">
               No organizations found.
             </p>
           ) : (
-            <div className="mt-6 overflow-x-auto">
+            <div className="mt-6 tp-scroll-x">
               <table className="w-full min-w-[940px] text-left text-sm">
                 <thead>
-                  <tr className="border-b text-xs uppercase tracking-wide text-neutral-400">
+                  <tr className="border-b text-xs uppercase tracking-wide text-[var(--tp-faint)]">
                     <th className="pb-3 pr-4">
                       Organization
                     </th>
@@ -374,7 +374,7 @@ export default async function AdminOrganizationsPage({
                               }
                             </p>
 
-                            <p className="mt-1 text-xs text-neutral-500">
+                            <p className="mt-1 text-xs text-[var(--tp-muted)]">
                               {friendlyText(
                                 organization.organization_type
                               )}
@@ -396,7 +396,7 @@ export default async function AdminOrganizationsPage({
                               {counts.total}
                             </p>
 
-                            <p className="mt-1 text-xs text-neutral-500">
+                            <p className="mt-1 text-xs text-[var(--tp-muted)]">
                               {counts.active} active
                             </p>
                           </td>
@@ -408,7 +408,7 @@ export default async function AdminOrganizationsPage({
                                   Restricted
                                 </span>
 
-                                <p className="mt-2 text-xs text-neutral-500">
+                                <p className="mt-2 text-xs text-[var(--tp-muted)]">
                                   {friendlyText(
                                     restriction.restriction_type
                                   )}
@@ -421,7 +421,7 @@ export default async function AdminOrganizationsPage({
                             )}
                           </td>
 
-                          <td className="py-4 pr-4 text-neutral-500">
+                          <td className="py-4 pr-4 text-[var(--tp-muted)]">
                             {formatDateTime(
                               organization.created_at
                             )}
@@ -448,5 +448,6 @@ export default async function AdminOrganizationsPage({
     </main>
   );
 }
+
 
 

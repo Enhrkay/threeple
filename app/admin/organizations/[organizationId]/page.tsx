@@ -233,12 +233,12 @@ export default async function AdminOrganizationPage({
     ).length;
 
   return (
-    <main className="min-h-screen bg-neutral-50 text-neutral-950">
+    <main className="min-h-screen bg-[var(--tp-bg-soft)] text-neutral-950">
       <div className="mx-auto max-w-7xl px-5 py-8 md:px-8 md:py-10">
         <div className="flex flex-wrap items-center gap-3 text-sm">
           <Link
             href="/admin"
-            className="font-semibold text-neutral-500 hover:text-neutral-950"
+            className="font-semibold text-[var(--tp-muted)] hover:text-neutral-950"
           >
             Admin
           </Link>
@@ -247,7 +247,7 @@ export default async function AdminOrganizationPage({
 
           <Link
             href="/admin/trust-safety"
-            className="font-semibold text-neutral-500 hover:text-neutral-950"
+            className="font-semibold text-[var(--tp-muted)] hover:text-neutral-950"
           >
             Trust & Safety
           </Link>
@@ -259,19 +259,19 @@ export default async function AdminOrganizationPage({
           </span>
         </div>
 
-        <section className="mt-6 rounded-3xl border bg-white p-6 md:p-8">
+        <section className="mt-6 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-neutral-400">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--tp-faint)]">
                 Organization
               </p>
 
-              <h1 className="mt-3 text-3xl font-semibold tracking-tight">
+              <h1 className="mt-3 text-3xl font-black tracking-tight tracking-tight">
                 {organization.name}
               </h1>
 
               <div className="mt-4 flex flex-wrap gap-2">
-                <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-semibold text-neutral-700">
+                <span className="rounded-full bg-[var(--tp-bg-soft)] px-3 py-1 text-xs font-semibold text-[var(--tp-ink-soft)]">
                   {friendlyText(
                     organization.organization_type
                   )}
@@ -289,16 +289,16 @@ export default async function AdminOrganizationPage({
               </div>
             </div>
 
-            <div className="rounded-2xl border bg-neutral-50 p-5 lg:min-w-[260px]">
-              <p className="text-xs uppercase tracking-wide text-neutral-400">
+            <div className="rounded-2xl border bg-[var(--tp-bg-soft)] p-5 lg:min-w-[260px]">
+              <p className="text-xs uppercase tracking-wide text-[var(--tp-faint)]">
                 Organization ID
               </p>
 
-              <p className="mt-2 break-all font-mono text-xs text-neutral-600">
+              <p className="mt-2 break-all font-mono text-xs text-[var(--tp-ink-soft)]">
                 {organization.id}
               </p>
 
-              <p className="mt-4 text-xs uppercase tracking-wide text-neutral-400">
+              <p className="mt-4 text-xs uppercase tracking-wide text-[var(--tp-faint)]">
                 Created
               </p>
 
@@ -317,7 +317,7 @@ export default async function AdminOrganizationPage({
               Active Enforcement
             </p>
 
-            <h2 className="mt-2 text-xl font-semibold text-red-950">
+            <h2 className="mt-2 text-xl font-black tracking-tight text-red-950">
               Organization Restricted
             </h2>
 
@@ -363,7 +363,7 @@ export default async function AdminOrganizationPage({
             </div>
 
             <div className="mt-6 rounded-2xl border border-red-200 bg-white/70 p-5">
-              <p className="text-xs font-semibold uppercase tracking-wide text-red-700">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-red-700">
                 Reason
               </p>
               <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-red-900">
@@ -374,48 +374,48 @@ export default async function AdminOrganizationPage({
         )}
 
         <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl border bg-white p-5">
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5">
+            <p className="text-xs uppercase tracking-wide text-[var(--tp-faint)]">
               Collections
             </p>
-            <p className="mt-3 text-2xl font-semibold">
+            <p className="mt-3 text-2xl font-black tracking-tight">
               {collections.length}
             </p>
           </div>
 
-          <div className="rounded-2xl border bg-white p-5">
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5">
+            <p className="text-xs uppercase tracking-wide text-[var(--tp-faint)]">
               Active Collections
             </p>
-            <p className="mt-3 text-2xl font-semibold">
+            <p className="mt-3 text-2xl font-black tracking-tight">
               {activeCollections}
             </p>
           </div>
 
-          <div className="rounded-2xl border bg-white p-5">
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5">
+            <p className="text-xs uppercase tracking-wide text-[var(--tp-faint)]">
               Archived
             </p>
-            <p className="mt-3 text-2xl font-semibold">
+            <p className="mt-3 text-2xl font-black tracking-tight">
               {archivedCollections}
             </p>
           </div>
 
-          <div className="rounded-2xl border bg-white p-5">
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5">
+            <p className="text-xs uppercase tracking-wide text-[var(--tp-faint)]">
               Members
             </p>
-            <p className="mt-3 text-2xl font-semibold">
+            <p className="mt-3 text-2xl font-black tracking-tight">
               {members.length}
             </p>
           </div>
         </section>
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
             Ownership
           </p>
-          <h2 className="mt-2 text-xl font-semibold">
+          <h2 className="mt-2 text-xl font-black tracking-tight">
             Organization Owner
           </h2>
 
@@ -423,36 +423,36 @@ export default async function AdminOrganizationPage({
             <p className="font-semibold">
               {owner?.full_name || "Unknown User"}
             </p>
-            <p className="mt-1 font-mono text-xs text-neutral-500">
+            <p className="mt-1 font-mono text-xs text-[var(--tp-muted)]">
               {organization.owner_id}
             </p>
 
             <Link
               href={`/admin/users/${organization.owner_id}`}
-              className="mt-4 inline-flex h-10 items-center justify-center rounded-xl border border-neutral-300 px-4 text-sm font-semibold hover:bg-neutral-50"
+              className="mt-4 inline-flex h-10 items-center justify-center rounded-xl border border-[var(--tp-border-strong)] px-4 text-sm font-semibold hover:bg-[var(--tp-bg-soft)]"
             >
               View Owner →
             </Link>
           </div>
         </section>
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
             Collections
           </p>
-          <h2 className="mt-2 text-xl font-semibold">
+          <h2 className="mt-2 text-xl font-black tracking-tight">
             Organization Collections
           </h2>
 
           {collections.length === 0 ? (
-            <p className="mt-6 text-sm text-neutral-500">
+            <p className="mt-6 text-sm text-[var(--tp-muted)]">
               No Collections found for this organization.
             </p>
           ) : (
-            <div className="mt-6 overflow-x-auto">
+            <div className="mt-6 tp-scroll-x">
               <table className="w-full min-w-[720px] text-left text-sm">
                 <thead>
-                  <tr className="border-b text-xs uppercase tracking-wide text-neutral-400">
+                  <tr className="border-b text-xs uppercase tracking-wide text-[var(--tp-faint)]">
                     <th className="pb-3 pr-4">Collection</th>
                     <th className="pb-3 pr-4">Status</th>
                     <th className="pb-3 pr-4">Type</th>
@@ -497,16 +497,16 @@ export default async function AdminOrganizationPage({
           )}
         </section>
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
             Trust & Safety
           </p>
-          <h2 className="mt-2 text-xl font-semibold">
+          <h2 className="mt-2 text-xl font-black tracking-tight">
             Organization Cases
           </h2>
 
           {trustSafetyCases.length === 0 ? (
-            <p className="mt-6 text-sm text-neutral-500">
+            <p className="mt-6 text-sm text-[var(--tp-muted)]">
               No Trust & Safety cases found for this organization.
             </p>
           ) : (
@@ -515,18 +515,18 @@ export default async function AdminOrganizationPage({
                 <Link
                   key={report.id}
                   href={`/admin/trust-safety/${report.id}`}
-                  className="block rounded-2xl border p-4 transition hover:border-neutral-400 hover:bg-neutral-50"
+                  className="block rounded-2xl border p-4 transition hover:border-neutral-400 hover:bg-[var(--tp-bg-soft)]"
                 >
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <p className="font-mono text-sm font-semibold">
                         {report.report_reference}
                       </p>
-                      <p className="mt-1 text-sm text-neutral-600">
+                      <p className="mt-1 text-sm text-[var(--tp-ink-soft)]">
                         {friendlyText(report.category)}
                       </p>
                     </div>
-                    <div className="text-sm text-neutral-500">
+                    <div className="text-sm text-[var(--tp-muted)]">
                       {friendlyText(report.status)}
                     </div>
                   </div>
@@ -536,16 +536,16 @@ export default async function AdminOrganizationPage({
           )}
         </section>
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
             Enforcement History
           </p>
-          <h2 className="mt-2 text-xl font-semibold">
+          <h2 className="mt-2 text-xl font-black tracking-tight">
             Restriction History
           </h2>
 
           {restrictionHistory.length === 0 ? (
-            <p className="mt-6 text-sm text-neutral-500">
+            <p className="mt-6 text-sm text-[var(--tp-muted)]">
               No organization restriction history.
             </p>
           ) : (
@@ -560,7 +560,7 @@ export default async function AdminOrganizationPage({
                       <p className="font-semibold">
                         {friendlyText(restriction.restriction_type)}
                       </p>
-                      <p className="mt-1 text-xs text-neutral-500">
+                      <p className="mt-1 text-xs text-[var(--tp-muted)]">
                         Imposed {formatDateTime(restriction.imposed_at)}
                       </p>
                     </div>
@@ -568,20 +568,20 @@ export default async function AdminOrganizationPage({
                     <span
                       className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${
                         restriction.lifted_at
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
+                          ? "bg-[var(--tp-success-soft)] text-[var(--tp-success)]"
+                          : "bg-[var(--tp-danger-soft)] text-[var(--tp-danger)]"
                       }`}
                     >
                       {restriction.lifted_at ? "Lifted" : "Active"}
                     </span>
                   </div>
 
-                  <p className="mt-4 text-sm leading-6 text-neutral-700">
+                  <p className="mt-4 text-sm leading-6 text-[var(--tp-ink-soft)]">
                     {restriction.reason}
                   </p>
 
                   {restriction.lifted_at && (
-                    <div className="mt-4 rounded-xl bg-neutral-50 p-4 text-sm text-neutral-600">
+                    <div className="mt-4 rounded-xl bg-[var(--tp-bg-soft)] p-4 text-sm text-[var(--tp-ink-soft)]">
                       <p>
                         Lifted {formatDateTime(restriction.lifted_at)}
                       </p>
@@ -601,5 +601,6 @@ export default async function AdminOrganizationPage({
     </main>
   );
 }
+
 
 
