@@ -19,6 +19,7 @@ export function SignUpForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
@@ -35,6 +36,12 @@ export function SignUpForm({
     const supabase = createClient();
     setIsLoading(true);
     setError(null);
+
+    if (fullName.trim().length < 2) {
+      setError("Please enter your full name");
+      setIsLoading(false);
+      return;
+    }
 
     if (password !== repeatPassword) {
       setError("Passwords do not match");
@@ -55,6 +62,9 @@ export function SignUpForm({
         password,
         options: {
           emailRedirectTo: confirmUrl.toString(),
+          data: {
+            full_name: fullName.trim(),
+          },
         },
       });
 
@@ -111,6 +121,28 @@ export function SignUpForm({
         </div>
       ) : (
 <form onSubmit={handleSignUp} className="space-y-5">
+        <div className="space-y-2">
+          <label
+            htmlFor="full-name"
+            className="block text-sm font-semibold text-[#171717]"
+          >
+            Full name
+          </label>
+
+          <Input
+            id="full-name"
+            type="text"
+            placeholder="Your full name"
+            autoComplete="name"
+            required
+            minLength={2}
+            maxLength={120}
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            className="h-12 rounded-2xl border-black/10 bg-white px-4 text-[#171717] shadow-none placeholder:text-black/30 focus-visible:ring-black/20"
+          />
+        </div>
+
         <div className="space-y-2">
           <label
             htmlFor="email"
@@ -194,4 +226,5 @@ export function SignUpForm({
     </div>
   );
 }
+
 

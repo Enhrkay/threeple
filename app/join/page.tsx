@@ -147,6 +147,12 @@ export default async function JoinPage({ searchParams }: PageProps) {
 
   const returnToJoin = `/join?code=${encodeURIComponent(code)}`;
 
+  const accountFullName =
+    user?.user_metadata?.full_name &&
+    typeof user.user_metadata.full_name === "string"
+      ? user.user_metadata.full_name
+      : "";
+
   return (
     <main className="min-h-screen bg-[#f7f7f5] text-[#171717]">
       <header className="border-b border-black/10 bg-white">
@@ -422,6 +428,7 @@ export default async function JoinPage({ searchParams }: PageProps) {
                       id="full_name"
                       name="full_name"
                       type="text"
+                      defaultValue={accountFullName}
                       required
                       minLength={2}
                       maxLength={120}
@@ -514,6 +521,7 @@ export default async function JoinPage({ searchParams }: PageProps) {
     </main>
   );
 }
+
 
 
 

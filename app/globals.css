@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -65,4 +65,12 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* THREEPLE_SMOOTH_SURFACE */
+html,
+body {
+  min-height: 100%;
+  background: #f7f7f5;
+  color: #171717;
 }
