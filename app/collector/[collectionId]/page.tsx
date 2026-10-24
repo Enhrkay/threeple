@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import {
   notFound,
   redirect,
@@ -42,7 +42,7 @@ function money(
     amount === null ||
     amount === undefined
   ) {
-    return "—";
+    return "â€”";
   }
 
   return new Intl.NumberFormat(
@@ -386,9 +386,12 @@ export default async function CollectorCollectionPage({
                         </p>
                       </div>
 
-                      <span className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--tp-border-strong)] bg-[var(--tp-bg-soft)] px-4 text-sm font-black text-[var(--tp-muted)]">
-                        Record soon
-                      </span>
+                      <Link
+                        href={`/collector/${collectionId}/record/${participant.id}`}
+                        className="inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--tp-primary)] px-4 text-sm font-black text-white"
+                      >
+                        Record contribution
+                      </Link>
                     </div>
                   </div>
                 )
@@ -400,3 +403,4 @@ export default async function CollectorCollectionPage({
     </ThreepleAppShell>
   );
 }
+
