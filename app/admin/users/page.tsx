@@ -151,13 +151,13 @@ export default async function AdminUsersPage({
     );
 
   return (
-    <main className="min-h-screen bg-neutral-50 text-neutral-950">
+    <main className="min-h-screen bg-[var(--tp-bg-soft)] text-neutral-950">
       <div className="mx-auto max-w-7xl px-5 py-8 md:px-8 md:py-10">
 
         <div className="flex flex-wrap items-center gap-3 text-sm">
           <Link
             href="/admin"
-            className="font-semibold text-neutral-500 hover:text-neutral-950"
+            className="font-semibold text-[var(--tp-muted)] hover:text-neutral-950"
           >
             Admin
           </Link>
@@ -173,15 +173,15 @@ export default async function AdminUsersPage({
 
         <div className="mt-6 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-neutral-400">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--tp-faint)]">
               Platform Operations
             </p>
 
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight">
+            <h1 className="mt-2 text-3xl font-black tracking-tight tracking-tight">
               Users
             </h1>
 
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-500">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--tp-muted)]">
               Review Threeple users and identify accounts with active Trust & Safety enforcement.
             </p>
           </div>
@@ -196,7 +196,7 @@ export default async function AdminUsersPage({
                 searchTerm
               }
               placeholder="Search by name"
-              className="h-11 min-w-0 flex-1 rounded-xl border border-neutral-300 bg-white px-4 text-sm outline-none focus:border-neutral-500"
+              className="h-11 min-w-0 flex-1 rounded-xl border border-[var(--tp-border-strong)] bg-white px-4 text-sm outline-none focus:border-neutral-500"
             />
 
             <button
@@ -208,32 +208,32 @@ export default async function AdminUsersPage({
           </form>
         </div>
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                 Directory
               </p>
 
-              <h2 className="mt-2 text-xl font-semibold">
+              <h2 className="mt-2 text-xl font-black tracking-tight">
                 User Accounts
               </h2>
             </div>
 
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-[var(--tp-muted)]">
               {userRows.length} shown
             </p>
           </div>
 
           {userRows.length === 0 ? (
-            <p className="mt-6 text-sm text-neutral-500">
+            <p className="mt-6 text-sm text-[var(--tp-muted)]">
               No users found.
             </p>
           ) : (
-            <div className="mt-6 overflow-x-auto">
+            <div className="mt-6 tp-scroll-x">
               <table className="w-full min-w-[860px] text-left text-sm">
                 <thead>
-                  <tr className="border-b text-xs uppercase tracking-wide text-neutral-400">
+                  <tr className="border-b text-xs uppercase tracking-wide text-[var(--tp-faint)]">
                     <th className="pb-3 pr-4">
                       User
                     </th>
@@ -276,7 +276,7 @@ export default async function AdminUsersPage({
                                 "Unnamed User"}
                             </p>
 
-                            <p className="mt-1 font-mono text-xs text-neutral-400">
+                            <p className="mt-1 font-mono text-xs text-[var(--tp-faint)]">
                               {user.id}
                             </p>
                           </td>
@@ -293,7 +293,7 @@ export default async function AdminUsersPage({
                                   Restricted
                                 </span>
 
-                                <p className="mt-2 text-xs text-neutral-500">
+                                <p className="mt-2 text-xs text-[var(--tp-muted)]">
                                   {friendlyText(
                                     restriction.restriction_type
                                   )}
@@ -311,8 +311,8 @@ export default async function AdminUsersPage({
                               <span
                                 className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
                                   admin.is_active
-                                    ? "bg-blue-100 text-blue-700"
-                                    : "bg-neutral-200 text-neutral-600"
+                                    ? "bg-[var(--tp-info-soft)] text-[var(--tp-info)]"
+                                    : "bg-neutral-200 text-[var(--tp-ink-soft)]"
                                 }`}
                               >
                                 {admin.is_active
@@ -322,7 +322,7 @@ export default async function AdminUsersPage({
                                   : "Inactive Admin"}
                               </span>
                             ) : (
-                              <span className="text-neutral-400">
+                              <span className="text-[var(--tp-faint)]">
                                 Standard User
                               </span>
                             )}
@@ -349,5 +349,6 @@ export default async function AdminUsersPage({
     </main>
   );
 }
+
 
 

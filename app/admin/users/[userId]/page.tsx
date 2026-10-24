@@ -293,13 +293,13 @@ export default async function AdminUserPage({
     ).length;
 
   return (
-    <main className="min-h-screen bg-neutral-50 text-neutral-950">
+    <main className="min-h-screen bg-[var(--tp-bg-soft)] text-neutral-950">
       <div className="mx-auto max-w-7xl px-5 py-8 md:px-8 md:py-10">
 
         <div className="flex flex-wrap items-center gap-3 text-sm">
           <Link
             href="/admin"
-            className="font-semibold text-neutral-500 hover:text-neutral-950"
+            className="font-semibold text-[var(--tp-muted)] hover:text-neutral-950"
           >
             Admin
           </Link>
@@ -310,7 +310,7 @@ export default async function AdminUserPage({
 
           <Link
             href="/admin/users"
-            className="font-semibold text-neutral-500 hover:text-neutral-950"
+            className="font-semibold text-[var(--tp-muted)] hover:text-neutral-950"
           >
             Users
           </Link>
@@ -324,15 +324,15 @@ export default async function AdminUserPage({
           </span>
         </div>
 
-        <section className="mt-6 rounded-3xl border bg-white p-6 md:p-8">
+        <section className="mt-6 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-neutral-400">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--tp-faint)]">
                 User Account
               </p>
 
-              <h1 className="mt-3 text-3xl font-semibold tracking-tight">
+              <h1 className="mt-3 text-3xl font-black tracking-tight tracking-tight">
                 {profile.full_name ||
                   authUser?.email ||
                   "Unknown User"}
@@ -353,8 +353,8 @@ export default async function AdminUserPage({
                   <span
                     className={`rounded-full px-3 py-1 text-xs font-semibold ${
                       platformAdmin.is_active
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-neutral-200 text-neutral-600"
+                        ? "bg-[var(--tp-info-soft)] text-[var(--tp-info)]"
+                        : "bg-neutral-200 text-[var(--tp-ink-soft)]"
                     }`}
                   >
                     {platformAdmin.is_active
@@ -367,16 +367,16 @@ export default async function AdminUserPage({
               </div>
             </div>
 
-            <div className="rounded-2xl border bg-neutral-50 p-5 lg:min-w-[280px]">
-              <p className="text-xs uppercase tracking-wide text-neutral-400">
+            <div className="rounded-2xl border bg-[var(--tp-bg-soft)] p-5 lg:min-w-[280px]">
+              <p className="text-xs uppercase tracking-wide text-[var(--tp-faint)]">
                 User ID
               </p>
 
-              <p className="mt-2 break-all font-mono text-xs text-neutral-600">
+              <p className="mt-2 break-all font-mono text-xs text-[var(--tp-ink-soft)]">
                 {profile.id}
               </p>
 
-              <p className="mt-4 text-xs uppercase tracking-wide text-neutral-400">
+              <p className="mt-4 text-xs uppercase tracking-wide text-[var(--tp-faint)]">
                 Email
               </p>
 
@@ -385,7 +385,7 @@ export default async function AdminUserPage({
                   "Not available"}
               </p>
 
-              <p className="mt-4 text-xs uppercase tracking-wide text-neutral-400">
+              <p className="mt-4 text-xs uppercase tracking-wide text-[var(--tp-faint)]">
                 Account Created
               </p>
 
@@ -404,7 +404,7 @@ export default async function AdminUserPage({
               Active Enforcement
             </p>
 
-            <h2 className="mt-2 text-xl font-semibold text-red-950">
+            <h2 className="mt-2 text-xl font-black tracking-tight text-red-950">
               User Restricted
             </h2>
 
@@ -454,7 +454,7 @@ export default async function AdminUserPage({
             </div>
 
             <div className="mt-6 rounded-2xl border border-red-200 bg-white/70 p-5">
-              <p className="text-xs font-semibold uppercase tracking-wide text-red-700">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-red-700">
                 Reason
               </p>
 
@@ -467,61 +467,61 @@ export default async function AdminUserPage({
 
         <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
-          <div className="rounded-2xl border bg-white p-5">
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5">
+            <p className="text-xs uppercase tracking-wide text-[var(--tp-faint)]">
               Organizations Owned
             </p>
 
-            <p className="mt-3 text-2xl font-semibold">
+            <p className="mt-3 text-2xl font-black tracking-tight">
               {ownedOrganizations.length}
             </p>
           </div>
 
-          <div className="rounded-2xl border bg-white p-5">
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5">
+            <p className="text-xs uppercase tracking-wide text-[var(--tp-faint)]">
               Collections Created
             </p>
 
-            <p className="mt-3 text-2xl font-semibold">
+            <p className="mt-3 text-2xl font-black tracking-tight">
               {createdCollections.length}
             </p>
           </div>
 
-          <div className="rounded-2xl border bg-white p-5">
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5">
+            <p className="text-xs uppercase tracking-wide text-[var(--tp-faint)]">
               Active Collections
             </p>
 
-            <p className="mt-3 text-2xl font-semibold">
+            <p className="mt-3 text-2xl font-black tracking-tight">
               {activeCollections}
             </p>
           </div>
 
-          <div className="rounded-2xl border bg-white p-5">
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5">
+            <p className="text-xs uppercase tracking-wide text-[var(--tp-faint)]">
               Archived Collections
             </p>
 
-            <p className="mt-3 text-2xl font-semibold">
+            <p className="mt-3 text-2xl font-black tracking-tight">
               {archivedCollections}
             </p>
           </div>
 
         </section>
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
             Account Information
           </p>
 
-          <h2 className="mt-2 text-xl font-semibold">
-            User Details
+          <h2 className="mt-2 text-xl font-black tracking-tight">
+            User overview
           </h2>
 
           <div className="mt-6 grid gap-6 md:grid-cols-3">
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Full Name
               </p>
 
@@ -532,7 +532,7 @@ export default async function AdminUserPage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Email
               </p>
 
@@ -543,7 +543,7 @@ export default async function AdminUserPage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Phone
               </p>
 
@@ -556,18 +556,18 @@ export default async function AdminUserPage({
           </div>
         </section>
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
             Organizations
           </p>
 
-          <h2 className="mt-2 text-xl font-semibold">
+          <h2 className="mt-2 text-xl font-black tracking-tight">
             Organizations Owned
           </h2>
 
           {ownedOrganizations.length ===
           0 ? (
-            <p className="mt-6 text-sm text-neutral-500">
+            <p className="mt-6 text-sm text-[var(--tp-muted)]">
               This user does not own any organizations.
             </p>
           ) : (
@@ -579,7 +579,7 @@ export default async function AdminUserPage({
                       organization.id
                     }
                     href={`/admin/organizations/${organization.id}`}
-                    className="block rounded-2xl border p-5 transition hover:border-neutral-400 hover:bg-neutral-50"
+                    className="block rounded-2xl border p-5 transition hover:border-neutral-400 hover:bg-[var(--tp-bg-soft)]"
                   >
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
 
@@ -590,14 +590,14 @@ export default async function AdminUserPage({
                           }
                         </p>
 
-                        <p className="mt-1 text-sm text-neutral-500">
+                        <p className="mt-1 text-sm text-[var(--tp-muted)]">
                           {friendlyText(
                             organization.organization_type
                           )}
                         </p>
                       </div>
 
-                      <p className="text-xs text-neutral-400">
+                      <p className="text-xs text-[var(--tp-faint)]">
                         {formatDateTime(
                           organization.created_at
                         )}
@@ -611,26 +611,26 @@ export default async function AdminUserPage({
           )}
         </section>
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
             Collections
           </p>
 
-          <h2 className="mt-2 text-xl font-semibold">
+          <h2 className="mt-2 text-xl font-black tracking-tight">
             Collections Created
           </h2>
 
           {createdCollections.length ===
           0 ? (
-            <p className="mt-6 text-sm text-neutral-500">
+            <p className="mt-6 text-sm text-[var(--tp-muted)]">
               This user has not created any Collections.
             </p>
           ) : (
-            <div className="mt-6 overflow-x-auto">
+            <div className="mt-6 tp-scroll-x">
               <table className="w-full min-w-[760px] text-left text-sm">
 
                 <thead>
-                  <tr className="border-b text-xs uppercase tracking-wide text-neutral-400">
+                  <tr className="border-b text-xs uppercase tracking-wide text-[var(--tp-faint)]">
                     <th className="pb-3 pr-4">
                       Collection
                     </th>
@@ -707,18 +707,18 @@ export default async function AdminUserPage({
           )}
         </section>
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
             Trust & Safety
           </p>
 
-          <h2 className="mt-2 text-xl font-semibold">
+          <h2 className="mt-2 text-xl font-black tracking-tight">
             User Cases
           </h2>
 
           {trustSafetyCases.length ===
           0 ? (
-            <p className="mt-6 text-sm text-neutral-500">
+            <p className="mt-6 text-sm text-[var(--tp-muted)]">
               No Trust & Safety cases found for this user.
             </p>
           ) : (
@@ -728,7 +728,7 @@ export default async function AdminUserPage({
                   <Link
                     key={report.id}
                     href={`/admin/trust-safety/${report.id}`}
-                    className="block rounded-2xl border p-4 transition hover:border-neutral-400 hover:bg-neutral-50"
+                    className="block rounded-2xl border p-4 transition hover:border-neutral-400 hover:bg-[var(--tp-bg-soft)]"
                   >
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
 
@@ -739,7 +739,7 @@ export default async function AdminUserPage({
                           }
                         </p>
 
-                        <p className="mt-1 text-sm text-neutral-600">
+                        <p className="mt-1 text-sm text-[var(--tp-ink-soft)]">
                           {friendlyText(
                             report.category
                           )}
@@ -747,13 +747,13 @@ export default async function AdminUserPage({
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2 text-xs">
-                        <span className="rounded-full bg-neutral-100 px-2.5 py-1 font-semibold text-neutral-600">
+                        <span className="rounded-full bg-[var(--tp-bg-soft)] px-2.5 py-1 font-semibold text-[var(--tp-ink-soft)]">
                           {friendlyText(
                             report.priority
                           )}
                         </span>
 
-                        <span className="rounded-full bg-neutral-100 px-2.5 py-1 font-semibold text-neutral-600">
+                        <span className="rounded-full bg-[var(--tp-bg-soft)] px-2.5 py-1 font-semibold text-[var(--tp-ink-soft)]">
                           {friendlyText(
                             report.status
                           )}
@@ -768,18 +768,18 @@ export default async function AdminUserPage({
           )}
         </section>
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
             Enforcement History
           </p>
 
-          <h2 className="mt-2 text-xl font-semibold">
+          <h2 className="mt-2 text-xl font-black tracking-tight">
             User Restriction History
           </h2>
 
           {restrictionHistory.length ===
           0 ? (
-            <p className="mt-6 text-sm text-neutral-500">
+            <p className="mt-6 text-sm text-[var(--tp-muted)]">
               No user restriction history.
             </p>
           ) : (
@@ -801,7 +801,7 @@ export default async function AdminUserPage({
                           )}
                         </p>
 
-                        <p className="mt-1 text-xs text-neutral-500">
+                        <p className="mt-1 text-xs text-[var(--tp-muted)]">
                           Imposed{" "}
                           {formatDateTime(
                             restriction.imposed_at
@@ -812,8 +812,8 @@ export default async function AdminUserPage({
                       <span
                         className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${
                           restriction.lifted_at
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
+                            ? "bg-[var(--tp-success-soft)] text-[var(--tp-success)]"
+                            : "bg-[var(--tp-danger-soft)] text-[var(--tp-danger)]"
                         }`}
                       >
                         {restriction.lifted_at
@@ -823,7 +823,7 @@ export default async function AdminUserPage({
 
                     </div>
 
-                    <p className="mt-4 text-sm leading-6 text-neutral-700">
+                    <p className="mt-4 text-sm leading-6 text-[var(--tp-ink-soft)]">
                       {restriction.reason}
                     </p>
 
@@ -837,7 +837,7 @@ export default async function AdminUserPage({
                     )}
 
                     {restriction.lifted_at && (
-                      <div className="mt-4 rounded-xl bg-neutral-50 p-4 text-sm text-neutral-600">
+                      <div className="mt-4 rounded-xl bg-[var(--tp-bg-soft)] p-4 text-sm text-[var(--tp-ink-soft)]">
 
                         <p>
                           Lifted{" "}
@@ -867,5 +867,6 @@ export default async function AdminUserPage({
     </main>
   );
 }
+
 
 
