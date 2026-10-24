@@ -2,16 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -37,8 +28,9 @@ export function LoginForm({
         email,
         password,
       });
+
       if (error) throw error;
-      // Update this route to redirect to an authenticated route. The user already has an active session.
+
       router.push("/protected");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
@@ -48,63 +40,92 @@ export function LoginForm({
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <Link
-                    href="/auth/forgot-password"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </Link>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
-              </Button>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/auth/sign-up"
-                className="underline underline-offset-4"
-              >
-                Sign up
-              </Link>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+    <div className={cn("w-full", className)} {...props}>
+      <div className="mb-8">
+        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-black/40">
+          Welcome back
+        </p>
+        <h1 className="mt-3 text-4xl font-black tracking-[-0.04em] text-[#171717]">
+          Sign in to Threeple
+        </h1>
+        <p className="mt-3 text-sm leading-6 text-black/55">
+          Continue managing your collections, participants, and contribution
+          activity.
+        </p>
+      </div>
+
+      <form onSubmit={handleLogin} className="space-y-5">
+        <div className="space-y-2">
+          <label
+            htmlFor="email"
+            className="block text-sm font-semibold text-[#171717]"
+          >
+            Email address
+          </label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="you@example.com"
+            autoComplete="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="h-12 rounded-2xl border-black/10 bg-white px-4 text-[#171717] shadow-none placeholder:text-black/30 focus-visible:ring-black/20"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-4">
+            <label
+              htmlFor="password"
+              className="block text-sm font-semibold text-[#171717]"
+            >
+              Password
+            </label>
+
+            <Link
+              href="/auth/forgot-password"
+              className="text-sm font-semibold text-black/55 transition hover:text-black"
+            >
+              Forgot password?
+            </Link>
+          </div>
+
+          <Input
+            id="password"
+            type="password"
+            autoComplete="current-password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="h-12 rounded-2xl border-black/10 bg-white px-4 text-[#171717] shadow-none focus-visible:ring-black/20"
+          />
+        </div>
+
+        {error && (
+          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="flex h-12 w-full items-center justify-center rounded-full bg-black px-6 text-sm font-bold text-white transition hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {isLoading ? "Signing in..." : "Sign in"}
+        </button>
+      </form>
+
+      <p className="mt-6 text-center text-sm text-black/50">
+        Don&apos;t have an account?{" "}
+        <Link
+          href="/auth/sign-up"
+          className="font-bold text-black underline-offset-4 hover:underline"
+        >
+          Create one
+        </Link>
+      </p>
     </div>
   );
 }
