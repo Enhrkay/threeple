@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -197,6 +197,118 @@ export async function createCollection(
         "default_amount"
       )
     );
+  const expectedParticipantCountRaw =
+    String(
+      formData.get(
+        "expected_participant_count"
+      ) ?? ""
+    ).trim();
+
+  const expectedParticipantCount =
+    expectedParticipantCountRaw
+      ? Number(expectedParticipantCountRaw)
+      : null;
+
+  let contributionAmountPolicy:
+    | "calculated_equal_share"
+    | "fixed_per_person"
+    | "flexible"
+    | "schedule_based";
+
+  let normalizedDefaultAmount =
+    defaultAmount;
+
+  let normalizedAllowCustomAmount =
+    false;
+
+  if (
+    collectionMode === "target"
+  ) {
+    contributionAmountPolicy =
+      "calculated_equal_share";
+
+    if (
+      targetAmount === null ||
+      !Number.isInteger(
+        expectedParticipantCount
+      ) ||
+      Number(
+        expectedParticipantCount
+      ) <= 0
+    ) {
+      throw new Error(
+        "Equal-share target collections require a target amount and a valid expected participant count."
+      );
+    }
+
+    normalizedDefaultAmount =
+      null;
+
+    normalizedAllowCustomAmount =
+      false;
+  } else if (
+    collectionMode ===
+      "fixed_per_person" ||
+    collectionMode ===
+      "event_fee"
+  ) {
+    contributionAmountPolicy =
+      "fixed_per_person";
+
+    if (
+      defaultAmount === null
+    ) {
+      throw new Error(
+        "Fixed-per-person and event-fee collections require an amount per participant."
+      );
+    }
+
+    normalizedAllowCustomAmount =
+      false;
+  } else if (
+    collectionMode ===
+      "flexible"
+  ) {
+    contributionAmountPolicy =
+      "flexible";
+
+    if (
+      targetAmount === null
+    ) {
+      throw new Error(
+        "Flexible target collections require a target amount."
+      );
+    }
+
+    normalizedDefaultAmount =
+      null;
+
+    normalizedAllowCustomAmount =
+      true;
+  } else if (
+    collectionMode ===
+      "recurring_dues" ||
+    collectionMode ===
+      "rotating_pool"
+  ) {
+    contributionAmountPolicy =
+      "schedule_based";
+
+    if (
+      defaultAmount === null
+    ) {
+      throw new Error(
+        "Recurring and rotational collections require a base contribution per cycle."
+      );
+    }
+
+    normalizedAllowCustomAmount =
+      false;
+  } else {
+    throw new Error(
+      "Select a valid contribution model."
+    );
+  }
 
   const deadlineRaw =
     String(
@@ -313,7 +425,15 @@ export async function createCollection(
           targetAmount,
 
         default_amount:
-          defaultAmount,
+          normalizedDefaultAmount,
+
+        contribution_amount_policy:
+          contributionAmountPolicy,
+
+        expected_participant_count:
+          collectionMode === "target"
+            ? expectedParticipantCount
+            : null,
 
         deadline,
 
@@ -325,9 +445,7 @@ export async function createCollection(
           ) === "on",
 
         allow_custom_amount:
-          formData.get(
-            "allow_custom_amount"
-          ) === "on",
+          normalizedAllowCustomAmount,
 
         requires_approval:
           formData.get(
