@@ -1,4 +1,4 @@
-import ParticipantControls from "./participant-controls";
+﻿import ParticipantControls from "./participant-controls";
 import Link from "next/link";
 
 import {
@@ -30,7 +30,7 @@ function friendlyText(
   value: string | null | undefined
 ) {
   if (!value) {
-    return "—";
+    return "â€”";
   }
 
   return value
@@ -318,6 +318,47 @@ export default async function ParticipantCollectionPage({
             collection.default_amount
           )
         : null;
+  const {
+    data: dashboardRows,
+    error: dashboardError,
+  } = await supabase.rpc(
+    "get_participant_dashboard_summary",
+    {
+      p_participant_id: participant.id,
+    }
+  );
+
+  if (dashboardError) {
+    console.error(
+      "PARTICIPANT_DASHBOARD_SUMMARY_ERROR:",
+      dashboardError
+    );
+  }
+
+  const dashboard =
+    dashboardRows?.[0] ?? null;
+
+  const paidAmount =
+    dashboard?.paid_amount !== undefined
+      ? Number(dashboard.paid_amount)
+      : 0;
+
+  const outstandingAmount =
+    dashboard?.outstanding_amount !== undefined
+      ? Number(dashboard.outstanding_amount)
+      : expectedAmount ?? 0;
+
+  const collectionRaised =
+    dashboard?.collection_amount_raised !== undefined
+      ? Number(dashboard.collection_amount_raised)
+      : 0;
+
+  const progressPercent =
+    dashboard?.progress_percent !== null &&
+    dashboard?.progress_percent !== undefined
+      ? Number(dashboard.progress_percent)
+      : null;
+
 
   const archived =
     Boolean(
@@ -373,7 +414,7 @@ export default async function ParticipantCollectionPage({
             href="/my-collections"
             className="text-sm font-medium text-neutral-600 hover:text-black"
           >
-            ← My Collections
+            â† My Collections
           </Link>
         </div>
       </header>
@@ -741,6 +782,119 @@ export default async function ParticipantCollectionPage({
             )}
           </div>
 
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <div className="rounded-2xl bg-neutral-50 p-5">
+              <p className="text-xs uppercase tracking-wide text-neutral-400">
+                Required
+              </p>
+              <p className="mt-2 text-xl font-semibold">
+                {formatMoney(
+                  expectedAmount,
+                  collection.currency
+                )}
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-neutral-50 p-5">
+              <p className="text-xs uppercase tracking-wide text-neutral-400">
+                Verified paid
+              </p>
+              <p className="mt-2 text-xl font-semibold">
+                {formatMoney(
+                  paidAmount,
+                  collection.currency
+                )}
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-neutral-50 p-5">
+              <p className="text-xs uppercase tracking-wide text-neutral-400">
+                Outstanding
+              </p>
+              <p className="mt-2 text-xl font-semibold">
+                {formatMoney(
+                  outstandingAmount,
+                  collection.currency
+                )}
+              </p>
+            </div>
+          </div>
+
+          {dashboard?.target_amount !== null &&
+            dashboard?.target_amount !== undefined && (
+              <div className="mt-6 rounded-2xl bg-neutral-50 p-5">
+                <div className="flex items-center justify-between gap-4 text-sm">
+                  <span className="text-neutral-500">
+                    Collection progress
+                  </span>
+                  <span className="font-semibold">
+                    {progressPercent !== null
+                      ? `${progressPercent}%`
+                      : "â€”"}
+                  </span>
+                </div>
+
+                <div className="mt-3 h-3 overflow-hidden rounded-full bg-neutral-200">
+                  <div
+                    className="h-full rounded-full bg-black"
+                    style={{
+                      width: `${Math.min(
+                        progressPercent ?? 0,
+                        100
+                      )}%`,
+                    }}
+                  />
+                </div>
+
+                <div className="mt-3 flex flex-wrap justify-between gap-2 text-xs text-neutral-500">
+                  <span>
+                    {formatMoney(
+                      collectionRaised,
+                      collection.currency
+                    )} raised
+                  </span>
+
+                  <span>
+                    {formatMoney(
+                      Number(dashboard.target_amount),
+                      collection.currency
+                    )} target
+                  </span>
+                </div>
+              </div>
+            )}
+
+          {dashboard && (
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+              <div className="rounded-2xl border p-4">
+                <p className="text-xs text-neutral-400">
+                  Joined participants
+                </p>
+                <p className="mt-1 font-semibold">
+                  {dashboard.joined_participants}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border p-4">
+                <p className="text-xs text-neutral-400">
+                  Planned participants
+                </p>
+                <p className="mt-1 font-semibold">
+                  {dashboard.expected_participant_count ?? "â€”"}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border p-4">
+                <p className="text-xs text-neutral-400">
+                  Remaining slots
+                </p>
+                <p className="mt-1 font-semibold">
+                  {dashboard.remaining_slots ?? "â€”"}
+                </p>
+              </div>
+            </div>
+          )}
+
           {!paymentReady &&
             participant.payment_status !==
               "paid" && (
@@ -764,3 +918,4 @@ export default async function ParticipantCollectionPage({
     </main>
   );
 }
+
