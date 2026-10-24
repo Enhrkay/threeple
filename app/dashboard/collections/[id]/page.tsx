@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 import {
   notFound,
@@ -37,7 +37,7 @@ function formatMoney(
     amount === null ||
     amount === undefined
   ) {
-    return "—";
+    return "â€”";
   }
 
   const numeric =
@@ -46,7 +46,7 @@ function formatMoney(
   if (
     Number.isNaN(numeric)
   ) {
-    return "—";
+    return "â€”";
   }
 
   try {
@@ -654,7 +654,7 @@ export default async function CollectionPage({
                   </span>
 
                   <span className="text-white/30">
-                    •
+                    â€¢
                   </span>
 
                   <span>
@@ -665,7 +665,7 @@ export default async function CollectionPage({
                   </span>
 
                   <span className="text-white/30">
-                    •
+                    â€¢
                   </span>
 
                   <span>
@@ -1195,7 +1195,7 @@ export default async function CollectionPage({
 
             <div className="rounded-[1.75rem] border border-[#d9eadf] bg-[#effaf3] p-6">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white font-black text-[#2e6b47]">
-                ₦
+                â‚¦
               </div>
 
               <h3 className="mt-5 font-black text-[#214f34]">
@@ -1530,6 +1530,25 @@ export default async function CollectionPage({
             </section>
           )}
       </div>
-    </main>
+    
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-danger-border)] bg-[var(--tp-danger-soft)] p-6 md:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-danger)]">
+            Collection lifecycle
+          </p>
+          <h2 className="mt-2 text-xl font-black text-[var(--tp-danger)]">
+            Archive or remove this collection
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--tp-danger)]/80">
+            Threeple protects participant and financial history when a collection is removed.
+          </p>
+          <a
+            href={`/dashboard/collections/${collection.id}/lifecycle`}
+            className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--tp-danger)] px-5 text-sm font-black text-white"
+          >
+            Manage collection lifecycle
+          </a>
+        </section>
+</main>
   );
 }
+
