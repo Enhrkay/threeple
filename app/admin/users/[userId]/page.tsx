@@ -864,9 +864,28 @@ export default async function AdminUserPage({
         </section>
 
       </div>
-    </main>
+    
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-danger-border)] bg-[var(--tp-danger-soft)] p-6 md:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-danger)]">
+            Account lifecycle
+          </p>
+          <h2 className="mt-2 text-xl font-black text-[var(--tp-danger)]">
+            Access, deactivation and deletion
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--tp-danger)]/80">
+            Manage account access without destroying contribution, payment or audit history.
+          </p>
+          <a
+            href={`/admin/users/${userId}/lifecycle`}
+            className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--tp-danger)] px-5 text-sm font-black text-white"
+          >
+            Manage account lifecycle
+          </a>
+        </section>
+</main>
   );
 }
+
 
 
 
