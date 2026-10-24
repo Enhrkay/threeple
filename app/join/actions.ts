@@ -103,49 +103,134 @@ export async function joinCollection(formData: FormData) {
     redirect(`/join/restricted?code=${encodeURIComponent(joinCode)}`);
   }
 
-  const { data: existingGuestParticipant } = await supabaseAdmin
+  const {
+    data: existingEmailParticipants,
+    error: existingEmailParticipantsError,
+  } = await supabaseAdmin
     .from("participants")
-    .select("id, full_name")
-    .eq("collection_id", collection.id)
-    .ilike("email", accountEmail)
-    .is("user_id", null)
-    .eq("is_active", true)
-    .maybeSingle();
+    .select(`
+      id,
+      user_id,
+      full_name,
+      email,
+      is_active,
+      created_at
+    `)
+    .eq(
+      "collection_id",
+      collection.id
+    )
+    .ilike(
+      "email",
+      accountEmail
+    )
+    .order(
+      "created_at",
+      {
+        ascending: true,
+      }
+    )
+    .limit(10);
 
-  if (existingGuestParticipant) {
-    const { error: linkError } = await supabaseAdmin
+  if (
+    existingEmailParticipantsError
+  ) {
+    console.error(
+      "PARTICIPANT_EMAIL_LOOKUP_FAILED",
+      {
+        collectionId:
+          collection.id,
+        accountEmail,
+        errorCode:
+          existingEmailParticipantsError.code,
+      }
+    );
+
+    joinError(
+      joinCode,
+      "join_failed"
+    );
+  }
+
+  const canonicalEmailParticipant =
+    existingEmailParticipants?.find(
+      (row) =>
+        row.is_active
+    ) ??
+    existingEmailParticipants?.[0] ??
+    null;
+
+  if (
+    canonicalEmailParticipant
+  ) {
+    const {
+      error: claimError,
+    } = await supabaseAdmin
       .from("participants")
       .update({
-        user_id: signedInUserId,
-        full_name: fullName,
-        phone: phone || null,
+        user_id:
+          signedInUserId,
+        full_name:
+          fullName,
+        phone:
+          phone || null,
+        email:
+          accountEmail,
+        is_active:
+          true,
       })
-      .eq("id", existingGuestParticipant.id)
-      .is("user_id", null);
+      .eq(
+        "id",
+        canonicalEmailParticipant.id
+      );
 
-    if (linkError) {
-      console.error("PARTICIPANT_ACCOUNT_LINK_FAILED", {
-        collectionId: collection.id,
-        participantId: existingGuestParticipant.id,
-        errorCode: linkError.code,
-      });
-      joinError(joinCode, "join_failed");
+    if (claimError) {
+      console.error(
+        "PARTICIPANT_ACCOUNT_CLAIM_FAILED",
+        {
+          collectionId:
+            collection.id,
+          participantId:
+            canonicalEmailParticipant.id,
+          errorCode:
+            claimError.code,
+        }
+      );
+
+      joinError(
+        joinCode,
+        "join_failed"
+      );
     }
 
     await logCollectionActivity({
-      collectionId: collection.id,
-      organizationId: collection.organization_id,
-      actorUserId: signedInUserId,
-      actorType: "user",
-      eventType: "participant.account_linked",
-      subjectType: "participant",
-      subjectId: existingGuestParticipant.id,
-      subjectLabel: fullName,
-      description: `${fullName}'s participant record was linked to their Threeple account.`,
-      metadata: { linking_method: "authenticated_email" },
+      collectionId:
+        collection.id,
+      organizationId:
+        collection.organization_id,
+      actorUserId:
+        signedInUserId,
+      actorType:
+        "user",
+      eventType:
+        "participant.account_linked",
+      subjectType:
+        "participant",
+      subjectId:
+        canonicalEmailParticipant.id,
+      subjectLabel:
+        fullName,
+      description:
+        `${fullName}'s existing participant record was linked to their Threeple account.`,
+      metadata: {
+        linking_method:
+          "authenticated_email",
+      },
     });
 
-    redirect(`/my-collections/${existingGuestParticipant.id}`);
+    redirect(
+      `/my-collections/${canonicalEmailParticipant.id}`
+    );
   }
 
   const { blocked: organizationParticipationBlocked } =
@@ -244,4 +329,5 @@ export async function joinCollection(formData: FormData) {
 
   redirect(`/my-collections/${participant.id}`);
 }
+
 

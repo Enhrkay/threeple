@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 
+import { supabaseAdmin } from "@/lib/supabase/admin";
+
 export const instant = false;
 
 // =========================================================
@@ -133,7 +135,7 @@ export default async function MyCollectionsPage() {
   const {
     data: participantRows,
     error: participantError,
-  } = await supabase
+  } = await supabaseAdmin
     .from("participants")
     .select(`
       id,
@@ -198,7 +200,7 @@ export default async function MyCollectionsPage() {
   ) {
     const {
       data: collectionRows,
-    } = await supabase
+    } = await supabaseAdmin
       .from("collections")
       .select(`
         id,
@@ -588,4 +590,5 @@ export default async function MyCollectionsPage() {
     </main>
   );
 }
+
 
