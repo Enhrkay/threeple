@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 import {
   notFound,
@@ -37,7 +37,7 @@ function formatMoney(
     amount === null ||
     amount === undefined
   ) {
-    return "—";
+    return "â€”";
   }
 
   const numeric =
@@ -46,7 +46,7 @@ function formatMoney(
   if (
     Number.isNaN(numeric)
   ) {
-    return "—";
+    return "â€”";
   }
 
   try {
@@ -375,11 +375,10 @@ export default async function CollectionPage({
     )
     .select(`
       verified_payment_count,
-      gross_processed,
-      refunded_amount,
-      platform_revenue,
-      processor_fees,
-      organizer_net
+      effective_gross_amount,
+      platform_fee_amount,
+      processor_fee_amount,
+      organizer_net_amount
     `)
     .eq(
       "collection_id",
@@ -398,31 +397,26 @@ export default async function CollectionPage({
 
   const grossProcessed =
     Number(
-      financialSummary?.gross_processed ??
+      financialSummary?.effective_gross_amount ??
         0
     );
+  const refundedAmount = 0;
 
-  const refundedAmount =
+const platformRevenue =
     Number(
-      financialSummary?.refunded_amount ??
-        0
-    );
-
-  const platformRevenue =
-    Number(
-      financialSummary?.platform_revenue ??
+      financialSummary?.platform_fee_amount ??
         0
     );
 
   const processorFees =
     Number(
-      financialSummary?.processor_fees ??
+      financialSummary?.processor_fee_amount ??
         0
     );
 
   const organizerNet =
     Number(
-      financialSummary?.organizer_net ??
+      financialSummary?.organizer_net_amount ??
         0
     );
 
@@ -432,12 +426,7 @@ export default async function CollectionPage({
         0
     );
 
-  const amountRaised =
-    Math.max(
-      0,
-      grossProcessed -
-        refundedAmount
-    );
+  const amountRaised = Math.max(0, grossProcessed);
 
   const targetAmount =
     collection.target_amount !==
@@ -501,7 +490,7 @@ export default async function CollectionPage({
             href="/dashboard"
             className="text-sm font-medium text-neutral-600 hover:text-black"
           >
-            ← Dashboard
+            â† Dashboard
           </Link>
         </div>
       </header>
@@ -643,7 +632,7 @@ export default async function CollectionPage({
                     targetAmount,
                     collection.currency
                   )
-                : "—"}
+                : "â€”"}
             </p>
           </div>
 
@@ -656,7 +645,7 @@ export default async function CollectionPage({
               {progressPercent !==
               null
                 ? `${progressPercent}%`
-                : "—"}
+                : "â€”"}
             </p>
           </div>
         </section>
@@ -758,7 +747,7 @@ export default async function CollectionPage({
                       outstandingAmount,
                       collection.currency
                     )
-                  : "—"}
+                  : "â€”"}
               </p>
             </div>
           </div>
@@ -866,7 +855,7 @@ export default async function CollectionPage({
               className="rounded-2xl border bg-white p-6 transition hover:border-neutral-400 hover:shadow-sm"
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg">
-                👥
+                ðŸ‘¥
               </div>
 
               <h3 className="mt-5 font-semibold">
@@ -878,7 +867,7 @@ export default async function CollectionPage({
               </p>
 
               <p className="mt-5 text-sm font-medium">
-                Manage participants →
+                Manage participants â†’
               </p>
             </Link>
 
@@ -888,7 +877,7 @@ export default async function CollectionPage({
                 className="rounded-2xl border bg-white p-6 transition hover:border-neutral-400 hover:shadow-sm"
               >
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg">
-                  ✎
+                  âœŽ
                 </div>
 
                 <h3 className="mt-5 font-semibold">
@@ -900,13 +889,13 @@ export default async function CollectionPage({
                 </p>
 
                 <p className="mt-5 text-sm font-medium">
-                  Edit Collection →
+                  Edit Collection â†’
                 </p>
               </Link>
             ) : (
               <div className="rounded-2xl border bg-white p-6 opacity-50">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg">
-                  ✎
+                  âœŽ
                 </div>
 
                 <h3 className="mt-5 font-semibold">
@@ -927,7 +916,7 @@ export default async function CollectionPage({
                 className="rounded-2xl border bg-white p-6 transition hover:border-neutral-400 hover:shadow-sm"
               >
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg">
-                  ↗
+                  â†—
                 </div>
 
                 <h3 className="mt-5 font-semibold">
@@ -939,13 +928,13 @@ export default async function CollectionPage({
                 </p>
 
                 <p className="mt-5 text-sm font-medium">
-                  Invite people →
+                  Invite people â†’
                 </p>
               </Link>
             ) : (
               <div className="rounded-2xl border bg-white p-6 opacity-50">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg">
-                  ↗
+                  â†—
                 </div>
 
                 <h3 className="mt-5 font-semibold">
@@ -958,12 +947,35 @@ export default async function CollectionPage({
               </div>
             )}
 
+            {collection.collection_mode ===
+              "rotating_pool" && (
+              <Link
+                href={`/dashboard/collections/${collection.id}/rotation`}
+                className="rounded-2xl border border-blue-200 bg-blue-50 p-6 transition hover:border-blue-400 hover:shadow-sm"
+              >
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-lg">
+                  â†»
+                </div>
+
+                <h3 className="mt-5 font-semibold text-blue-950">
+                  Rotation Workspace
+                </h3>
+
+                <p className="mt-2 text-sm leading-6 text-blue-800">
+                  Manage member order, recipient sequence, cycles and contribution obligations.
+                </p>
+
+                <p className="mt-5 text-sm font-medium text-blue-950">
+                  Manage rotation â†’
+                </p>
+              </Link>
+            )}
             <Link
               href={`/dashboard/collections/${collection.id}/reports`}
               className="rounded-2xl border bg-white p-6 transition hover:border-neutral-400 hover:shadow-sm"
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg">
-                ▤
+                â–¤
               </div>
 
               <h3 className="mt-5 font-semibold">
@@ -975,7 +987,7 @@ export default async function CollectionPage({
               </p>
 
               <p className="mt-5 text-sm font-medium">
-                View reports →
+                View reports â†’
               </p>
             </Link>
 
@@ -984,7 +996,7 @@ export default async function CollectionPage({
               className="rounded-2xl border bg-white p-6 transition hover:border-neutral-400 hover:shadow-sm"
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg">
-                ◷
+                â—·
               </div>
 
               <h3 className="mt-5 font-semibold">
@@ -996,14 +1008,14 @@ export default async function CollectionPage({
               </p>
 
               <p className="mt-5 text-sm font-medium">
-                View activity →
+                View activity â†’
               </p>
             </Link>
 
             <div className="rounded-2xl border bg-white p-6">
               <div className="flex items-center justify-between">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg">
-                  ₦
+                  â‚¦
                 </div>
 
                 <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
@@ -1375,3 +1387,4 @@ export default async function CollectionPage({
     </main>
   );
 }
+
