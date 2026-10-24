@@ -24,6 +24,8 @@ type PaystackWebhookEvent = {
           participant_id?: string;
           collection_id?: string;
           organization_id?: string;
+          rotation_cycle_id?: string | null;
+          rotation_obligation_id?: string | null;
           gross_amount?: number;
           platform_fee_amount?: number;
           platform_fee_percentage?: number;
@@ -47,6 +49,8 @@ type PaystackVerifyResponse = {
           participant_id?: string;
           collection_id?: string;
           organization_id?: string;
+          rotation_cycle_id?: string | null;
+          rotation_obligation_id?: string | null;
           gross_amount?: number;
           platform_fee_amount?: number;
           platform_fee_percentage?: number;
@@ -113,6 +117,8 @@ function metadataObject(
         participant_id?: string;
         collection_id?: string;
         organization_id?: string;
+          rotation_cycle_id?: string | null;
+          rotation_obligation_id?: string | null;
         gross_amount?: number;
         platform_fee_amount?: number;
         platform_fee_percentage?: number;
@@ -284,6 +290,19 @@ export async function POST(
         transaction.metadata
       );
 
+    const rotationCycleId =
+      typeof metadata?.rotation_cycle_id ===
+        "string" &&
+      metadata.rotation_cycle_id
+        ? metadata.rotation_cycle_id
+        : null;
+
+    const rotationObligationId =
+      typeof metadata?.rotation_obligation_id ===
+        "string" &&
+      metadata.rotation_obligation_id
+        ? metadata.rotation_obligation_id
+        : null;
     const frozenPlatformFeeAmount =
       metadata?.platform_fee_amount !== undefined
         ? Number(metadata.platform_fee_amount)
@@ -456,6 +475,10 @@ export async function POST(
           frozenPlatformFeeAmount,
         p_platform_fee_percentage:
           frozenPlatformFeePercentage,
+        p_rotation_cycle_id:
+          rotationCycleId,
+        p_rotation_obligation_id:
+          rotationObligationId,
       }
     );
 
@@ -492,6 +515,7 @@ export async function POST(
     );
   }
 }
+
 
 
 

@@ -4,6 +4,8 @@
 
 type CreatePaystackSubaccountInput = {
   organizationId: string;
+  rotationCycleId?: string | null;
+  rotationObligationId?: string | null;
   businessName: string;
   bankCode: string;
   accountNumber: string;
@@ -24,6 +26,8 @@ type InitializePaystackSplitPaymentInput = {
   participantId: string;
   collectionId: string;
   organizationId: string;
+  rotationCycleId?: string | null;
+  rotationObligationId?: string | null;
 };
 
 type PaystackSubaccountResponse = {
@@ -149,6 +153,8 @@ export async function createOrganizerPaystackSubaccount(
 ) {
   const {
     organizationId,
+    rotationCycleId,
+    rotationObligationId,
     businessName,
     bankCode,
     accountNumber,
@@ -301,6 +307,8 @@ export async function initializePaystackSplitPayment(
     participantId,
     collectionId,
     organizationId,
+    rotationCycleId,
+    rotationObligationId,
   } = input;
 
   if (
@@ -379,6 +387,12 @@ export async function initializePaystackSplitPayment(
               collectionId,
             organization_id:
               organizationId,
+            rotation_cycle_id:
+              rotationCycleId ?? null,
+            rotation_obligation_id:
+              rotationObligationId ?? null,
+    rotationCycleId,
+    rotationObligationId,
             gross_amount:
               amountMajor,
             platform_fee_amount:
@@ -416,4 +430,5 @@ export async function initializePaystackSplitPayment(
       result.data.reference,
   };
 }
+
 

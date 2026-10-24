@@ -134,18 +134,7 @@ export async function startParticipantPayment(
       "participation_inactive"
     );
   }
-
-  if (
-    participant.payment_status ===
-      "paid"
-  ) {
-    backWithError(
-      participantId,
-      "already_paid"
-    );
-  }
-
-  if (!participant.email) {
+if (!participant.email) {
     backWithError(
       participantId,
       "email_required"
@@ -161,6 +150,7 @@ export async function startParticipantPayment(
       id,
       organization_id,
       title,
+      collection_mode,
       currency,
       default_amount,
       requires_approval,
@@ -230,18 +220,199 @@ export async function startParticipantPayment(
     );
   }
 
-  const amount =
-    participant.expected_amount !==
-      null
-      ? Number(
-          participant.expected_amount
+  let rotationCycleId:
+    | string
+    | null =
+      null;
+
+  let rotationObligationId:
+    | string
+    | null =
+      null;
+
+  let rotationOutstandingAmount:
+    | number
+    | null =
+      null;
+
+  if (
+    collection.collection_mode ===
+      "rotating_pool"
+  ) {
+    const {
+      data: rotationCycles,
+      error: rotationCyclesError,
+    } = await supabaseAdmin
+      .from("rotation_cycles")
+      .select(`
+        id,
+        cycle_number,
+        status,
+        scheduled_date
+      `)
+      .eq(
+        "collection_id",
+        collection.id
+      )
+      .in(
+        "status",
+        [
+          "scheduled",
+          "open",
+        ]
+      )
+      .order(
+        "cycle_number",
+        {
+          ascending: true,
+        }
+      );
+
+    if (
+      rotationCyclesError ||
+      !rotationCycles?.length
+    ) {
+      backWithError(
+        participantId,
+        "rotation_not_ready"
+      );
+    }
+
+    const cycleIds =
+      rotationCycles.map(
+        (cycle) =>
+          cycle.id
+      );
+
+    const {
+      data: obligations,
+      error: obligationsError,
+    } = await supabaseAdmin
+      .from(
+        "rotation_cycle_obligations"
+      )
+      .select(`
+        id,
+        cycle_id,
+        amount_due,
+        amount_paid,
+        status
+      `)
+      .eq(
+        "participant_id",
+        participant.id
+      )
+      .in(
+        "cycle_id",
+        cycleIds
+      )
+      .in(
+        "status",
+        [
+          "pending",
+          "partial",
+        ]
+      );
+
+    if (
+      obligationsError ||
+      !obligations?.length
+    ) {
+      backWithError(
+        participantId,
+        "rotation_cycle_paid"
+      );
+    }
+
+    const obligationByCycle =
+      new Map(
+        obligations.map(
+          (obligation) => [
+            obligation.cycle_id,
+            obligation,
+          ]
         )
-      : collection.default_amount !==
+      );
+
+    const nextCycle =
+      rotationCycles.find(
+        (cycle) =>
+          obligationByCycle.has(
+            cycle.id
+          )
+      );
+
+    if (!nextCycle) {
+      backWithError(
+        participantId,
+        "rotation_cycle_paid"
+      );
+    }
+
+    const nextObligation =
+      obligationByCycle.get(
+        nextCycle.id
+      );
+
+    if (!nextObligation) {
+      backWithError(
+        participantId,
+        "rotation_cycle_paid"
+      );
+    }
+
+    const outstanding =
+      Math.max(
+        0,
+        Number(
+          nextObligation.amount_due
+        ) -
+        Number(
+          nextObligation.amount_paid ??
+            0
+        )
+      );
+
+    if (
+      !Number.isFinite(
+        outstanding
+      ) ||
+      outstanding <= 0
+    ) {
+      backWithError(
+        participantId,
+        "rotation_cycle_paid"
+      );
+    }
+
+    rotationCycleId =
+      nextCycle.id;
+
+    rotationObligationId =
+      nextObligation.id;
+
+    rotationOutstandingAmount =
+      Math.round(
+        outstanding * 100
+      ) / 100;
+  }
+  const amount =
+    collection.collection_mode ===
+      "rotating_pool" &&
+    rotationOutstandingAmount !==
+      null
+      ? rotationOutstandingAmount
+      : participant.expected_amount !==
           null
         ? Number(
-            collection.default_amount
+            participant.expected_amount
           )
-        : 0;
+        : collection.default_amount !==
+            null
+          ? Number(
+              collection.default_amount
+            )
+          : 0;
 
   if (
     !Number.isFinite(
@@ -344,6 +515,10 @@ export async function startParticipantPayment(
           collection.id,
         organizationId:
           organization.id,
+        rotationCycleId:
+          rotationCycleId,
+        rotationObligationId:
+          rotationObligationId,
       });
 
     redirect(
@@ -367,6 +542,10 @@ export async function startParticipantPayment(
           collection.id,
         organizationId:
           organization.id,
+        rotationCycleId:
+          rotationCycleId,
+        rotationObligationId:
+          rotationObligationId,
         reference,
         error,
       }
@@ -378,4 +557,5 @@ export async function startParticipantPayment(
     );
   }
 }
+
 

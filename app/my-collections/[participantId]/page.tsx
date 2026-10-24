@@ -316,18 +316,153 @@ export default async function ParticipantCollectionPage({
     )
     .maybeSingle();
 
-  const expectedAmount =
-    participant.expected_amount !==
-      null
-      ? Number(
-          participant.expected_amount
+  let currentRotationObligation:
+    | {
+        id: string;
+        cycle_id: string;
+        amount_due: number | string;
+        amount_paid: number | string;
+        status: string;
+        cycle_number: number;
+        scheduled_date: string;
+        recipient_name: string | null;
+      }
+    | null =
+      null;
+
+  if (
+    collection.collection_mode ===
+      "rotating_pool"
+  ) {
+    const {
+      data: rotationCycles,
+    } = await supabase
+      .from("rotation_cycle_summary")
+      .select(`
+        cycle_id,
+        cycle_number,
+        scheduled_date,
+        recipient_name,
+        status
+      `)
+      .eq(
+        "collection_id",
+        collection.id
+      )
+      .in(
+        "status",
+        [
+          "scheduled",
+          "open",
+        ]
+      )
+      .order(
+        "cycle_number",
+        {
+          ascending: true,
+        }
+      );
+
+    if (rotationCycles?.length) {
+      const cycleIds =
+        rotationCycles.map(
+          (cycle) =>
+            cycle.cycle_id
+        );
+
+      const {
+        data: obligations,
+      } = await supabase
+        .from(
+          "rotation_cycle_obligations"
         )
-      : collection.default_amount !==
+        .select(`
+          id,
+          cycle_id,
+          amount_due,
+          amount_paid,
+          status
+        `)
+        .eq(
+          "participant_id",
+          participant.id
+        )
+        .in(
+          "cycle_id",
+          cycleIds
+        )
+        .in(
+          "status",
+          [
+            "pending",
+            "partial",
+          ]
+        );
+
+      const obligationByCycle =
+        new Map(
+          (obligations ?? []).map(
+            (obligation) => [
+              obligation.cycle_id,
+              obligation,
+            ]
+          )
+        );
+
+      const cycle =
+        rotationCycles.find(
+          (candidate) =>
+            obligationByCycle.has(
+              candidate.cycle_id
+            )
+        );
+
+      if (cycle) {
+        const obligation =
+          obligationByCycle.get(
+            cycle.cycle_id
+          );
+
+        if (obligation) {
+          currentRotationObligation = {
+            ...obligation,
+            cycle_number:
+              cycle.cycle_number,
+            scheduled_date:
+              cycle.scheduled_date,
+            recipient_name:
+              cycle.recipient_name,
+          };
+        }
+      }
+    }
+  }
+  const expectedAmount =
+    collection.collection_mode ===
+      "rotating_pool"
+      ? currentRotationObligation
+        ? Math.max(
+            0,
+            Number(
+              currentRotationObligation.amount_due
+            ) -
+              Number(
+                currentRotationObligation.amount_paid ??
+                  0
+              )
+          )
+        : null
+      : participant.expected_amount !==
           null
         ? Number(
-            collection.default_amount
+            participant.expected_amount
           )
-        : null;
+        : collection.default_amount !==
+            null
+          ? Number(
+              collection.default_amount
+            )
+          : null;
   const {
     data: dashboardRows,
     error: dashboardError,
@@ -411,8 +546,8 @@ export default async function ParticipantCollectionPage({
     !archived &&
     participant.is_active &&
     approvedForPayment &&
-    participant.payment_status !==
-      "paid" &&
+    (collection.collection_mode === "rotating_pool" ||
+      participant.payment_status !== "paid") &&
     expectedAmount !== null &&
     expectedAmount > 0 &&
     Boolean(
@@ -773,6 +908,35 @@ export default async function ParticipantCollectionPage({
                 Payments are processed by Paystack. The organizer receives settlement through their connected Paystack subaccount; Threeple does not hold the organizer&apos;s funds for later payout.
               </p>
 
+              {collection.collection_mode ===
+                "rotating_pool" &&
+                currentRotationObligation && (
+                <div className="mt-4 rounded-2xl bg-neutral-50 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+                    Current rotation cycle
+                  </p>
+
+                  <p className="mt-2 font-semibold">
+                    Cycle {currentRotationObligation.cycle_number}
+                    {" Â· "}
+                    Recipient:{" "}
+                    {currentRotationObligation.recipient_name ??
+                      "Participant"}
+                  </p>
+
+                  <p className="mt-1 text-xs text-neutral-500">
+                    Scheduled{" "}
+                    {new Date(
+                      currentRotationObligation.scheduled_date
+                    ).toLocaleDateString(
+                      "en-NG",
+                      {
+                        dateStyle: "medium",
+                      }
+                    )}
+                  </p>
+                </div>
+              )}
               <p className="mt-4 text-2xl font-semibold">
                 {formatMoney(
                   expectedAmount,
@@ -781,8 +945,8 @@ export default async function ParticipantCollectionPage({
               </p>
             </div>
 
-            {participant.payment_status ===
-              "paid" ? (
+            {collection.collection_mode !== "rotating_pool" &&
+            participant.payment_status === "paid" ? (
               <span className="w-fit rounded-full bg-green-100 px-4 py-2 text-sm font-semibold text-green-700">
                 Paid
               </span>
@@ -928,8 +1092,8 @@ export default async function ParticipantCollectionPage({
           )}
 
           {!paymentReady &&
-            participant.payment_status !==
-              "paid" && (
+            (collection.collection_mode === "rotating_pool" ||
+      participant.payment_status !== "paid") && (
               <div className="mt-5 rounded-2xl bg-neutral-50 p-4 text-sm leading-6 text-neutral-600">
                 {!participant.email
                   ? "Add an email address to this participant record before payment can begin."
@@ -1048,6 +1212,7 @@ export default async function ParticipantCollectionPage({
     </main>
   );
 }
+
 
 
 
