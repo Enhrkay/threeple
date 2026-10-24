@@ -16,6 +16,16 @@ import {
 
 export const instant = false;
 
+type TransparencyLedgerRow = {
+  participant_number: number;
+  display_name: string | null;
+  payment_status: string;
+  paid_amount: number | string | null;
+  expected_amount: number | string | null;
+  is_self: boolean;
+  show_participant_names: boolean;
+  show_payment_amounts: boolean;
+};
 type PageProps = {
   params: Promise<{
     participantId: string;
@@ -359,6 +369,28 @@ export default async function ParticipantCollectionPage({
       ? Number(dashboard.progress_percent)
       : null;
 
+
+  const {
+    data: ledgerRows,
+    error: ledgerError,
+  } = await supabase.rpc(
+    "get_participant_transparency_ledger",
+    {
+      p_participant_id: participant.id,
+    }
+  );
+
+  if (ledgerError) {
+    console.error(
+      "PARTICIPANT_LEDGER_ERROR:",
+      ledgerError
+    );
+  }
+
+  const ledger = (ledgerRows ?? []) as TransparencyLedgerRow[];
+
+  const ledgerPrivacy =
+    ledger[0] ?? null;
 
   const archived =
     Boolean(
@@ -914,8 +946,109 @@ export default async function ParticipantCollectionPage({
               </div>
             )}
         </section>
+
+        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+                Transparency
+              </p>
+              <h2 className="mt-2 text-xl font-semibold">
+                Contribution ledger
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-500">
+                See participation and contribution progress across this Collection. Names and amounts follow the organizer&apos;s privacy settings.
+              </p>
+            </div>
+
+            <span className="w-fit rounded-full bg-neutral-100 px-3 py-1.5 text-xs font-semibold text-neutral-600">
+              {ledger.length} participant{ledger.length === 1 ? "" : "s"}
+            </span>
+          </div>
+
+          {ledger.length === 0 ? (
+            <div className="mt-6 rounded-2xl bg-neutral-50 p-5 text-sm text-neutral-500">
+              No participant activity is available yet.
+            </div>
+          ) : (
+            <div className="mt-6 overflow-hidden rounded-2xl border">
+              <div className="grid grid-cols-[1fr_auto] gap-4 border-b bg-neutral-50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-400 sm:grid-cols-[1.5fr_1fr_1fr]">
+                <span>Participant</span>
+                <span>Status</span>
+                <span className="hidden sm:block">Contribution</span>
+              </div>
+
+              <div className="divide-y">
+                {ledger.map((entry) => {
+                  const label =
+                    entry.display_name ??
+                    `Participant ${entry.participant_number}`;
+
+                  const paid =
+                    entry.paid_amount !== null &&
+                    entry.paid_amount !== undefined
+                      ? Number(entry.paid_amount)
+                      : null;
+
+                  return (
+                    <div
+                      key={String(entry.participant_number)}
+                      className="grid grid-cols-[1fr_auto] gap-4 px-4 py-4 text-sm sm:grid-cols-[1.5fr_1fr_1fr]"
+                    >
+                      <div>
+                        <p className="font-medium">
+                          {label}
+                          {entry.is_self ? " (You)" : ""}
+                        </p>
+                        {!entry.show_participant_names &&
+                          !entry.is_self && (
+                            <p className="mt-1 text-xs text-neutral-400">
+                              Name hidden by organizer
+                            </p>
+                          )}
+                      </div>
+
+                      <div>
+                        <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-semibold text-neutral-700">
+                          {friendlyText(entry.payment_status)}
+                        </span>
+                      </div>
+
+                      <div className="hidden sm:block">
+                        {paid !== null ? (
+                          <span className="font-medium">
+                            {formatMoney(
+                              paid,
+                              collection.currency
+                            )}
+                          </span>
+                        ) : (
+                          <span className="text-neutral-400">
+                            Hidden
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {ledgerPrivacy && (
+            <div className="mt-4 text-xs leading-5 text-neutral-400">
+              {!ledgerPrivacy.show_participant_names &&
+                "Participant names are hidden. "}
+              {!ledgerPrivacy.show_payment_amounts &&
+                "Contribution amounts are hidden for other participants."}
+            </div>
+          )}
+        </section>
       </div>
     </main>
   );
 }
+
+
+
 
