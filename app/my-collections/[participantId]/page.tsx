@@ -11,6 +11,10 @@ import {
 } from "@/lib/supabase/server";
 
 import {
+  supabaseAdmin,
+} from "@/lib/supabase/admin";
+
+import {
   startParticipantPayment,
 } from "./payment-actions";
 
@@ -232,7 +236,7 @@ export default async function ParticipantCollectionPage({
   const {
     data: participant,
     error: participantError,
-  } = await supabase
+  } = await supabaseAdmin
     .from("participants")
     .select(`
       id,
@@ -261,13 +265,27 @@ export default async function ParticipantCollectionPage({
     participantError ||
     !participant
   ) {
-    notFound();
+    console.error(
+      "PARTICIPANT_WORKSPACE_LOOKUP_FAILED",
+      {
+        participantId,
+        userId,
+        errorCode:
+          participantError?.code,
+        errorMessage:
+          participantError?.message,
+      }
+    );
+
+    redirect(
+      "/my-collections?error=participant_not_found"
+    );
   }
 
   const {
     data: collection,
     error: collectionError,
-  } = await supabase
+  } = await supabaseAdmin
     .from("collections")
     .select(`
       id,
@@ -302,7 +320,7 @@ export default async function ParticipantCollectionPage({
 
   const {
     data: organization,
-  } = await supabase
+  } = await supabaseAdmin
     .from("organizations")
     .select(`
       id,
@@ -1212,6 +1230,7 @@ export default async function ParticipantCollectionPage({
     </main>
   );
 }
+
 
 
 
