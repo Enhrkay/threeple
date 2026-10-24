@@ -1,16 +1,31 @@
-﻿import Link from "next/link";
-import { redirect } from "next/navigation";
+import Link from "next/link";
+import {
+  redirect,
+} from "next/navigation";
 
-import { createClient } from "@/lib/supabase/server";
+import {
+  createClient,
+} from "@/lib/supabase/server";
+
+import {
+  ThreepleAppShell,
+} from "@/components/threeple/app-shell";
+
+import {
+  ThreepleBadge,
+  ThreepleEmptyState,
+  ThreepleLinkButton,
+  ThreepleProgress,
+  ThreepleStat,
+} from "@/components/threeple/design-system";
 
 export const instant = false;
 
-// =========================================================
-// HELPERS
-// =========================================================
-
 function friendlyText(
-  value: string | null | undefined
+  value:
+    | string
+    | null
+    | undefined
 ) {
   if (!value) {
     return "—";
@@ -18,147 +33,105 @@ function friendlyText(
 
   return value
     .replaceAll("_", " ")
-    .replace(/\b\w/g, (character) =>
-      character.toUpperCase()
+    .replace(
+      /\b\w/g,
+      (character) =>
+        character.toUpperCase()
     );
 }
 
-function statusStyle(
-  status: string
+function money(
+  value:
+    | number
+    | string
+    | null
+    | undefined,
+  currency = "NGN"
 ) {
+  if (
+    value === null ||
+    value === undefined
+  ) {
+    return "—";
+  }
+
+  const number =
+    Number(value);
+
+  if (!Number.isFinite(number)) {
+    return "—";
+  }
+
+  try {
+    return new Intl.NumberFormat(
+      "en-NG",
+      {
+        style: "currency",
+        currency,
+        maximumFractionDigits: 0,
+      }
+    ).format(number);
+  } catch {
+    return `${currency} ${number.toLocaleString()}`;
+  }
+}
+
+function dateLabel(
+  value:
+    | string
+    | null
+    | undefined
+) {
+  if (!value) {
+    return "No deadline";
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return "No deadline";
+  }
+
+  return date.toLocaleDateString(
+    "en-NG",
+    {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }
+  );
+}
+
+function badgeTone(
+  status: string
+):
+  | "neutral"
+  | "primary"
+  | "success"
+  | "warning"
+  | "danger" {
   switch (status) {
     case "active":
-      return "bg-green-100 text-green-700";
-
+      return "success";
     case "draft":
-      return "bg-amber-100 text-amber-700";
-
-    case "closed":
-      return "bg-neutral-200 text-neutral-700";
-
+      return "warning";
     case "cancelled":
-      return "bg-red-100 text-red-700";
-
+      return "danger";
+    case "closed":
+      return "neutral";
     default:
-      return "bg-neutral-100 text-neutral-600";
+      return "primary";
   }
 }
-
-function eventBadgeStyle(
-  eventType: string
-) {
-  if (
-    eventType.includes("approved") ||
-    eventType.includes("reactivated") ||
-    eventType.includes("activated")
-  ) {
-    return "bg-green-100 text-green-700";
-  }
-
-  if (
-    eventType.includes("declined") ||
-    eventType.includes("deactivated") ||
-    eventType.includes("cancelled")
-  ) {
-    return "bg-red-100 text-red-700";
-  }
-
-  if (
-    eventType.includes("joined")
-  ) {
-    return "bg-blue-100 text-blue-700";
-  }
-
-  if (
-    eventType.includes("updated")
-  ) {
-    return "bg-amber-100 text-amber-700";
-  }
-
-  return "bg-neutral-100 text-neutral-600";
-}
-
-function friendlyEventName(
-  eventType: string
-) {
-  switch (eventType) {
-    case "participant.joined":
-      return "Participant joined";
-
-    case "participant.approved":
-      return "Participant approved";
-
-    case "participant.declined":
-      return "Participant declined";
-
-    case "participant.deactivated":
-      return "Participant deactivated";
-
-    case "participant.reactivated":
-      return "Participant reactivated";
-
-    case "collection.created":
-      return "Collection created";
-
-    case "collection.updated":
-      return "Collection updated";
-
-    case "collection.activated":
-      return "Collection activated";
-
-    case "collection.closed":
-      return "Collection closed";
-
-    case "collection.reopened":
-      return "Collection reopened";
-
-    default:
-      return friendlyText(
-        eventType.replaceAll(".", " ")
-      );
-  }
-}
-
-function formatDate(
-  value: string
-) {
-  return new Intl.DateTimeFormat(
-    "en-NG",
-    {
-      dateStyle: "medium",
-      timeZone: "Africa/Lagos",
-    }
-  ).format(
-    new Date(value)
-  );
-}
-
-function formatDateTime(
-  value: string
-) {
-  return new Intl.DateTimeFormat(
-    "en-NG",
-    {
-      dateStyle: "medium",
-      timeStyle: "short",
-      timeZone: "Africa/Lagos",
-    }
-  ).format(
-    new Date(value)
-  );
-}
-
-// =========================================================
-// DASHBOARD
-// =========================================================
 
 export default async function DashboardPage() {
   const supabase =
     await createClient();
-
-  // =======================================================
-  // 1. AUTHENTICATED USER
-  // =======================================================
 
   const {
     data: claimsData,
@@ -173,1076 +146,563 @@ export default async function DashboardPage() {
     claimsError ||
     !userId
   ) {
-    redirect("/auth/login");
+    redirect(
+      "/auth/login?next=/dashboard"
+    );
   }
 
-  // =======================================================
-  // 2. PROFILE
-  // =======================================================
+  const email =
+    typeof claimsData?.claims?.email ===
+      "string"
+      ? claimsData.claims.email
+      : "";
+
+  const firstName =
+    email
+      ? email
+          .split("@")[0]
+          .split(/[._-]/)[0]
+      : "there";
 
   const {
-    data: profile,
-  } = await supabase
-    .from("profiles")
-    .select(`
-      full_name
-    `)
-    .eq(
-      "id",
-      userId
-    )
-    .maybeSingle();
-
-  const displayName =
-    profile?.full_name?.trim() ||
-    "there";
-
-  // =======================================================
-  // 3. PERSONAL WORKSPACE
-  // =======================================================
-
-  const {
-    data: workspace,
-    error: workspaceError,
+    data: ownedOrganizations,
   } = await supabase
     .from("organizations")
     .select(`
       id,
       name,
-      organization_type,
-      created_at
+      owner_id,
+      settlement_status
     `)
     .eq(
       "owner_id",
       userId
-    )
-    .eq(
-      "organization_type",
-      "personal"
-    )
-    .maybeSingle();
-
-  if (
-    workspaceError ||
-    !workspace
-  ) {
-    return (
-      <main className="min-h-screen bg-neutral-50 text-neutral-900">
-
-        <div className="mx-auto max-w-5xl px-6 py-12">
-
-          <div className="rounded-3xl border bg-white p-8">
-
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-neutral-100 text-xl">
-              !
-            </div>
-
-            <h1 className="mt-5 text-2xl font-semibold">
-              Workspace unavailable
-            </h1>
-
-            <p className="mt-3 max-w-lg leading-7 text-neutral-600">
-              Threeple could not
-              load your personal
-              workspace.
-            </p>
-
-          </div>
-
-        </div>
-
-      </main>
     );
-  }
-
-  // =======================================================
-  // 4. COLLECTIONS
-  // =======================================================
 
   const {
-    data: collectionRows,
+    data: memberships,
   } = await supabase
-    .from("collections")
+    .from("organization_members")
     .select(`
-      id,
-      title,
-      description,
-      collection_type,
-      collection_mode,
-      currency,
-      target_amount,
-      default_amount,
-      status,
-      join_code,
-      requires_approval,
-      deadline,
-      created_at
+      organization_id,
+      role
     `)
     .eq(
-      "organization_id",
-      workspace.id
-    )
-    .order(
-      "created_at",
-      {
-        ascending: false,
-      }
+      "user_id",
+      userId
     );
 
-  const collections =
-    collectionRows ?? [];
-
-  const collectionIds =
-    collections.map(
-      (collection) =>
-        collection.id
+  const organizationIds =
+    Array.from(
+      new Set([
+        ...(
+          ownedOrganizations ??
+          []
+        ).map(
+          (item) =>
+            item.id
+        ),
+        ...(
+          memberships ??
+          []
+        ).map(
+          (item) =>
+            item.organization_id
+        ),
+      ])
     );
 
-  // =======================================================
-  // 5. PARTICIPANTS
-  // =======================================================
-
-  let participants:
-    {
-      id: string;
-      collection_id: string;
-      participation_status: string;
-      is_active: boolean;
-      created_at: string;
-    }[] = [];
-
-  if (
-    collectionIds.length > 0
-  ) {
-    const {
-      data: participantRows,
-    } = await supabase
-      .from("participants")
-      .select(`
-        id,
-        collection_id,
-        participation_status,
-        is_active,
-        created_at
-      `)
-      .in(
-        "collection_id",
-        collectionIds
-      );
-
-    participants =
-      participantRows ?? [];
-  }
-
-  // =======================================================
-  // 6. RECENT ACTIVITY
-  // =======================================================
-
-  let activityEvents:
-    {
-      id: string;
-      collection_id: string;
-      event_type: string;
-      subject_label: string | null;
-      description: string | null;
-      created_at: string;
-    }[] = [];
+  let collections: Array<{
+    id: string;
+    organization_id: string;
+    title: string;
+    collection_type: string;
+    collection_mode: string;
+    currency: string;
+    target_amount:
+      | number
+      | string
+      | null;
+    default_amount:
+      | number
+      | string
+      | null;
+    amount_raised:
+      | number
+      | string
+      | null;
+    status: string;
+    deadline: string | null;
+    archived_at: string | null;
+    created_at: string;
+    join_code: string | null;
+  }> = [];
 
   if (
-    collectionIds.length > 0
+    organizationIds.length >
+    0
   ) {
     const {
-      data: eventRows,
+      data,
     } = await supabase
-      .from(
-        "collection_activity_events"
-      )
+      .from("collections")
       .select(`
         id,
-        collection_id,
-        event_type,
-        subject_label,
-        description,
-        created_at
+        organization_id,
+        title,
+        collection_type,
+        collection_mode,
+        currency,
+        target_amount,
+        default_amount,
+        amount_raised,
+        status,
+        deadline,
+        archived_at,
+        created_at,
+        join_code
       `)
       .in(
-        "collection_id",
-        collectionIds
+        "organization_id",
+        organizationIds
       )
       .order(
         "created_at",
         {
           ascending: false,
         }
-      )
-      .limit(8);
+      );
 
-    activityEvents =
-      eventRows ?? [];
+    collections =
+      data ?? [];
   }
-
-  // =======================================================
-  // 7. COLLECTION NAME LOOKUP
-  // =======================================================
-
-  const collectionNames =
-    new Map<
-      string,
-      string
-    >();
-
-  for (
-    const collection
-    of collections
-  ) {
-    collectionNames.set(
-      collection.id,
-      collection.title
-    );
-  }
-
-  // =======================================================
-  // 8. SUMMARY METRICS
-  // =======================================================
-
-  const totalCollections =
-    collections.length;
 
   const activeCollections =
     collections.filter(
       (collection) =>
         collection.status ===
-        "active"
-    ).length;
+          "active" &&
+        !collection.archived_at
+    );
 
   const draftCollections =
     collections.filter(
       (collection) =>
         collection.status ===
-        "draft"
-    ).length;
+          "draft" &&
+        !collection.archived_at
+    );
 
-  const activeParticipants =
-    participants.filter(
-      (participant) =>
-        participant.is_active
-    ).length;
+  const ajoCollections =
+    collections.filter(
+      (collection) =>
+        collection.collection_mode ===
+          "rotating_pool" &&
+        !collection.archived_at
+    );
 
-  const pendingApprovals =
-    participants.filter(
-      (participant) =>
-        participant.is_active &&
-        participant
-          .participation_status ===
-          "approval_pending"
-    ).length;
+  const settlementReady =
+    (ownedOrganizations ??
+      []).some(
+      (organization) =>
+        organization.settlement_status ===
+        "active"
+    );
 
-  // =======================================================
-  // 9. UPCOMING DEADLINES
-  // =======================================================
-
-  const now =
-    new Date();
-
-  const upcomingCollections =
+  const recentCollections =
     collections
       .filter(
         (collection) =>
-          collection.status ===
-            "active" &&
-          collection.deadline &&
-          new Date(
-            collection.deadline
-          ) > now
+          !collection.archived_at
       )
-      .sort(
-        (a, b) =>
-          new Date(
-            a.deadline!
-          ).getTime() -
-          new Date(
-            b.deadline!
-          ).getTime()
-      )
-      .slice(0, 5);
-
-  // =======================================================
-  // 10. PARTICIPANT COUNT PER COLLECTION
-  // =======================================================
-
-  const participantCountByCollection =
-    new Map<
-      string,
-      number
-    >();
-
-  const pendingCountByCollection =
-    new Map<
-      string,
-      number
-    >();
-
-  for (
-    const participant
-    of participants
-  ) {
-    if (
-      participant.is_active
-    ) {
-      participantCountByCollection.set(
-        participant.collection_id,
-        (
-          participantCountByCollection.get(
-            participant.collection_id
-          ) ?? 0
-        ) + 1
+      .slice(
+        0,
+        6
       );
-    }
-
-    if (
-      participant.is_active &&
-      participant
-        .participation_status ===
-        "approval_pending"
-    ) {
-      pendingCountByCollection.set(
-        participant.collection_id,
-        (
-          pendingCountByCollection.get(
-            participant.collection_id
-          ) ?? 0
-        ) + 1
-      );
-    }
-  }
-
-  // =======================================================
-  // UI
-  // =======================================================
 
   return (
-    <main className="min-h-screen bg-neutral-50 text-neutral-900">
-
-      {/* ================================================= */}
-      {/* HEADER */}
-      {/* ================================================= */}
-
-      <header className="border-b bg-white">
-
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-
-          <Link
-            href="/dashboard"
-          >
-            <div className="text-2xl font-bold tracking-tight">
-              Threeple
-            </div>
-
-            <div className="text-sm text-neutral-500">
-              Collect. Coordinate.
-              Track.
-            </div>
-          </Link>
-
-          <div className="text-right">
-
-            <p className="text-sm font-medium">
-              {workspace.name}
-            </p>
-
-            <p className="mt-0.5 text-xs capitalize text-neutral-400">
-              {
-                workspace.organization_type
-              }{" "}
-              workspace
-            </p>
-
-          </div>
-
-        </div>
-
-      </header>
-
-      <div className="mx-auto max-w-7xl px-6 py-10">
-
-        {/* ================================================= */}
-        {/* WELCOME */}
-        {/* ================================================= */}
-
-        <section className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-
+    <ThreepleAppShell
+      title="Home"
+      subtitle="Your Threeple workspace"
+      actions={
+        <ThreepleLinkButton
+          href="/dashboard/collections/new"
+          className="hidden sm:inline-flex"
+        >
+          Create collection
+        </ThreepleLinkButton>
+      }
+    >
+      <section className="overflow-hidden rounded-[2rem] border border-[var(--tp-primary-border)] bg-[var(--tp-primary)] text-white shadow-[var(--tp-shadow-md)]">
+        <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.25fr_.75fr] lg:p-10">
           <div>
-
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-neutral-400">
-              Organizer Dashboard
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-white/55">
+              Threeple home
             </p>
 
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
-              Welcome, {displayName}
+            <h1 className="mt-3 max-w-2xl text-3xl font-black tracking-[-0.04em] sm:text-4xl lg:text-5xl">
+              Welcome back,{" "}
+              <span className="capitalize">
+                {firstName}
+              </span>
+              .
             </h1>
 
-            <p className="mt-3 max-w-2xl leading-7 text-neutral-600">
-              Create, coordinate and
-              manage your Collections,
-              participants and shared
-              contribution activities
-              from one place.
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-white/70 sm:text-base">
+              Create a contribution, join one with a code, or see everything you are already managing in one place.
             </p>
 
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-
-            <Link
-              href="/join"
-              className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 text-sm font-semibold transition hover:bg-neutral-100"
-            >
-              Join a Collection
-            </Link>
-
-            <Link
-              href="/dashboard/collections/new"
-              className="inline-flex h-11 items-center justify-center rounded-xl bg-black px-5 text-sm font-semibold text-white transition hover:bg-neutral-800"
-            >
-              + Create Collection
-            </Link>
-
-          </div>
-
-        </section>
-
-        {/* ================================================= */}
-        {/* METRICS */}
-        {/* ================================================= */}
-
-        <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-
-          <div className="rounded-2xl border bg-white p-5">
-
-            <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
-              Collections
-            </p>
-
-            <p className="mt-3 text-3xl font-semibold">
-              {totalCollections}
-            </p>
-
-            <p className="mt-2 text-xs text-neutral-500">
-              {draftCollections} draft
-            </p>
-
-          </div>
-
-          <div className="rounded-2xl border bg-white p-5">
-
-            <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
-              Active Collections
-            </p>
-
-            <p className="mt-3 text-3xl font-semibold">
-              {activeCollections}
-            </p>
-
-            <p className="mt-2 text-xs text-neutral-500">
-              Currently running
-            </p>
-
-          </div>
-
-          <div className="rounded-2xl border bg-white p-5">
-
-            <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
-              Participants
-            </p>
-
-            <p className="mt-3 text-3xl font-semibold">
-              {activeParticipants}
-            </p>
-
-            <p className="mt-2 text-xs text-neutral-500">
-              Active across your
-              Collections
-            </p>
-
-          </div>
-
-          <div
-            className={`rounded-2xl border p-5 ${
-              pendingApprovals > 0
-                ? "border-amber-200 bg-amber-50"
-                : "bg-white"
-            }`}
-          >
-
-            <p
-              className={`text-xs font-medium uppercase tracking-wide ${
-                pendingApprovals > 0
-                  ? "text-amber-700"
-                  : "text-neutral-400"
-              }`}
-            >
-              Pending Approvals
-            </p>
-
-            <p className="mt-3 text-3xl font-semibold">
-              {pendingApprovals}
-            </p>
-
-            <p
-              className={`mt-2 text-xs ${
-                pendingApprovals > 0
-                  ? "text-amber-700"
-                  : "text-neutral-500"
-              }`}
-            >
-              {pendingApprovals > 0
-                ? "Requires your attention"
-                : "Nothing waiting"}
-            </p>
-
-          </div>
-
-        </section>
-
-        {/* ================================================= */}
-        {/* ATTENTION */}
-        {/* ================================================= */}
-
-        {pendingApprovals > 0 && (
-          <section className="mt-6 rounded-3xl border border-amber-200 bg-amber-50 p-6">
-
-            <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-
-              <div>
-
-                <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">
-                  Needs attention
-                </p>
-
-                <h2 className="mt-2 text-xl font-semibold text-amber-950">
-                  You have{" "}
-                  {pendingApprovals}{" "}
-                  participant
-                  {pendingApprovals ===
-                  1
-                    ? ""
-                    : "s"}{" "}
-                  awaiting approval
-                </h2>
-
-                <p className="mt-2 text-sm leading-6 text-amber-800">
-                  Review pending join
-                  requests from the
-                  relevant Collection.
-                </p>
-
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-
-                {collections
-                  .filter(
-                    (collection) =>
-                      (
-                        pendingCountByCollection.get(
-                          collection.id
-                        ) ?? 0
-                      ) > 0
-                  )
-                  .slice(0, 3)
-                  .map(
-                    (collection) => (
-                      <Link
-                        key={
-                          collection.id
-                        }
-                        href={`/dashboard/collections/${collection.id}/participants`}
-                        className="inline-flex h-10 items-center justify-center rounded-xl bg-black px-4 text-sm font-semibold text-white"
-                      >
-                        {
-                          collection.title
-                        }{" "}
-                        (
-                        {
-                          pendingCountByCollection.get(
-                            collection.id
-                          )
-                        }
-                        )
-                      </Link>
-                    )
-                  )}
-
-              </div>
-
-            </div>
-
-          </section>
-        )}
-
-        {/* ================================================= */}
-        {/* MAIN GRID */}
-        {/* ================================================= */}
-
-        <div className="mt-10 grid gap-8 xl:grid-cols-[1fr_360px]">
-
-          {/* =============================================== */}
-          {/* COLLECTIONS */}
-          {/* =============================================== */}
-
-          <section className="overflow-hidden rounded-3xl border bg-white">
-
-            <div className="flex items-center justify-between border-b px-6 py-5">
-
-              <div>
-
-                <h2 className="text-lg font-semibold">
-                  Your Collections
-                </h2>
-
-                <p className="mt-1 text-sm text-neutral-500">
-                  Everything you are
-                  currently organizing
-                  and tracking.
-                </p>
-
-              </div>
-
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/dashboard/collections/new"
-                className="text-sm font-semibold hover:underline"
+                className="inline-flex min-h-12 items-center justify-center rounded-full bg-white px-6 text-sm font-black text-[var(--tp-primary)] transition hover:bg-white/90"
               >
-                New Collection
+                Create a collection
               </Link>
 
+              <Link
+                href="/join"
+                className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 text-sm font-black text-white transition hover:bg-white/15"
+              >
+                Join with a code
+              </Link>
             </div>
-
-            {collections.length >
-            0 ? (
-              <div className="divide-y">
-
-                {collections.map(
-                  (collection) => {
-                    const collectionParticipants =
-                      participantCountByCollection.get(
-                        collection.id
-                      ) ?? 0;
-
-                    const collectionPending =
-                      pendingCountByCollection.get(
-                        collection.id
-                      ) ?? 0;
-
-                    return (
-                      <Link
-                        key={
-                          collection.id
-                        }
-                        href={`/dashboard/collections/${collection.id}`}
-                        className="block px-6 py-6 transition hover:bg-neutral-50"
-                      >
-
-                        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-
-                          <div className="min-w-0">
-
-                            <div className="flex flex-wrap items-center gap-2">
-
-                              <h3 className="text-lg font-semibold">
-                                {
-                                  collection.title
-                                }
-                              </h3>
-
-                              <span
-                                className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusStyle(
-                                  collection.status
-                                )}`}
-                              >
-                                {friendlyText(
-                                  collection.status
-                                )}
-                              </span>
-
-                            </div>
-
-                            {collection.description && (
-                              <p className="mt-2 line-clamp-2 max-w-xl text-sm leading-6 text-neutral-500">
-                                {
-                                  collection.description
-                                }
-                              </p>
-                            )}
-
-                            <div className="mt-4 flex flex-wrap gap-2">
-
-                              <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-600">
-                                {friendlyText(
-                                  collection.collection_type
-                                )}
-                              </span>
-
-                              <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-600">
-                                {friendlyText(
-                                  collection.collection_mode
-                                )}
-                              </span>
-
-                              <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-600">
-                                {
-                                  collectionParticipants
-                                }{" "}
-                                participant
-                                {collectionParticipants ===
-                                1
-                                  ? ""
-                                  : "s"}
-                              </span>
-
-                              {collectionPending >
-                                0 && (
-                                <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700">
-                                  {
-                                    collectionPending
-                                  }{" "}
-                                  pending
-                                </span>
-                              )}
-
-                            </div>
-
-                          </div>
-
-                          <div className="shrink-0 md:text-right">
-
-                            <p className="text-xs uppercase tracking-wide text-neutral-400">
-                              Threeple Code
-                            </p>
-
-                            <p className="mt-1 font-mono text-lg font-semibold tracking-wider">
-                              {
-                                collection.join_code
-                              }
-                            </p>
-
-                            {collection.deadline && (
-                              <p className="mt-2 text-xs text-neutral-400">
-                                Deadline{" "}
-                                {formatDate(
-                                  collection.deadline
-                                )}
-                              </p>
-                            )}
-
-                          </div>
-
-                        </div>
-
-                      </Link>
-                    );
-                  }
-                )}
-
-              </div>
-            ) : (
-              <div className="px-6 py-14 text-center">
-
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-100 text-2xl">
-                  +
-                </div>
-
-                <h3 className="mt-5 font-semibold">
-                  No Collections yet
-                </h3>
-
-                <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-neutral-500">
-                  Start a wedding
-                  contribution, event
-                  fee, society dues,
-                  shared fund,
-                  recurring
-                  contribution or
-                  another Collection.
-                </p>
-
-                <Link
-                  href="/dashboard/collections/new"
-                  className="mt-6 inline-flex h-11 items-center justify-center rounded-xl bg-black px-5 text-sm font-semibold text-white"
-                >
-                  Create your first
-                  Collection
-                </Link>
-
-              </div>
-            )}
-
-          </section>
-
-          {/* =============================================== */}
-          {/* RIGHT SIDE */}
-          {/* =============================================== */}
-
-          <aside className="space-y-6">
-
-            {/* QUICK ACTIONS */}
-
-            <section className="rounded-3xl border bg-white p-6">
-
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-                Quick actions
-              </p>
-
-              <h2 className="mt-2 text-lg font-semibold">
-                What do you want to
-                do?
-              </h2>
-
-              <div className="mt-5 space-y-3">
-
-                <Link
-                  href="/dashboard/collections/new"
-                  className="flex items-center justify-between rounded-xl bg-black px-4 py-3 text-sm font-semibold text-white"
-                >
-                  <span>
-                    Create Collection
-                  </span>
-
-                  <span>→</span>
-                </Link>
-
-                <Link
-                  href="/join"
-                  className="flex items-center justify-between rounded-xl border border-neutral-200 px-4 py-3 text-sm font-medium hover:bg-neutral-50"
-                >
-                  <span>
-                    Join with a Code
-                  </span>
-
-                  <span>→</span>
-                </Link>
-
-              </div>
-
-            </section>
-
-            {/* UPCOMING DEADLINES */}
-
-            <section className="rounded-3xl border bg-white p-6">
-
-              <div className="flex items-center justify-between">
-
-                <div>
-
-                  <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-                    Deadlines
-                  </p>
-
-                  <h2 className="mt-2 text-lg font-semibold">
-                    Coming up
-                  </h2>
-
-                </div>
-
-                <span className="text-xl">
-                  ◷
-                </span>
-
-              </div>
-
-              {upcomingCollections.length >
-              0 ? (
-                <div className="mt-5 divide-y">
-
-                  {upcomingCollections.map(
-                    (collection) => (
-                      <Link
-                        key={
-                          collection.id
-                        }
-                        href={`/dashboard/collections/${collection.id}`}
-                        className="block py-4 first:pt-0 last:pb-0"
-                      >
-
-                        <p className="text-sm font-medium">
-                          {
-                            collection.title
-                          }
-                        </p>
-
-                        <p className="mt-1 text-xs text-neutral-500">
-                          {formatDate(
-                            collection.deadline!
-                          )}
-                        </p>
-
-                      </Link>
-                    )
-                  )}
-
-                </div>
-              ) : (
-                <p className="mt-5 text-sm leading-6 text-neutral-500">
-                  No upcoming
-                  Collection
-                  deadlines.
-                </p>
-              )}
-
-            </section>
-
-          </aside>
-
-        </div>
-
-        {/* ================================================= */}
-        {/* RECENT ACTIVITY */}
-        {/* ================================================= */}
-
-        <section className="mt-8 overflow-hidden rounded-3xl border bg-white">
-
-          <div className="border-b px-6 py-5">
-
-            <h2 className="text-lg font-semibold">
-              Recent Activity
-            </h2>
-
-            <p className="mt-1 text-sm text-neutral-500">
-              Recent participant
-              and Collection
-              management actions
-              across your workspace.
-            </p>
-
           </div>
 
-          {activityEvents.length >
-          0 ? (
-            <div className="divide-y">
-
-              {activityEvents.map(
-                (event) => {
-                  const collectionTitle =
-                    collectionNames.get(
-                      event.collection_id
-                    ) ??
-                    "Collection";
-
-                  return (
-                    <Link
-                      key={
-                        event.id
-                      }
-                      href={`/dashboard/collections/${event.collection_id}/activity`}
-                      className="flex flex-col gap-3 px-6 py-5 transition hover:bg-neutral-50 md:flex-row md:items-center md:justify-between"
-                    >
-
-                      <div className="min-w-0">
-
-                        <div className="flex flex-wrap items-center gap-2">
-
-                          <span
-                            className={`rounded-full px-2.5 py-1 text-xs font-medium ${eventBadgeStyle(
-                              event.event_type
-                            )}`}
-                          >
-                            {friendlyEventName(
-                              event.event_type
-                            )}
-                          </span>
-
-                          <span className="text-xs text-neutral-400">
-                            {
-                              collectionTitle
-                            }
-                          </span>
-
-                        </div>
-
-                        <p className="mt-2 text-sm text-neutral-700">
-                          {event.description ||
-                            event.subject_label ||
-                            friendlyEventName(
-                              event.event_type
-                            )}
-                        </p>
-
-                      </div>
-
-                      <time className="shrink-0 text-xs text-neutral-400">
-                        {formatDateTime(
-                          event.created_at
-                        )}
-                      </time>
-
-                    </Link>
-                  );
-                }
-              )}
-
-            </div>
-          ) : (
-            <div className="px-6 py-10 text-center">
-
-              <p className="text-sm font-medium">
-                No recorded activity
-                yet
-              </p>
-
-              <p className="mt-2 text-sm text-neutral-500">
-                New organizer and
-                participant actions
-                will appear here.
-              </p>
-
-            </div>
-          )}
-
-        </section>
-
-        {/* ================================================= */}
-        {/* PLATFORM NOTICE */}
-        {/* ================================================= */}
-
-        <section className="mt-8 rounded-3xl bg-neutral-900 p-6 text-white md:p-8">
-
-          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-
-            <div>
-
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-                Threeple
-              </p>
-
-              <h2 className="mt-2 text-xl font-semibold">
-                Collect. Coordinate.
-                Track.
-              </h2>
-
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-300">
-                Manage shared
-                contributions,
-                participation,
-                approvals and
-                Collection activity
-                from one place.
-              </p>
-
-            </div>
-
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
             <Link
-              href="/dashboard/collections/new"
-              className="inline-flex h-11 shrink-0 items-center justify-center rounded-xl bg-white px-5 text-sm font-semibold text-black hover:bg-neutral-100"
+              href="/my-collections"
+              className="rounded-2xl bg-white/10 p-5 transition hover:bg-white/15"
             >
-              Create Collection
+              <p className="text-xs font-black uppercase tracking-wide text-white/45">
+                Participant workspace
+              </p>
+
+              <p className="mt-2 text-lg font-black">
+                My Collections
+              </p>
+
+              <p className="mt-2 text-sm leading-6 text-white/60">
+                Open collections you have joined and check your contribution status.
+              </p>
             </Link>
 
+            <div className="rounded-2xl bg-white/10 p-5">
+              <p className="text-xs font-black uppercase tracking-wide text-white/45">
+                Field ready
+              </p>
+
+              <p className="mt-2 text-lg font-black">
+                Phone · Tablet · Desktop
+              </p>
+
+              <p className="mt-2 text-sm leading-6 text-white/60">
+                Collector Mode and offline sync will connect here in a later phase.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <ThreepleStat
+          label="Active"
+          value={
+            activeCollections.length
+          }
+          helper="Collections currently running."
+          tone="success"
+        />
+
+        <ThreepleStat
+          label="Drafts"
+          value={
+            draftCollections.length
+          }
+          helper="Collections still being prepared."
+          tone="warning"
+        />
+
+        <ThreepleStat
+          label="Ajo groups"
+          value={
+            ajoCollections.length
+          }
+          helper="Rotational contribution collections."
+          tone="primary"
+        />
+
+        <ThreepleStat
+          label="Settlement"
+          value={
+            settlementReady
+              ? "Connected"
+              : "Not connected"
+          }
+          helper={
+            settlementReady
+              ? "At least one organizer workspace is settlement-ready."
+              : "Connect settlement before accepting electronic payments."
+          }
+          tone={
+            settlementReady
+              ? "success"
+              : "neutral"
+          }
+        />
+      </section>
+
+      <section className="mt-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="tp-kicker">
+              Your collections
+            </p>
+
+            <h2 className="tp-heading mt-2 text-2xl sm:text-3xl">
+              Keep everyone aligned.
+            </h2>
+
+            <p className="tp-body mt-2 max-w-2xl text-sm">
+              Open a collection to manage people, progress, transparency, Ajo rounds and contribution activity.
+            </p>
           </div>
 
-        </section>
+          <ThreepleLinkButton
+            href="/dashboard/collections/new"
+            variant="secondary"
+          >
+            New collection
+          </ThreepleLinkButton>
+        </div>
 
-      </div>
+        {recentCollections.length ===
+        0 ? (
+          <ThreepleEmptyState
+            className="mt-6"
+            title="No organizer collections yet"
+            description="Create your first contribution collection, Ajo group or shared goal. Threeple will keep the people, rules and progress together."
+            action={
+              <ThreepleLinkButton href="/dashboard/collections/new">
+                Create your first collection
+              </ThreepleLinkButton>
+            }
+          />
+        ) : (
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {recentCollections.map(
+              (collection) => {
+                const isAjo =
+                  collection.collection_mode ===
+                  "rotating_pool";
 
-    </main>
+                const isGoal =
+                  collection.collection_mode ===
+                    "target" ||
+                  collection.collection_mode ===
+                    "flexible";
+
+                const target =
+                  collection.target_amount !==
+                  null
+                    ? Number(
+                        collection.target_amount
+                      )
+                    : 0;
+
+                const raised =
+                  collection.amount_raised !==
+                  null
+                    ? Number(
+                        collection.amount_raised
+                      )
+                    : 0;
+
+                const progress =
+                  target > 0
+                    ? Math.min(
+                        100,
+                        Math.round(
+                          (
+                            raised /
+                            target
+                          ) *
+                            100
+                        )
+                      )
+                    : 0;
+
+                const href =
+                  isAjo
+                    ? `/dashboard/collections/${collection.id}/rotation`
+                    : `/dashboard/collections/${collection.id}`;
+
+                return (
+                  <Link
+                    key={
+                      collection.id
+                    }
+                    href={href}
+                    className="tp-card tp-hover-card block overflow-hidden"
+                  >
+                    <div
+                      className={[
+                        "h-2",
+                        isAjo
+                          ? "bg-[var(--tp-warning)]"
+                          : isGoal
+                            ? "bg-[var(--tp-primary)]"
+                            : "bg-[var(--tp-success)]",
+                      ].join(" ")}
+                    />
+
+                    <div className="p-5 sm:p-6">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <ThreepleBadge
+                          tone={
+                            badgeTone(
+                              collection.status
+                            )
+                          }
+                        >
+                          {friendlyText(
+                            collection.status
+                          )}
+                        </ThreepleBadge>
+
+                        <span className="text-xs font-bold text-[var(--tp-muted)]">
+                          {isAjo
+                            ? "Ajo"
+                            : isGoal
+                              ? "Goal"
+                              : "Fixed"}
+                        </span>
+                      </div>
+
+                      <h3 className="tp-heading mt-5 text-xl">
+                        {collection.title}
+                      </h3>
+
+                      <p className="tp-muted mt-2 text-sm">
+                        {friendlyText(
+                          collection.collection_type
+                        )}
+                        {" · "}
+                        {dateLabel(
+                          collection.deadline
+                        )}
+                      </p>
+
+                      {isGoal ? (
+                        <div className="mt-6">
+                          <ThreepleProgress
+                            value={
+                              progress
+                            }
+                            label={`${money(
+                              raised,
+                              collection.currency
+                            )} raised`}
+                            helper={`${progress}%`}
+                          />
+
+                          <p className="tp-muted mt-2 text-xs">
+                            Goal:{" "}
+                            {money(
+                              target,
+                              collection.currency
+                            )}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="mt-6 rounded-2xl bg-[var(--tp-bg-soft)] p-4">
+                          <p className="tp-kicker">
+                            {isAjo
+                              ? "Per cycle"
+                              : "Per person"}
+                          </p>
+
+                          <p className="tp-heading mt-2 text-lg">
+                            {money(
+                              collection.default_amount,
+                              collection.currency
+                            )}
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="mt-5 flex items-center justify-between border-t border-[var(--tp-border)] pt-4">
+                        <span className="text-xs font-bold text-[var(--tp-muted)]">
+                          {collection.join_code
+                            ? `Code ${collection.join_code}`
+                            : "Collection"}
+                        </span>
+
+                        <span className="text-sm font-black text-[var(--tp-primary)]">
+                          Open
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              }
+            )}
+          </div>
+        )}
+      </section>
+
+      <section className="mt-8 grid gap-4 md:grid-cols-3">
+        <Link
+          href="/join"
+          className="tp-card tp-hover-card p-6"
+        >
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--tp-primary-soft)] font-black text-[var(--tp-primary)]">
+            J
+          </div>
+
+          <h3 className="tp-heading mt-5 text-lg">
+            Join a collection
+          </h3>
+
+          <p className="tp-body mt-2 text-sm">
+            Enter a Threeple Code and join a contribution in a few steps.
+          </p>
+        </Link>
+
+        <Link
+          href="/my-collections"
+          className="tp-card tp-hover-card p-6"
+        >
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--tp-success-soft)] font-black text-[var(--tp-success)]">
+            M
+          </div>
+
+          <h3 className="tp-heading mt-5 text-lg">
+            My Collections
+          </h3>
+
+          <p className="tp-body mt-2 text-sm">
+            See every collection you joined and return to your participant workspace.
+          </p>
+        </Link>
+
+        <Link
+          href="/dashboard/settlement"
+          className="tp-card tp-hover-card p-6"
+        >
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--tp-warning-soft)] font-black text-[var(--tp-warning)]">
+            S
+          </div>
+
+          <h3 className="tp-heading mt-5 text-lg">
+            Settlement
+          </h3>
+
+          <p className="tp-body mt-2 text-sm">
+            Manage the account used for organizer settlement on supported payments.
+          </p>
+        </Link>
+      </section>
+    </ThreepleAppShell>
   );
 }
-
