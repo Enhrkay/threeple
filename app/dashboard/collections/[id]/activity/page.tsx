@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 import {
   notFound,
@@ -140,7 +140,7 @@ function eventMarker(
       "deactivated"
     )
   ) {
-    return "×";
+    return "Ã—";
   }
 
   if (
@@ -164,10 +164,10 @@ function eventMarker(
       "activated"
     )
   ) {
-    return "▶";
+    return "â–¶";
   }
 
-  return "•";
+  return "â€¢";
 }
 
 function formatDate(

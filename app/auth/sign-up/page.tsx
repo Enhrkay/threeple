@@ -43,7 +43,7 @@ export default function SignUpPage() {
           </div>
 
           <p className="text-sm text-black/35">
-            Threeple Â· Transparent group contributions
+            Threeple · Transparent group contributions
           </p>
         </div>
 
@@ -56,5 +56,6 @@ export default function SignUpPage() {
     </main>
   );
 }
+
 
 

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   useMemo,
@@ -341,7 +341,7 @@ export default function AccountForm({
             </span>
 
             <span className="font-mono text-sm font-semibold">
-              ••••••
+              â€¢â€¢â€¢â€¢â€¢â€¢
               {
                 connectedSettlement.last4
               }
@@ -685,7 +685,7 @@ export default function AccountForm({
                   </span>
 
                   <span className="font-mono text-sm font-semibold">
-                    ••••••
+                    â€¢â€¢â€¢â€¢â€¢â€¢
                     {
                       verifiedAccount.last4
                     }

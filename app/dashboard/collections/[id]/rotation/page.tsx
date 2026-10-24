@@ -39,7 +39,7 @@ function formatMoney(
     amount === null ||
     amount === undefined
   ) {
-    return "â€”";
+    return "—";
   }
 
   const numeric =
@@ -50,7 +50,7 @@ function formatMoney(
       numeric
     )
   ) {
-    return "â€”";
+    return "—";
   }
 
   return new Intl.NumberFormat(
@@ -70,7 +70,7 @@ function friendlyText(
     | undefined
 ) {
   if (!value) {
-    return "â€”";
+    return "—";
   }
 
   return value
@@ -408,7 +408,7 @@ export default async function RotationPage({
             href={`/dashboard/collections/${collection.id}`}
             className="text-sm font-medium text-neutral-600 hover:text-black"
           >
-            â† Collection
+            ← Collection
           </Link>
         </div>
       </header>
@@ -832,4 +832,5 @@ export default async function RotationPage({
     </main>
   );
 }
+
 

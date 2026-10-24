@@ -40,7 +40,7 @@ function friendlyText(
   value: string | null | undefined
 ) {
   if (!value) {
-    return "â€”";
+    return "—";
   }
 
   return value
@@ -581,7 +581,7 @@ export default async function ParticipantCollectionPage({
             href="/my-collections"
             className="text-sm font-medium text-neutral-600 hover:text-black"
           >
-            â† My Collections
+            ← My Collections
           </Link>
         </div>
       </header>
@@ -918,7 +918,7 @@ export default async function ParticipantCollectionPage({
 
                   <p className="mt-2 font-semibold">
                     Cycle {currentRotationObligation.cycle_number}
-                    {" Â· "}
+                    {" · "}
                     Recipient:{" "}
                     {currentRotationObligation.recipient_name ??
                       "Participant"}
@@ -1026,7 +1026,7 @@ export default async function ParticipantCollectionPage({
                   <span className="font-semibold">
                     {progressPercent !== null
                       ? `${progressPercent}%`
-                      : "â€”"}
+                      : "—"}
                   </span>
                 </div>
 
@@ -1076,7 +1076,7 @@ export default async function ParticipantCollectionPage({
                   Planned participants
                 </p>
                 <p className="mt-1 font-semibold">
-                  {dashboard.expected_participant_count ?? "â€”"}
+                  {dashboard.expected_participant_count ?? "—"}
                 </p>
               </div>
 
@@ -1085,7 +1085,7 @@ export default async function ParticipantCollectionPage({
                   Remaining slots
                 </p>
                 <p className="mt-1 font-semibold">
-                  {dashboard.remaining_slots ?? "â€”"}
+                  {dashboard.remaining_slots ?? "—"}
                 </p>
               </div>
             </div>
@@ -1212,6 +1212,7 @@ export default async function ParticipantCollectionPage({
     </main>
   );
 }
+
 
 
 

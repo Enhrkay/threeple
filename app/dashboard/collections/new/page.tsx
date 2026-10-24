@@ -14,7 +14,7 @@ type CollectionMode =
   | "rotating_pool";
 
 function money(value: number, currency: string) {
-  if (!Number.isFinite(value) || value <= 0) return "â€”";
+  if (!Number.isFinite(value) || value <= 0) return "—";
 
   return new Intl.NumberFormat("en-NG", {
     style: "currency",
@@ -68,7 +68,7 @@ export default function NewCollectionPage() {
               href="/dashboard"
               className="text-sm font-semibold text-black/45 transition hover:text-black"
             >
-              â† Dashboard
+              ← Dashboard
             </Link>
 
             <p className="mt-7 text-xs font-bold uppercase tracking-[0.18em] text-black/35">
@@ -101,7 +101,7 @@ export default function NewCollectionPage() {
 
           <section className="rounded-[2rem] border border-black/10 bg-white p-6 md:p-8">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-black/35">
-              01 Â· Collection
+              01 · Collection
             </p>
             <h2 className="mt-2 text-xl font-black">
               What are you contributing towards?
@@ -182,7 +182,7 @@ export default function NewCollectionPage() {
 
           <section className="rounded-[2rem] border border-black/10 bg-white p-6 md:p-8">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-black/35">
-              02 Â· Contribution model
+              02 · Contribution model
             </p>
             <h2 className="mt-2 text-xl font-black">
               How should the group contribute?
@@ -214,22 +214,22 @@ export default function NewCollectionPage() {
                   Select contribution model
                 </option>
                 <option value="target">
-                  Shared target â€” Threeple divides the target equally
+                  Shared target — Threeple divides the target equally
                 </option>
                 <option value="fixed_per_person">
-                  Fixed amount â€” organizer sets what each person pays
+                  Fixed amount — organizer sets what each person pays
                 </option>
                 <option value="event_fee">
-                  Event fee â€” fixed amount required from each attendee
+                  Event fee — fixed amount required from each attendee
                 </option>
                 <option value="flexible">
-                  Flexible target â€” participants may contribute different amounts
+                  Flexible target — participants may contribute different amounts
                 </option>
                 <option value="recurring_dues">
-                  Recurring dues â€” weekly/monthly group contribution
+                  Recurring dues — weekly/monthly group contribution
                 </option>
                 <option value="rotating_pool">
-                  Rotational contribution â€” Ajo / Esusu style
+                  Rotational contribution — Ajo / Esusu style
                 </option>
               </select>
             </div>
@@ -544,7 +544,7 @@ export default function NewCollectionPage() {
 
           <section className="rounded-[2rem] border border-black/10 bg-white p-6 md:p-8">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-black/35">
-              03 Â· Timing & access
+              03 · Timing & access
             </p>
 
             <div className="mt-6 grid gap-5 md:grid-cols-2">
@@ -564,11 +564,11 @@ export default function NewCollectionPage() {
                   }
                   className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none focus:border-black"
                 >
-                  <option value="NGN">NGN â€” Nigerian Naira</option>
-                  <option value="GBP">GBP â€” British Pound</option>
-                  <option value="USD">USD â€” US Dollar</option>
-                  <option value="EUR">EUR â€” Euro</option>
-                  <option value="CAD">CAD â€” Canadian Dollar</option>
+                  <option value="NGN">NGN — Nigerian Naira</option>
+                  <option value="GBP">GBP — British Pound</option>
+                  <option value="USD">USD — US Dollar</option>
+                  <option value="EUR">EUR — Euro</option>
+                  <option value="CAD">CAD — Canadian Dollar</option>
                 </select>
               </div>
 
@@ -604,10 +604,10 @@ export default function NewCollectionPage() {
                   className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none focus:border-black"
                 >
                   <option value="private">
-                    Private â€” join code required
+                    Private — join code required
                   </option>
                   <option value="public">
-                    Public â€” discoverable collection
+                    Public — discoverable collection
                   </option>
                 </select>
               </div>
@@ -667,4 +667,5 @@ export default function NewCollectionPage() {
     </main>
   );
 }
+
 

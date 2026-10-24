@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 import {
   requirePlatformAdmin,
@@ -432,7 +432,7 @@ export default async function AdminOrganizationsPage({
                               href={`/admin/organizations/${organization.id}`}
                               className="font-semibold hover:underline"
                             >
-                              View Organization →
+                              View Organization â†’
                             </Link>
                           </td>
                         </tr>
@@ -448,3 +448,4 @@ export default async function AdminOrganizationsPage({
     </main>
   );
 }
+

@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 import {
   redirect,
@@ -359,7 +359,7 @@ export default async function SettlementPage({
                   </p>
 
                   <p className="mt-1 font-semibold text-green-950">
-                    ••••••{
+                    â€¢â€¢â€¢â€¢â€¢â€¢{
                       selectedOrganization.settlement_account_last4 ||
                       "----"
                     }
@@ -507,3 +507,4 @@ export default async function SettlementPage({
     </main>
   );
 }
+

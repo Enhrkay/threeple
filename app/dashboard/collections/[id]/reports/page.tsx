@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 import {
   notFound,
@@ -732,7 +732,7 @@ export default async function ReportsPage({
               href={`/dashboard/collections/${collection.id}/participants`}
               className="text-sm font-semibold hover:underline"
             >
-              Manage Participants →
+              Manage Participants â†’
             </Link>
 
           </div>

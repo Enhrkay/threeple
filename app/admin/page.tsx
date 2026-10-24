@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 import {
   requirePlatformAdmin,
@@ -81,7 +81,7 @@ function metricCard(
               : "text-neutral-900"
           }`}
         >
-          Open →
+          Open â†’
         </p>
       )}
     </div>
@@ -535,7 +535,7 @@ export default async function AdminDashboardPage() {
               href="/admin/trust-safety"
               className="text-sm font-semibold hover:underline"
             >
-              Open Trust & Safety →
+              Open Trust & Safety â†’
             </Link>
           </div>
 
@@ -633,7 +633,7 @@ export default async function AdminDashboardPage() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg transition group-hover:bg-neutral-900 group-hover:text-white">
-                  👤
+                  ðŸ‘¤
                 </div>
 
                 {restrictedUsers > 0 ? (
@@ -656,7 +656,7 @@ export default async function AdminDashboardPage() {
               </p>
 
               <p className="mt-5 text-sm font-semibold text-neutral-900">
-                Open Users →
+                Open Users â†’
               </p>
             </Link>
 
@@ -666,7 +666,7 @@ export default async function AdminDashboardPage() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg transition group-hover:bg-neutral-900 group-hover:text-white">
-                  ◫
+                  â—«
                 </div>
 
                 {restrictedOrganizations >
@@ -690,7 +690,7 @@ export default async function AdminDashboardPage() {
               </p>
 
               <p className="mt-5 text-sm font-semibold text-neutral-900">
-                Open Organizations →
+                Open Organizations â†’
               </p>
             </Link>
 
@@ -700,7 +700,7 @@ export default async function AdminDashboardPage() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg transition group-hover:bg-neutral-900 group-hover:text-white">
-                  ▦
+                  â–¦
                 </div>
 
                 {restrictedCollections >
@@ -724,7 +724,7 @@ export default async function AdminDashboardPage() {
               </p>
 
               <p className="mt-5 text-sm font-semibold text-neutral-900">
-                Open Collections →
+                Open Collections â†’
               </p>
             </Link>
 
@@ -734,7 +734,7 @@ export default async function AdminDashboardPage() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg transition group-hover:bg-neutral-900 group-hover:text-white">
-                  ⚑
+                  âš‘
                 </div>
 
                 {activeTrustSafetyWorkload >
@@ -758,7 +758,7 @@ export default async function AdminDashboardPage() {
               </p>
 
               <p className="mt-5 text-sm font-semibold text-neutral-900">
-                Open Trust & Safety →
+                Open Trust & Safety â†’
               </p>
             </Link>
 
@@ -769,3 +769,4 @@ export default async function AdminDashboardPage() {
     </main>
   );
 }
+

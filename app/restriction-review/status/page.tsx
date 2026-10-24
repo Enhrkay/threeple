@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 import {
   connection,
@@ -418,3 +418,4 @@ export default async function RestrictionReviewStatusPage({
     </main>
   );
 }
+

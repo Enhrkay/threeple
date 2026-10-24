@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
@@ -1007,7 +1007,7 @@ export default async function DashboardPage() {
                     Create Collection
                   </span>
 
-                  <span>→</span>
+                  <span>â†’</span>
                 </Link>
 
                 <Link
@@ -1018,7 +1018,7 @@ export default async function DashboardPage() {
                     Join with a Code
                   </span>
 
-                  <span>→</span>
+                  <span>â†’</span>
                 </Link>
 
               </div>

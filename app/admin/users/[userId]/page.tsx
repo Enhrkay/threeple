@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 import {
   notFound,
@@ -443,7 +443,7 @@ export default async function AdminUserPage({
                     href={`/admin/trust-safety/${activeRestriction.trust_safety_report_id}`}
                     className="mt-2 inline-block font-semibold text-red-950 underline underline-offset-4"
                   >
-                    Open Case →
+                    Open Case â†’
                   </Link>
                 ) : (
                   <p className="mt-2 font-semibold text-red-950">
@@ -832,7 +832,7 @@ export default async function AdminUserPage({
                         href={`/admin/trust-safety/${restriction.trust_safety_report_id}`}
                         className="mt-4 inline-block text-sm font-semibold underline underline-offset-4"
                       >
-                        Open Trust & Safety Case →
+                        Open Trust & Safety Case â†’
                       </Link>
                     )}
 
@@ -867,3 +867,4 @@ export default async function AdminUserPage({
     </main>
   );
 }
+

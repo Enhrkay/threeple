@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
@@ -541,7 +541,7 @@ export default async function MyCollectionsPage() {
                           href={`/my-collections/${participant.id}`}
                           className="text-sm font-semibold hover:underline"
                         >
-                          View Collection →
+                          View Collection â†’
                         </Link>
 
                       </div>

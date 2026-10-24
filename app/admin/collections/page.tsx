@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 import {
   requirePlatformAdmin,
@@ -374,7 +374,7 @@ export default async function AdminCollectionsPage({
                               href={`/admin/collections/${collection.id}`}
                               className="font-semibold hover:underline"
                             >
-                              View Collection →
+                              View Collection â†’
                             </Link>
                           </td>
                         </tr>
@@ -390,3 +390,4 @@ export default async function AdminCollectionsPage({
     </main>
   );
 }
+

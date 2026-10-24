@@ -37,7 +37,7 @@ function formatMoney(
     amount === null ||
     amount === undefined
   ) {
-    return "â€”";
+    return "—";
   }
 
   const numeric =
@@ -46,7 +46,7 @@ function formatMoney(
   if (
     Number.isNaN(numeric)
   ) {
-    return "â€”";
+    return "—";
   }
 
   try {
@@ -490,7 +490,7 @@ const platformRevenue =
             href="/dashboard"
             className="text-sm font-medium text-neutral-600 hover:text-black"
           >
-            â† Dashboard
+            ← Dashboard
           </Link>
         </div>
       </header>
@@ -632,7 +632,7 @@ const platformRevenue =
                     targetAmount,
                     collection.currency
                   )
-                : "â€”"}
+                : "—"}
             </p>
           </div>
 
@@ -645,7 +645,7 @@ const platformRevenue =
               {progressPercent !==
               null
                 ? `${progressPercent}%`
-                : "â€”"}
+                : "—"}
             </p>
           </div>
         </section>
@@ -747,7 +747,7 @@ const platformRevenue =
                       outstandingAmount,
                       collection.currency
                     )
-                  : "â€”"}
+                  : "—"}
               </p>
             </div>
           </div>
@@ -855,7 +855,7 @@ const platformRevenue =
               className="rounded-2xl border bg-white p-6 transition hover:border-neutral-400 hover:shadow-sm"
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg">
-                ðŸ‘¥
+                👥
               </div>
 
               <h3 className="mt-5 font-semibold">
@@ -877,7 +877,7 @@ const platformRevenue =
                 className="rounded-2xl border bg-white p-6 transition hover:border-neutral-400 hover:shadow-sm"
               >
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg">
-                  âœŽ
+                  ✎
                 </div>
 
                 <h3 className="mt-5 font-semibold">
@@ -895,7 +895,7 @@ const platformRevenue =
             ) : (
               <div className="rounded-2xl border bg-white p-6 opacity-50">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg">
-                  âœŽ
+                  ✎
                 </div>
 
                 <h3 className="mt-5 font-semibold">
@@ -916,7 +916,7 @@ const platformRevenue =
                 className="rounded-2xl border bg-white p-6 transition hover:border-neutral-400 hover:shadow-sm"
               >
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg">
-                  â†—
+                  ↗
                 </div>
 
                 <h3 className="mt-5 font-semibold">
@@ -934,7 +934,7 @@ const platformRevenue =
             ) : (
               <div className="rounded-2xl border bg-white p-6 opacity-50">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg">
-                  â†—
+                  ↗
                 </div>
 
                 <h3 className="mt-5 font-semibold">
@@ -975,7 +975,7 @@ const platformRevenue =
               className="rounded-2xl border bg-white p-6 transition hover:border-neutral-400 hover:shadow-sm"
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg">
-                â–¤
+                ▤
               </div>
 
               <h3 className="mt-5 font-semibold">
@@ -996,7 +996,7 @@ const platformRevenue =
               className="rounded-2xl border bg-white p-6 transition hover:border-neutral-400 hover:shadow-sm"
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg">
-                â—·
+                ◷
               </div>
 
               <h3 className="mt-5 font-semibold">
@@ -1015,7 +1015,7 @@ const platformRevenue =
             <div className="rounded-2xl border bg-white p-6">
               <div className="flex items-center justify-between">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 text-lg">
-                  â‚¦
+                  ₦
                 </div>
 
                 <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
@@ -1387,4 +1387,5 @@ const platformRevenue =
     </main>
   );
 }
+
 
