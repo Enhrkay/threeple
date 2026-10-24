@@ -1,18 +1,35 @@
-﻿import Link from "next/link";
-import { redirect } from "next/navigation";
+import Link from "next/link";
+import {
+  redirect,
+} from "next/navigation";
 
-import { createClient } from "@/lib/supabase/server";
+import {
+  createClient,
+} from "@/lib/supabase/server";
 
-import { supabaseAdmin } from "@/lib/supabase/admin";
+import {
+  supabaseAdmin,
+} from "@/lib/supabase/admin";
+
+import {
+  ThreepleAppShell,
+} from "@/components/threeple/app-shell";
+
+import {
+  ThreepleBadge,
+  ThreepleEmptyState,
+  ThreepleLinkButton,
+  ThreepleProgress,
+  ThreepleStat,
+} from "@/components/threeple/design-system";
 
 export const instant = false;
 
-// =========================================================
-// HELPERS
-// =========================================================
-
 function friendlyText(
-  value: string | null | undefined
+  value:
+    | string
+    | null
+    | undefined
 ) {
   if (!value) {
     return "—";
@@ -20,19 +37,32 @@ function friendlyText(
 
   return value
     .replaceAll("_", " ")
-    .replace(/\b\w/g, (character) =>
-      character.toUpperCase()
+    .replace(
+      /\b\w/g,
+      (character) =>
+        character.toUpperCase()
     );
 }
 
-function formatMoney(
-  amount: number | null,
-  currency: string
+function money(
+  value:
+    | number
+    | string
+    | null
+    | undefined,
+  currency = "NGN"
 ) {
   if (
-    amount === null ||
-    amount === undefined
+    value === null ||
+    value === undefined
   ) {
+    return "—";
+  }
+
+  const number =
+    Number(value);
+
+  if (!Number.isFinite(number)) {
     return "—";
   }
 
@@ -42,58 +72,83 @@ function formatMoney(
       {
         style: "currency",
         currency,
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
+        maximumFractionDigits: 0,
       }
-    ).format(amount);
+    ).format(number);
   } catch {
-    return `${currency} ${amount.toLocaleString()}`;
+    return `${currency} ${number.toLocaleString()}`;
   }
 }
 
-function participationStyle(
-  status: string,
-  active: boolean
+function dateLabel(
+  value:
+    | string
+    | null
+    | undefined
 ) {
-  if (!active) {
-    return "bg-neutral-200 text-neutral-600";
+  if (!value) {
+    return "No deadline";
   }
 
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return "No deadline";
+  }
+
+  return date.toLocaleDateString(
+    "en-NG",
+    {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }
+  );
+}
+
+function statusTone(
+  status:
+    | string
+    | null
+    | undefined
+):
+  | "neutral"
+  | "primary"
+  | "success"
+  | "warning"
+  | "danger" {
   switch (status) {
+    case "paid":
     case "approved":
-      return "bg-green-100 text-green-700";
+    case "active":
+      return "success";
 
-    case "approval_pending":
-      return "bg-amber-100 text-amber-700";
+    case "pending":
+    case "awaiting_approval":
+    case "unpaid":
+      return "warning";
 
-    case "joined":
-      return "bg-blue-100 text-blue-700";
-
-    case "invited":
-      return "bg-purple-100 text-purple-700";
-
-    case "declined":
-      return "bg-red-100 text-red-700";
-
+    case "rejected":
     case "cancelled":
-      return "bg-neutral-200 text-neutral-600";
+      return "danger";
+
+    case "inactive":
+    case "closed":
+      return "neutral";
 
     default:
-      return "bg-neutral-100 text-neutral-600";
+      return "primary";
   }
 }
-
-// =========================================================
-// PAGE
-// =========================================================
 
 export default async function MyCollectionsPage() {
   const supabase =
     await createClient();
-
-  // =======================================================
-  // AUTH
-  // =======================================================
 
   const {
     data: claimsData,
@@ -108,33 +163,15 @@ export default async function MyCollectionsPage() {
     claimsError ||
     !userId
   ) {
-    redirect("/auth/login");
+    redirect(
+      "/auth/login?next=/my-collections"
+    );
   }
 
-  // =======================================================
-  // PROFILE
-  // =======================================================
-
   const {
-    data: profile,
-  } = await supabase
-    .from("profiles")
-    .select(`
-      full_name
-    `)
-    .eq(
-      "id",
-      userId
-    )
-    .maybeSingle();
-
-  // =======================================================
-  // PARTICIPANT RECORDS LINKED TO USER
-  // =======================================================
-
-  const {
-    data: participantRows,
-    error: participantError,
+    data: participants,
+    error:
+      participantError,
   } = await supabaseAdmin
     .from("participants")
     .select(`
@@ -144,7 +181,6 @@ export default async function MyCollectionsPage() {
       expected_amount,
       payment_status,
       participation_status,
-      join_method,
       is_active,
       created_at
     `)
@@ -160,55 +196,70 @@ export default async function MyCollectionsPage() {
     );
 
   if (participantError) {
-    throw new Error(
-      "Threeple could not load your Collections."
+    console.error(
+      "MY_COLLECTIONS_PARTICIPANT_LOOKUP_FAILED",
+      participantError
     );
   }
 
-  const participants =
-    participantRows ?? [];
+  const participantRows =
+    participants ?? [];
 
   const collectionIds =
     Array.from(
       new Set(
-        participants.map(
+        participantRows.map(
           (participant) =>
             participant.collection_id
         )
       )
     );
 
-  // =======================================================
-  // COLLECTIONS
-  // =======================================================
-
-  let collections:
-    {
-      id: string;
-      title: string;
-      description: string | null;
-      collection_type: string;
-      collection_mode: string;
-      currency: string;
-      deadline: string | null;
-      status: string;
-      archived_at: string | null;
-    }[] = [];
+  let collections: Array<{
+    id: string;
+    organization_id: string;
+    title: string;
+    description: string | null;
+    collection_type: string;
+    collection_mode: string;
+    currency: string;
+    target_amount:
+      | number
+      | string
+      | null;
+    default_amount:
+      | number
+      | string
+      | null;
+    amount_raised:
+      | number
+      | string
+      | null;
+    deadline: string | null;
+    status: string;
+    archived_at: string | null;
+  }> = [];
 
   if (
-    collectionIds.length > 0
+    collectionIds.length >
+    0
   ) {
     const {
-      data: collectionRows,
+      data,
+      error,
     } = await supabaseAdmin
       .from("collections")
       .select(`
         id,
+        organization_id,
         title,
         description,
         collection_type,
         collection_mode,
         currency,
+        target_amount,
+        default_amount,
+        amount_raised,
         deadline,
         status,
         archived_at
@@ -218,8 +269,15 @@ export default async function MyCollectionsPage() {
         collectionIds
       );
 
+    if (error) {
+      console.error(
+        "MY_COLLECTIONS_COLLECTION_LOOKUP_FAILED",
+        error
+      );
+    }
+
     collections =
-      collectionRows ?? [];
+      data ?? [];
   }
 
   const collectionMap =
@@ -232,363 +290,408 @@ export default async function MyCollectionsPage() {
       )
     );
 
-  // =======================================================
-  // COUNTS
-  // =======================================================
+  const items =
+    participantRows
+      .map(
+        (participant) => {
+          const collection =
+            collectionMap.get(
+              participant.collection_id
+            );
 
-  const activeMemberships =
-    participants.filter(
-      (participant) =>
-        participant.is_active
-    ).length;
+          if (!collection) {
+            return null;
+          }
 
-  const approvedMemberships =
-    participants.filter(
-      (participant) =>
+          return {
+            participant,
+            collection,
+          };
+        }
+      )
+      .filter(
+        (
+          item
+        ): item is NonNullable<
+          typeof item
+        > =>
+          Boolean(item)
+      );
+
+  const activeCount =
+    items.filter(
+      ({ participant, collection }) =>
         participant.is_active &&
-        participant
-          .participation_status ===
-          "approved"
+        collection.status ===
+          "active" &&
+        !collection.archived_at
     ).length;
 
-  const pendingMemberships =
-    participants.filter(
-      (participant) =>
-        participant.is_active &&
-        participant
-          .participation_status ===
-          "approval_pending"
+  const paidCount =
+    items.filter(
+      ({ participant }) =>
+        participant.payment_status ===
+        "paid"
     ).length;
 
-  const displayName =
-    profile?.full_name?.trim() ||
-    "there";
+  const ajoCount =
+    items.filter(
+      ({ collection }) =>
+        collection.collection_mode ===
+        "rotating_pool"
+    ).length;
 
-  // =======================================================
-  // UI
-  // =======================================================
+  const archivedCount =
+    items.filter(
+      ({ collection }) =>
+        Boolean(
+          collection.archived_at
+        )
+    ).length;
 
   return (
-    <main className="min-h-screen bg-neutral-50 text-neutral-900">
-
-      {/* HEADER */}
-
-      <header className="border-b bg-white">
-
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-
-          <Link
-            href="/"
-          >
-            <div className="text-2xl font-bold tracking-tight">
-              Threeple
-            </div>
-
-            <p className="text-sm text-neutral-500">
-              Collect. Coordinate.
-              Track.
+    <ThreepleAppShell
+      title="My Collections"
+      subtitle="Everything you have joined"
+      actions={
+        <ThreepleLinkButton
+          href="/join"
+          className="hidden sm:inline-flex"
+        >
+          Join another
+        </ThreepleLinkButton>
+      }
+    >
+      <section className="overflow-hidden rounded-[2rem] border border-[var(--tp-primary-border)] bg-[var(--tp-surface)] p-6 shadow-[var(--tp-shadow-sm)] sm:p-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="tp-kicker">
+              Participant workspace
             </p>
-          </Link>
 
-          <Link
-            href="/join"
-            className="inline-flex h-10 items-center justify-center rounded-xl border border-neutral-300 px-4 text-sm font-semibold hover:bg-neutral-50"
-          >
-            Join a Collection
-          </Link>
+            <h1 className="tp-heading mt-2 text-3xl sm:text-4xl">
+              The collections you are part of.
+            </h1>
 
+            <p className="tp-body mt-3 max-w-2xl text-sm sm:text-base">
+              Open any collection to see your contribution, group progress, transparency details and Ajo position where applicable.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <ThreepleLinkButton
+              href="/join"
+            >
+              Join with a code
+            </ThreepleLinkButton>
+
+            <ThreepleLinkButton
+              href="/dashboard"
+              variant="secondary"
+            >
+              Organizer home
+            </ThreepleLinkButton>
+          </div>
         </div>
+      </section>
 
-      </header>
+      <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <ThreepleStat
+          label="Active"
+          value={
+            activeCount
+          }
+          helper="Collections currently running."
+          tone="success"
+        />
 
-      <div className="mx-auto max-w-6xl px-6 py-10">
+        <ThreepleStat
+          label="Paid"
+          value={
+            paidCount
+          }
+          helper="Participant records currently marked paid."
+          tone="primary"
+        />
 
-        {/* INTRO */}
+        <ThreepleStat
+          label="Ajo"
+          value={
+            ajoCount
+          }
+          helper="Rotational contribution groups you joined."
+          tone="warning"
+        />
 
-        <section>
+        <ThreepleStat
+          label="Archived"
+          value={
+            archivedCount
+          }
+          helper="Historical collections that remain available."
+        />
+      </section>
 
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-neutral-400">
-            Participant Portal
-          </p>
-
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
-            My Collections
-          </h1>
-
-          <p className="mt-3 max-w-2xl leading-7 text-neutral-600">
-            Welcome, {displayName}.
-            View the Collections you
-            participate in and track
-            your current participation
-            status.
-          </p>
-
-        </section>
-
-        {/* SUMMARY */}
-
-        <section className="mt-8 grid gap-4 sm:grid-cols-3">
-
-          <div className="rounded-2xl border bg-white p-5">
-
-            <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
-              Collections
-            </p>
-
-            <p className="mt-3 text-3xl font-semibold">
-              {participants.length}
-            </p>
-
-          </div>
-
-          <div className="rounded-2xl border bg-white p-5">
-
-            <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
-              Approved
-            </p>
-
-            <p className="mt-3 text-3xl font-semibold">
-              {approvedMemberships}
-            </p>
-
-          </div>
-
-          <div
-            className={`rounded-2xl border p-5 ${
-              pendingMemberships > 0
-                ? "border-amber-200 bg-amber-50"
-                : "bg-white"
-            }`}
-          >
-
-            <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
-              Awaiting Approval
-            </p>
-
-            <p className="mt-3 text-3xl font-semibold">
-              {pendingMemberships}
-            </p>
-
-          </div>
-
-        </section>
-
-        {/* COLLECTIONS */}
-
-        <section className="mt-10">
-
-          <div className="flex items-center justify-between">
-
+      {items.length ===
+      0 ? (
+        <ThreepleEmptyState
+          className="mt-8"
+          title="You have not joined a collection yet"
+          description="Use a Threeple Code from an organizer to join a contribution, shared goal or Ajo group."
+          action={
+            <ThreepleLinkButton href="/join">
+              Join a collection
+            </ThreepleLinkButton>
+          }
+        />
+      ) : (
+        <section className="mt-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-
-              <h2 className="text-xl font-semibold">
+              <p className="tp-kicker">
                 Your participation
-              </h2>
-
-              <p className="mt-1 text-sm text-neutral-500">
-                {activeMemberships} active{" "}
-                {activeMemberships === 1
-                  ? "membership"
-                  : "memberships"}
               </p>
 
+              <h2 className="tp-heading mt-2 text-2xl">
+                Pick up where you left off.
+              </h2>
             </div>
 
+            <p className="text-sm text-[var(--tp-muted)]">
+              {items.length}
+              {" "}
+              collection
+              {items.length === 1
+                ? ""
+                : "s"}
+            </p>
           </div>
 
-          {participants.length >
-          0 ? (
-            <div className="mt-5 grid gap-5 lg:grid-cols-2">
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {items.map(
+              ({
+                participant,
+                collection,
+              }) => {
+                const isAjo =
+                  collection.collection_mode ===
+                  "rotating_pool";
 
-              {participants.map(
-                (participant) => {
-                  const collection =
-                    collectionMap.get(
-                      participant.collection_id
-                    );
+                const isGoal =
+                  collection.collection_mode ===
+                    "target" ||
+                  collection.collection_mode ===
+                    "flexible";
 
-                  if (!collection) {
-                    return null;
-                  }
+                const target =
+                  collection.target_amount !==
+                  null
+                    ? Number(
+                        collection.target_amount
+                      )
+                    : 0;
 
-                  const archived =
-                    Boolean(
-                      collection.archived_at
-                    );
+                const raised =
+                  collection.amount_raised !==
+                  null
+                    ? Number(
+                        collection.amount_raised
+                      )
+                    : 0;
 
-                  return (
-                    <article
-                      key={
-                        participant.id
-                      }
-                      className="rounded-3xl border bg-white p-6"
-                    >
+                const progress =
+                  target > 0
+                    ? Math.min(
+                        100,
+                        Math.round(
+                          (
+                            raised /
+                            target
+                          ) *
+                            100
+                        )
+                      )
+                    : 0;
 
-                      <div className="flex flex-wrap items-start justify-between gap-3">
+                const expectedAmount =
+                  participant.expected_amount !==
+                  null
+                    ? Number(
+                        participant.expected_amount
+                      )
+                    : collection.default_amount !==
+                        null
+                      ? Number(
+                          collection.default_amount
+                        )
+                      : null;
 
-                        <div>
+                const archived =
+                  Boolean(
+                    collection.archived_at
+                  );
 
-                          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-                            {friendlyText(
-                              collection.collection_type
-                            )}
-                          </p>
+                return (
+                  <article
+                    key={
+                      participant.id
+                    }
+                    className="tp-card overflow-hidden"
+                  >
+                    <div
+                      className={[
+                        "h-2",
+                        archived
+                          ? "bg-[var(--tp-muted)]"
+                          : isAjo
+                            ? "bg-[var(--tp-warning)]"
+                            : isGoal
+                              ? "bg-[var(--tp-primary)]"
+                              : "bg-[var(--tp-success)]",
+                      ].join(" ")}
+                    />
 
-                          <h3 className="mt-2 text-xl font-semibold">
-                            {
-                              collection.title
+                    <div className="p-5 sm:p-6">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex flex-wrap gap-2">
+                          <ThreepleBadge
+                            tone={
+                              participant.is_active
+                                ? statusTone(
+                                    participant.participation_status
+                                  )
+                                : "neutral"
                             }
-                          </h3>
+                          >
+                            {participant.is_active
+                              ? friendlyText(
+                                  participant.participation_status
+                                )
+                              : "Inactive"}
+                          </ThreepleBadge>
 
+                          <ThreepleBadge
+                            tone={
+                              statusTone(
+                                participant.payment_status
+                              )
+                            }
+                          >
+                            {friendlyText(
+                              participant.payment_status
+                            )}
+                          </ThreepleBadge>
                         </div>
 
-                        <span
-                          className={`rounded-full px-2.5 py-1 text-xs font-semibold ${participationStyle(
-                            participant.participation_status,
-                            participant.is_active
-                          )}`}
-                        >
-                          {participant.is_active
-                            ? friendlyText(
-                                participant.participation_status
-                              )
-                            : "Inactive"}
+                        <span className="text-xs font-black text-[var(--tp-muted)]">
+                          {isAjo
+                            ? "Ajo"
+                            : isGoal
+                              ? "Goal"
+                              : "Fixed"}
                         </span>
-
                       </div>
 
+                      <h3 className="tp-heading mt-5 text-xl">
+                        {collection.title}
+                      </h3>
+
+                      <p className="tp-muted mt-2 text-sm">
+                        {friendlyText(
+                          collection.collection_type
+                        )}
+                        {" · "}
+                        {dateLabel(
+                          collection.deadline
+                        )}
+                      </p>
+
                       {collection.description && (
-                        <p className="mt-4 line-clamp-2 text-sm leading-6 text-neutral-500">
-                          {
-                            collection.description
-                          }
+                        <p className="tp-body mt-3 line-clamp-2 text-sm">
+                          {collection.description}
                         </p>
                       )}
 
-                      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                      {isGoal &&
+                      target > 0 ? (
+                        <div className="mt-6">
+                          <ThreepleProgress
+                            value={
+                              progress
+                            }
+                            label="Group progress"
+                            helper={`${progress}%`}
+                          />
 
-                        <div className="rounded-2xl bg-neutral-50 p-4">
+                          <div className="mt-3 flex items-center justify-between gap-4 text-xs">
+                            <span className="text-[var(--tp-muted)]">
+                              {money(
+                                raised,
+                                collection.currency
+                              )}{" "}
+                              raised
+                            </span>
 
-                          <p className="text-xs text-neutral-400">
-                            Expected
+                            <span className="font-bold text-[var(--tp-ink-soft)]">
+                              {money(
+                                target,
+                                collection.currency
+                              )}{" "}
+                              goal
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-6 rounded-2xl bg-[var(--tp-bg-soft)] p-4">
+                          <p className="tp-kicker">
+                            {isAjo
+                              ? "Your cycle contribution"
+                              : "Your expected contribution"}
                           </p>
 
-                          <p className="mt-2 font-semibold">
-                            {formatMoney(
-                              participant.expected_amount !==
-                                null
-                                ? Number(
-                                    participant.expected_amount
-                                  )
-                                : null,
+                          <p className="tp-heading mt-2 text-lg">
+                            {money(
+                              expectedAmount,
                               collection.currency
                             )}
                           </p>
-
                         </div>
+                      )}
 
-                        <div className="rounded-2xl bg-neutral-50 p-4">
+                      {archived && (
+                        <div className="tp-alert tp-alert-info mt-5 text-sm">
+                          This collection is archived. Your participation history is still available.
+                        </div>
+                      )}
 
-                          <p className="text-xs text-neutral-400">
-                            Current status
+                      <div className="mt-6 flex items-center justify-between gap-4 border-t border-[var(--tp-border)] pt-4">
+                        <div>
+                          <p className="text-xs text-[var(--tp-muted)]">
+                            My status
                           </p>
 
-                          <p className="mt-2 font-semibold">
+                          <p className="mt-1 text-sm font-black text-[var(--tp-ink)]">
                             {friendlyText(
                               participant.payment_status
                             )}
                           </p>
-
                         </div>
-
-                      </div>
-
-                      <div className="mt-5 flex flex-wrap gap-2">
-
-                        <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-600">
-                          {friendlyText(
-                            collection.collection_mode
-                          )}
-                        </span>
-
-                        <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-600">
-                          Joined via{" "}
-                          {friendlyText(
-                            participant.join_method
-                          )}
-                        </span>
-
-                        {archived && (
-                          <span className="rounded-full bg-neutral-900 px-3 py-1 text-xs font-semibold text-white">
-                            Archived
-                          </span>
-                        )}
-
-                      </div>
-
-                      {collection.deadline && (
-                        <p className="mt-5 text-xs text-neutral-500">
-                          Deadline:{" "}
-                          {new Date(
-                            collection.deadline
-                          ).toLocaleDateString(
-                            "en-NG"
-                          )}
-                        </p>
-                      )}
-
-                      <div className="mt-6 border-t pt-5">
 
                         <Link
                           href={`/my-collections/${participant.id}`}
-                          className="text-sm font-semibold hover:underline"
+                          className="tp-btn tp-btn-primary"
                         >
-                          View Collection →
+                          Open workspace
                         </Link>
-
                       </div>
-
-                    </article>
-                  );
-                }
-              )}
-
-            </div>
-          ) : (
-            <div className="mt-5 rounded-3xl border border-dashed bg-white p-10 text-center">
-
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-100 text-xl">
-                +
-              </div>
-
-              <h3 className="mt-5 font-semibold">
-                You haven't joined a
-                Collection yet
-              </h3>
-
-              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-neutral-500">
-                Enter a Threeple Code
-                or use an invitation
-                link to join a
-                Collection.
-              </p>
-
-              <Link
-                href="/join"
-                className="mt-6 inline-flex h-11 items-center justify-center rounded-xl bg-black px-5 text-sm font-semibold text-white"
-              >
-                Join a Collection
-              </Link>
-
-            </div>
-          )}
-
+                    </div>
+                  </article>
+                );
+              }
+            )}
+          </div>
         </section>
-
-      </div>
-
-    </main>
+      )}
+    </ThreepleAppShell>
   );
 }
-
-
