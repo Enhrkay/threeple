@@ -444,3 +444,107 @@ body {
   }
 }
 
+
+
+/* =========================================================
+   THREEPLE RESPONSIVE FOUNDATION
+   Phone-first interaction and safe-area behavior.
+   ========================================================= */
+
+:root {
+  --tp-touch-target: 44px;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+button,
+[role="button"],
+.tp-btn {
+  min-height: var(--tp-touch-target);
+}
+
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
+.tp-scroll-x {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tp-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tp-responsive-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.tp-safe-bottom {
+  padding-bottom: max(
+    1rem,
+    env(safe-area-inset-bottom)
+  );
+}
+
+@media (min-width: 640px) {
+  .tp-responsive-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+}
+
+@media (min-width: 1024px) {
+  .tp-responsive-grid {
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0, 1fr)
+      );
+  }
+}
+
+@media (pointer: coarse) {
+  .tp-btn,
+  button,
+  select {
+    min-height: 46px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
