@@ -180,13 +180,13 @@ export default async function AdminCollectionsPage({
     );
 
   return (
-    <main className="min-h-screen bg-neutral-50 text-neutral-950">
+    <main className="min-h-screen bg-[var(--tp-bg-soft)] text-neutral-950">
       <div className="mx-auto max-w-7xl px-5 py-8 md:px-8 md:py-10">
 
         <div className="flex flex-wrap items-center gap-3 text-sm">
           <Link
             href="/admin"
-            className="font-semibold text-neutral-500 hover:text-neutral-950"
+            className="font-semibold text-[var(--tp-muted)] hover:text-neutral-950"
           >
             Admin
           </Link>
@@ -202,15 +202,15 @@ export default async function AdminCollectionsPage({
 
         <div className="mt-6 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-neutral-400">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--tp-faint)]">
               Platform Operations
             </p>
 
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight">
+            <h1 className="mt-2 text-3xl font-black tracking-tight tracking-tight">
               Collections
             </h1>
 
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-500">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--tp-muted)]">
               Review Collections across Threeple and see active enforcement immediately.
             </p>
           </div>
@@ -225,7 +225,7 @@ export default async function AdminCollectionsPage({
                 searchTerm
               }
               placeholder="Search Collections"
-              className="h-11 min-w-0 flex-1 rounded-xl border border-neutral-300 bg-white px-4 text-sm outline-none focus:border-neutral-500"
+              className="h-11 min-w-0 flex-1 rounded-xl border border-[var(--tp-border-strong)] bg-white px-4 text-sm outline-none focus:border-neutral-500"
             />
 
             <button
@@ -237,33 +237,33 @@ export default async function AdminCollectionsPage({
           </form>
         </div>
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                 Directory
               </p>
 
-              <h2 className="mt-2 text-xl font-semibold">
+              <h2 className="mt-2 text-xl font-black tracking-tight">
                 Platform Collections
               </h2>
             </div>
 
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-[var(--tp-muted)]">
               {collectionRows.length} shown
             </p>
           </div>
 
           {collectionRows.length ===
           0 ? (
-            <p className="mt-6 text-sm text-neutral-500">
+            <p className="mt-6 text-sm text-[var(--tp-muted)]">
               No Collections found.
             </p>
           ) : (
-            <div className="mt-6 overflow-x-auto">
+            <div className="mt-6 tp-scroll-x">
               <table className="w-full min-w-[980px] text-left text-sm">
                 <thead>
-                  <tr className="border-b text-xs uppercase tracking-wide text-neutral-400">
+                  <tr className="border-b text-xs uppercase tracking-wide text-[var(--tp-faint)]">
                     <th className="pb-3 pr-4">
                       Collection
                     </th>
@@ -312,7 +312,7 @@ export default async function AdminCollectionsPage({
                               }
                             </p>
 
-                            <p className="mt-1 font-mono text-xs text-neutral-400">
+                            <p className="mt-1 font-mono text-xs text-[var(--tp-faint)]">
                               {collection.join_code ||
                                 collection.id}
                             </p>
@@ -334,7 +334,7 @@ export default async function AdminCollectionsPage({
                           </td>
 
                           <td className="py-4 pr-4">
-                            <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-semibold text-neutral-700">
+                            <span className="rounded-full bg-[var(--tp-bg-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--tp-ink-soft)]">
                               {collection.archived_at
                                 ? "Archived"
                                 : friendlyText(
@@ -350,7 +350,7 @@ export default async function AdminCollectionsPage({
                                   Restricted
                                 </span>
 
-                                <p className="mt-2 text-xs text-neutral-500">
+                                <p className="mt-2 text-xs text-[var(--tp-muted)]">
                                   {friendlyText(
                                     restriction.restriction_type
                                   )}
@@ -363,7 +363,7 @@ export default async function AdminCollectionsPage({
                             )}
                           </td>
 
-                          <td className="py-4 pr-4 text-neutral-500">
+                          <td className="py-4 pr-4 text-[var(--tp-muted)]">
                             {formatDateTime(
                               collection.created_at
                             )}
@@ -390,5 +390,6 @@ export default async function AdminCollectionsPage({
     </main>
   );
 }
+
 
 

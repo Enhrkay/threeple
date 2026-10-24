@@ -107,19 +107,19 @@ function statusStyle(
 
   switch (status) {
     case "active":
-      return "bg-green-100 text-green-700";
+      return "bg-[var(--tp-success-soft)] text-[var(--tp-success)]";
 
     case "draft":
-      return "bg-amber-100 text-amber-700";
+      return "bg-[var(--tp-warning-soft)] text-[var(--tp-warning)]";
 
     case "closed":
-      return "bg-neutral-200 text-neutral-700";
+      return "bg-neutral-200 text-[var(--tp-ink-soft)]";
 
     case "cancelled":
-      return "bg-red-100 text-red-700";
+      return "bg-[var(--tp-danger-soft)] text-[var(--tp-danger)]";
 
     default:
-      return "bg-neutral-100 text-neutral-600";
+      return "bg-[var(--tp-bg-soft)] text-[var(--tp-ink-soft)]";
   }
 }
 
@@ -128,27 +128,27 @@ function participantStyle(
   active: boolean
 ) {
   if (!active) {
-    return "bg-neutral-200 text-neutral-600";
+    return "bg-neutral-200 text-[var(--tp-ink-soft)]";
   }
 
   switch (status) {
     case "approved":
-      return "bg-green-100 text-green-700";
+      return "bg-[var(--tp-success-soft)] text-[var(--tp-success)]";
 
     case "approval_pending":
-      return "bg-amber-100 text-amber-700";
+      return "bg-[var(--tp-warning-soft)] text-[var(--tp-warning)]";
 
     case "joined":
-      return "bg-blue-100 text-blue-700";
+      return "bg-[var(--tp-info-soft)] text-[var(--tp-info)]";
 
     case "declined":
-      return "bg-red-100 text-red-700";
+      return "bg-[var(--tp-danger-soft)] text-[var(--tp-danger)]";
 
     case "cancelled":
-      return "bg-neutral-200 text-neutral-600";
+      return "bg-neutral-200 text-[var(--tp-ink-soft)]";
 
     default:
-      return "bg-neutral-100 text-neutral-600";
+      return "bg-[var(--tp-bg-soft)] text-[var(--tp-ink-soft)]";
   }
 }
 
@@ -540,23 +540,23 @@ export default async function AdminCollectionProfilePage({
   // =======================================================
 
   return (
-    <main className="min-h-screen bg-neutral-50 text-neutral-900">
+    <main className="min-h-screen bg-[var(--tp-bg)] text-[var(--tp-ink)]">
 
       {/* HEADER */}
 
-      <header className="border-b bg-neutral-950 text-white">
+      <header className="border-b border-[var(--tp-border)] bg-[var(--tp-surface)] text-[var(--tp-ink)]">
 
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
 
           <Link
             href="/admin"
           >
-            <div className="text-2xl font-bold tracking-tight">
+            <div className="text-2xl font-black tracking-tight text-[var(--tp-primary)]">
               Threeple
             </div>
 
-            <p className="text-xs text-neutral-400">
-              Platform Administration
+            <p className="text-xs text-[var(--tp-faint)]">
+              Threeple Operations
             </p>
           </Link>
 
@@ -566,7 +566,7 @@ export default async function AdminCollectionProfilePage({
               {admin.fullName}
             </p>
 
-            <p className="mt-0.5 text-xs text-neutral-400">
+            <p className="mt-0.5 text-xs text-[var(--tp-faint)]">
               {friendlyText(
                 admin.role
               )}
@@ -578,15 +578,15 @@ export default async function AdminCollectionProfilePage({
 
       </header>
 
-      <div className="mx-auto max-w-7xl px-6 py-10">
+      <div className="mx-auto max-w-7xl px-4 pb-28 pt-6 sm:px-6 sm:pb-10 sm:pt-8 lg:px-8 lg:py-10">
 
         {/* BACK */}
 
         <Link
           href="/admin/collections"
-          className="text-sm font-medium text-neutral-500 hover:text-black"
+          className="text-sm font-medium text-[var(--tp-muted)] hover:text-black"
         >
-          ← Collection Directory
+          ← Collections
         </Link>
 
         {/* COLLECTION HEADER */}
@@ -613,7 +613,7 @@ export default async function AdminCollectionProfilePage({
                 </span>
 
                 {archived && (
-                  <span className="rounded-full bg-neutral-200 px-3 py-1 text-xs font-semibold text-neutral-700">
+                  <span className="rounded-full bg-neutral-200 px-3 py-1 text-xs font-semibold text-[var(--tp-ink-soft)]">
                     Lifecycle:{" "}
                     {friendlyText(
                       collection.status
@@ -629,16 +629,16 @@ export default async function AdminCollectionProfilePage({
 
               </div>
 
-              <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-neutral-400">
-                Admin Collection Profile
+              <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--tp-faint)]">
+                Admin Collection overview
               </p>
 
-              <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
+              <h1 className="mt-3 text-3xl font-black tracking-tight tracking-tight md:text-4xl">
                 {collection.title}
               </h1>
 
               {collection.description && (
-                <p className="mt-4 max-w-3xl leading-7 text-neutral-600">
+                <p className="mt-4 max-w-3xl leading-7 text-[var(--tp-ink-soft)]">
                   {
                     collection.description
                   }
@@ -647,22 +647,22 @@ export default async function AdminCollectionProfilePage({
 
             </div>
 
-            <div className="rounded-2xl border bg-white p-5 lg:min-w-[240px]">
+            <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5 lg:min-w-[240px]">
 
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                 Threeple Code
               </p>
 
-              <p className="mt-2 font-mono text-xl font-semibold tracking-wider">
+              <p className="mt-2 font-mono text-xl font-black tracking-tight tracking-wider">
                 {collection.join_code ||
                   "—"}
               </p>
 
-              <p className="mt-4 text-xs text-neutral-400">
+              <p className="mt-4 text-xs text-[var(--tp-faint)]">
                 Collection ID
               </p>
 
-              <p className="mt-1 break-all font-mono text-[11px] text-neutral-500">
+              <p className="mt-1 break-all font-mono text-[11px] text-[var(--tp-muted)]">
                 {collection.id}
               </p>
 
@@ -676,29 +676,29 @@ export default async function AdminCollectionProfilePage({
 
         <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
-          <div className="rounded-2xl border bg-white p-5">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5">
 
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
               Participants
             </p>
 
-            <p className="mt-3 text-3xl font-semibold">
+            <p className="mt-3 text-3xl font-black tracking-tight">
               {totalParticipants}
             </p>
 
-            <p className="mt-2 text-xs text-neutral-500">
+            <p className="mt-2 text-xs text-[var(--tp-muted)]">
               {activeParticipants} active
             </p>
 
           </div>
 
-          <div className="rounded-2xl border bg-white p-5">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5">
 
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
               Approved
             </p>
 
-            <p className="mt-3 text-3xl font-semibold">
+            <p className="mt-3 text-3xl font-black tracking-tight">
               {approvedParticipants}
             </p>
 
@@ -712,27 +712,27 @@ export default async function AdminCollectionProfilePage({
             }`}
           >
 
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
               Pending Approval
             </p>
 
-            <p className="mt-3 text-3xl font-semibold">
+            <p className="mt-3 text-3xl font-black tracking-tight">
               {pendingParticipants}
             </p>
 
           </div>
 
-          <div className="rounded-2xl border bg-white p-5">
+          <div className="rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-5">
 
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
               Activity Events
             </p>
 
-            <p className="mt-3 text-3xl font-semibold">
+            <p className="mt-3 text-3xl font-black tracking-tight">
               {activityRows.length}
             </p>
 
-            <p className="mt-2 text-xs text-neutral-500">
+            <p className="mt-2 text-xs text-[var(--tp-muted)]">
               Latest 30 loaded
             </p>
 
@@ -742,20 +742,20 @@ export default async function AdminCollectionProfilePage({
 
         {/* COLLECTION CONFIGURATION */}
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
 
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
             Configuration
           </p>
 
-          <h2 className="mt-2 text-xl font-semibold">
+          <h2 className="mt-2 text-xl font-black tracking-tight">
             Collection Settings
           </h2>
 
           <div className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Type
               </p>
 
@@ -767,7 +767,7 @@ export default async function AdminCollectionProfilePage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Mode
               </p>
 
@@ -779,7 +779,7 @@ export default async function AdminCollectionProfilePage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Currency
               </p>
 
@@ -789,7 +789,7 @@ export default async function AdminCollectionProfilePage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Target Amount
               </p>
 
@@ -802,7 +802,7 @@ export default async function AdminCollectionProfilePage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Default Amount
               </p>
 
@@ -815,7 +815,7 @@ export default async function AdminCollectionProfilePage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Deadline
               </p>
 
@@ -827,7 +827,7 @@ export default async function AdminCollectionProfilePage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Approval Required
               </p>
 
@@ -839,7 +839,7 @@ export default async function AdminCollectionProfilePage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Partial Payments
               </p>
 
@@ -851,7 +851,7 @@ export default async function AdminCollectionProfilePage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Custom Amount
               </p>
 
@@ -863,7 +863,7 @@ export default async function AdminCollectionProfilePage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Access Mode
               </p>
 
@@ -875,7 +875,7 @@ export default async function AdminCollectionProfilePage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Visibility
               </p>
 
@@ -887,7 +887,7 @@ export default async function AdminCollectionProfilePage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Public Slug
               </p>
 
@@ -903,20 +903,20 @@ export default async function AdminCollectionProfilePage({
 
         {/* LIFECYCLE */}
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
 
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
             Lifecycle
           </p>
 
-          <h2 className="mt-2 text-xl font-semibold">
+          <h2 className="mt-2 text-xl font-black tracking-tight">
             Collection History
           </h2>
 
           <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Created
               </p>
 
@@ -928,7 +928,7 @@ export default async function AdminCollectionProfilePage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Last Updated
               </p>
 
@@ -940,7 +940,7 @@ export default async function AdminCollectionProfilePage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Closed
               </p>
 
@@ -952,7 +952,7 @@ export default async function AdminCollectionProfilePage({
             </div>
 
             <div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[var(--tp-faint)]">
                 Archived
               </p>
 
@@ -969,21 +969,21 @@ export default async function AdminCollectionProfilePage({
 
         {/* ORGANIZER */}
 
-        <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
 
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
             Organizer
           </p>
 
-          <h2 className="mt-2 text-xl font-semibold">
+          <h2 className="mt-2 text-xl font-black tracking-tight">
             Collection Ownership
           </h2>
 
           <div className="mt-6 grid gap-6 md:grid-cols-2">
 
-            <div className="rounded-2xl bg-neutral-50 p-5">
+            <div className="rounded-2xl bg-[var(--tp-bg-soft)] p-5">
 
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                 Workspace
               </p>
 
@@ -992,24 +992,24 @@ export default async function AdminCollectionProfilePage({
                   "Unknown Organization"}
               </p>
 
-              <p className="mt-1 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-[var(--tp-muted)]">
                 {friendlyText(
                   organization?.type
                 )}
               </p>
 
               {organization?.slug && (
-                <p className="mt-3 text-xs text-neutral-400">
+                <p className="mt-3 text-xs text-[var(--tp-faint)]">
                   {organization.slug}
                 </p>
               )}
 
             </div>
 
-            <div className="rounded-2xl bg-neutral-50 p-5">
+            <div className="rounded-2xl bg-[var(--tp-bg-soft)] p-5">
 
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-                Created By
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
+                Organizer
               </p>
 
               <p className="mt-3 text-lg font-semibold">
@@ -1017,7 +1017,7 @@ export default async function AdminCollectionProfilePage({
                   "Unknown User"}
               </p>
 
-              <p className="mt-1 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-[var(--tp-muted)]">
                 {creatorEmail ||
                   "No email available"}
               </p>
@@ -1041,54 +1041,54 @@ export default async function AdminCollectionProfilePage({
           "recurring_dues" ||
           collection.collection_mode ===
             "rotating_pool") && (
-          <section className="mt-8 rounded-3xl border bg-white p-6 md:p-8">
+          <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
 
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
               Recurring Structure
             </p>
 
-            <h2 className="mt-2 text-xl font-semibold">
+            <h2 className="mt-2 text-xl font-black tracking-tight">
               Schedule & Obligations
             </h2>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
-              <div className="rounded-2xl bg-neutral-50 p-5">
-                <p className="text-xs text-neutral-400">
+              <div className="rounded-2xl bg-[var(--tp-bg-soft)] p-5">
+                <p className="text-xs text-[var(--tp-faint)]">
                   Schedules
                 </p>
 
-                <p className="mt-2 text-2xl font-semibold">
+                <p className="mt-2 text-2xl font-black tracking-tight">
                   {recurringSchedules}
                 </p>
               </div>
 
-              <div className="rounded-2xl bg-neutral-50 p-5">
-                <p className="text-xs text-neutral-400">
+              <div className="rounded-2xl bg-[var(--tp-bg-soft)] p-5">
+                <p className="text-xs text-[var(--tp-faint)]">
                   Cycles
                 </p>
 
-                <p className="mt-2 text-2xl font-semibold">
+                <p className="mt-2 text-2xl font-black tracking-tight">
                   {collectionCycles}
                 </p>
               </div>
 
-              <div className="rounded-2xl bg-neutral-50 p-5">
-                <p className="text-xs text-neutral-400">
+              <div className="rounded-2xl bg-[var(--tp-bg-soft)] p-5">
+                <p className="text-xs text-[var(--tp-faint)]">
                   Rotation Entries
                 </p>
 
-                <p className="mt-2 text-2xl font-semibold">
+                <p className="mt-2 text-2xl font-black tracking-tight">
                   {rotationEntries}
                 </p>
               </div>
 
-              <div className="rounded-2xl bg-neutral-50 p-5">
-                <p className="text-xs text-neutral-400">
+              <div className="rounded-2xl bg-[var(--tp-bg-soft)] p-5">
+                <p className="text-xs text-[var(--tp-faint)]">
                   Obligations
                 </p>
 
-                <p className="mt-2 text-2xl font-semibold">
+                <p className="mt-2 text-2xl font-black tracking-tight">
                   {obligations}
                 </p>
               </div>
@@ -1100,7 +1100,7 @@ export default async function AdminCollectionProfilePage({
 
         {/* PARTICIPANTS */}
 
-        <section className="mt-8 overflow-hidden rounded-3xl border bg-white">
+        <section className="mt-8 overflow-hidden rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)]">
 
           <div className="border-b px-6 py-5">
 
@@ -1108,7 +1108,7 @@ export default async function AdminCollectionProfilePage({
               Participants
             </h2>
 
-            <p className="mt-1 text-sm text-neutral-500">
+            <p className="mt-1 text-sm text-[var(--tp-muted)]">
               All participant records
               for this Collection.
             </p>
@@ -1117,35 +1117,35 @@ export default async function AdminCollectionProfilePage({
 
           {participantRows.length >
           0 ? (
-            <div className="overflow-x-auto">
+            <div className="tp-scroll-x">
 
               <table className="min-w-full text-left">
 
-                <thead className="border-b bg-neutral-50">
+                <thead className="border-b bg-[var(--tp-bg-soft)]">
 
                   <tr>
 
-                    <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-neutral-400">
+                    <th className="px-6 py-4 text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                       Participant
                     </th>
 
-                    <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-neutral-400">
+                    <th className="px-6 py-4 text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                       Participation
                     </th>
 
-                    <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-neutral-400">
+                    <th className="px-6 py-4 text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                       Expected
                     </th>
 
-                    <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-neutral-400">
+                    <th className="px-6 py-4 text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                       Contribution
                     </th>
 
-                    <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-neutral-400">
+                    <th className="px-6 py-4 text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                       Joined Via
                     </th>
 
-                    <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-neutral-400">
+                    <th className="px-6 py-4 text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                       Joined
                     </th>
 
@@ -1161,7 +1161,7 @@ export default async function AdminCollectionProfilePage({
                         key={
                           participant.id
                         }
-                        className="hover:bg-neutral-50"
+                        className="hover:bg-[var(--tp-bg-soft)]"
                       >
 
                         <td className="px-6 py-5 align-top">
@@ -1172,7 +1172,7 @@ export default async function AdminCollectionProfilePage({
                             }
                           </p>
 
-                          <p className="mt-1 text-sm text-neutral-500">
+                          <p className="mt-1 text-sm text-[var(--tp-muted)]">
                             {participant.email ||
                               participant.phone ||
                               "No contact"}
@@ -1239,7 +1239,7 @@ export default async function AdminCollectionProfilePage({
 
                         <td className="px-6 py-5 align-top">
 
-                          <p className="text-sm text-neutral-500">
+                          <p className="text-sm text-[var(--tp-muted)]">
                             {formatDateTime(
                               participant.created_at
                             )}
@@ -1257,7 +1257,7 @@ export default async function AdminCollectionProfilePage({
 
             </div>
           ) : (
-            <div className="px-6 py-10 text-sm text-neutral-500">
+            <div className="px-6 py-10 text-sm text-[var(--tp-muted)]">
               No participants in this
               Collection.
             </div>
@@ -1267,7 +1267,7 @@ export default async function AdminCollectionProfilePage({
 
         {/* ACTIVITY */}
 
-        <section className="mt-8 overflow-hidden rounded-3xl border bg-white">
+        <section className="mt-8 overflow-hidden rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)]">
 
           <div className="border-b px-6 py-5">
 
@@ -1275,7 +1275,7 @@ export default async function AdminCollectionProfilePage({
               Collection Activity
             </h2>
 
-            <p className="mt-1 text-sm text-neutral-500">
+            <p className="mt-1 text-sm text-[var(--tp-muted)]">
               Latest recorded
               lifecycle, participant
               and management events.
@@ -1315,7 +1315,7 @@ export default async function AdminCollectionProfilePage({
                             )}
                           </p>
 
-                          <p className="mt-2 text-sm leading-6 text-neutral-600">
+                          <p className="mt-2 text-sm leading-6 text-[var(--tp-ink-soft)]">
                             {event.description ||
                               event.subject_label ||
                               "Collection activity"}
@@ -1323,7 +1323,7 @@ export default async function AdminCollectionProfilePage({
 
                         </div>
 
-                        <time className="whitespace-nowrap text-xs text-neutral-400">
+                        <time className="whitespace-nowrap text-xs text-[var(--tp-faint)]">
                           {formatDateTime(
                             event.created_at
                           )}
@@ -1331,7 +1331,7 @@ export default async function AdminCollectionProfilePage({
 
                       </div>
 
-                      <div className="mt-3 flex flex-wrap gap-2 text-xs text-neutral-400">
+                      <div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--tp-faint)]">
 
                         <span>
                           Actor:{" "}
@@ -1359,7 +1359,7 @@ export default async function AdminCollectionProfilePage({
 
             </div>
           ) : (
-            <div className="px-6 py-10 text-sm text-neutral-500">
+            <div className="px-6 py-10 text-sm text-[var(--tp-muted)]">
               No recorded activity yet.
             </div>
           )}
@@ -1368,21 +1368,21 @@ export default async function AdminCollectionProfilePage({
 
         {/* PAYMENT BOUNDARY */}
 
-        <section className="mt-8 rounded-3xl border border-dashed bg-neutral-50 p-6 md:p-8">
+        <section className="mt-8 rounded-3xl border border-dashed bg-[var(--tp-bg-soft)] p-6 md:p-8">
 
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
             <div>
 
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
                 Payments & Settlement
               </p>
 
-              <h2 className="mt-2 text-xl font-semibold">
+              <h2 className="mt-2 text-xl font-black tracking-tight">
                 Payment administration paused
               </h2>
 
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-500">
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--tp-muted)]">
                 Payment initiation,
                 settlement, refunds and
                 provider reconciliation
@@ -1404,11 +1404,11 @@ export default async function AdminCollectionProfilePage({
 
         <section className="mt-8 rounded-3xl bg-neutral-950 p-6 text-white md:p-8">
 
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-            Platform Administration
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
+            Threeple Operations
           </p>
 
-          <h2 className="mt-2 text-xl font-semibold">
+          <h2 className="mt-2 text-xl font-black tracking-tight">
             Read-only Collection inspection
           </h2>
 
@@ -1429,7 +1429,26 @@ export default async function AdminCollectionProfilePage({
 
       </div>
 
-    </main>
+    
+        <section className="mt-8 rounded-[2rem] border border-[var(--tp-danger-border)] bg-[var(--tp-danger-soft)] p-6 md:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-danger)]">
+            Lifecycle protection
+          </p>
+          <h2 className="mt-2 text-xl font-black text-[var(--tp-danger)]">
+            Archive and deletion history
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--tp-danger)]/80">
+            Collection removal is handled through the organizer lifecycle workflow so participant and financial history remain protected.
+          </p>
+          <a
+            href={`/dashboard/collections/${collection.id}/lifecycle`}
+            className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--tp-danger)] px-5 text-sm font-black text-white"
+          >
+            Open lifecycle controls
+          </a>
+        </section>
+</main>
   );
 }
+
 
