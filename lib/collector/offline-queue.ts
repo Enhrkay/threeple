@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 export type OfflineFieldEvent = {
   device_event_id: string;
@@ -28,10 +28,13 @@ export type OfflineFieldEvent = {
 const DB_NAME =
   "threeple-field-collector";
 
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
-const STORE_NAME =
+const EVENT_STORE =
   "offline-field-events";
+
+const SNAPSHOT_STORE =
+  "offline-collection-snapshots";
 
 function openDb() {
   return new Promise<IDBDatabase>(
@@ -49,19 +52,19 @@ function openDb() {
 
           if (
             !db.objectStoreNames.contains(
-              STORE_NAME
+              EVENT_STORE
             )
           ) {
-            const store =
+            const eventStore =
               db.createObjectStore(
-                STORE_NAME,
+                EVENT_STORE,
                 {
                   keyPath:
                     "device_event_id",
                 }
               );
 
-            store.createIndex(
+            eventStore.createIndex(
               "lifecycle_status",
               "lifecycle_status",
               {
@@ -69,9 +72,32 @@ function openDb() {
               }
             );
 
-            store.createIndex(
+            eventStore.createIndex(
               "created_at",
               "created_at",
+              {
+                unique: false,
+              }
+            );
+          }
+
+          if (
+            !db.objectStoreNames.contains(
+              SNAPSHOT_STORE
+            )
+          ) {
+            const snapshotStore =
+              db.createObjectStore(
+                SNAPSHOT_STORE,
+                {
+                  keyPath:
+                    "collection_id",
+                }
+              );
+
+            snapshotStore.createIndex(
+              "prepared_at",
+              "prepared_at",
               {
                 unique: false,
               }
@@ -125,13 +151,13 @@ export async function saveOfflineFieldEvent(
     (resolve, reject) => {
       const transaction =
         db.transaction(
-          STORE_NAME,
+          EVENT_STORE,
           "readwrite"
         );
 
       transaction
         .objectStore(
-          STORE_NAME
+          EVENT_STORE
         )
         .put(event);
 
@@ -161,11 +187,11 @@ export async function getOfflineFieldEvents() {
         const request =
           db
             .transaction(
-              STORE_NAME,
+              EVENT_STORE,
               "readonly"
             )
             .objectStore(
-              STORE_NAME
+              EVENT_STORE
             )
             .getAll();
 
@@ -207,13 +233,13 @@ export async function updateOfflineFieldEvent(
     (resolve, reject) => {
       const transaction =
         db.transaction(
-          STORE_NAME,
+          EVENT_STORE,
           "readwrite"
         );
 
       const store =
         transaction.objectStore(
-          STORE_NAME
+          EVENT_STORE
         );
 
       const getRequest =
@@ -251,3 +277,4 @@ export async function updateOfflineFieldEvent(
 
   db.close();
 }
+

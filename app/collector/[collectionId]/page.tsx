@@ -272,7 +272,33 @@ export default async function CollectorCollectionPage({
           </div>
         </section>
 
-        <section className="mt-6 grid gap-4 sm:grid-cols-3">
+                <section className="mt-6 rounded-[1.75rem] border border-[var(--tp-warning-border)] bg-[var(--tp-warning-soft)] p-5 sm:flex sm:items-center sm:justify-between sm:gap-6">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-warning)]">
+              Going somewhere with weak signal?
+            </p>
+            <p className="mt-2 font-black text-[var(--tp-ink)]">
+              Prepare this collection for offline use.
+            </p>
+            <p className="mt-1 text-sm leading-6 text-[var(--tp-warning)]">
+              Download the current member roster to this device before you leave connectivity.
+            </p>
+          </div>
+
+          <Link
+            href={`/collector/${collectionId}/prepare-offline`}
+            className="tp-btn tp-btn-primary mt-4 min-h-11 shrink-0 sm:mt-0"
+          >
+            Prepare for Offline
+          </Link>
+          <a
+            href={`/collector-offline.html?collectionId=${encodeURIComponent(collectionId)}`}
+            className="tp-btn tp-btn-secondary mt-3 min-h-11 sm:ml-3 sm:mt-0"
+          >
+            Open offline copy
+          </a>
+        </section>
+<section className="mt-6 grid gap-4 sm:grid-cols-3">
           <ThreepleStat
             label="Members"
             value={
@@ -403,4 +429,6 @@ export default async function CollectorCollectionPage({
     </ThreepleAppShell>
   );
 }
+
+
 

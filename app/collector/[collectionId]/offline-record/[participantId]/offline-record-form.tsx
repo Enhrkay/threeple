@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   useState,
@@ -33,7 +33,7 @@ function money(
     value === null ||
     value === undefined
   ) {
-    return "—";
+    return "â€”";
   }
 
   return new Intl.NumberFormat(
@@ -276,11 +276,11 @@ export default function OfflineRecordForm({
             </option>
 
             <option value="bank_transfer_manual">
-              Bank transfer — manually confirmed
+              Bank transfer â€” manually confirmed
             </option>
 
             <option value="pos_manual">
-              POS — manually confirmed
+              POS â€” manually confirmed
             </option>
 
             <option value="other_manual">
@@ -324,3 +324,4 @@ export default function OfflineRecordForm({
     </section>
   );
 }
+

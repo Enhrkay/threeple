@@ -1,0 +1,422 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#5a2b70" />
+  <title>Threeple Offline Collector</title>
+  <style>
+    :root{
+      --bg:#f7f5fa;--surface:#fff;--primary:#5a2b70;--primary-soft:#eee4f3;
+      --ink:#201824;--muted:#786f7d;--border:#e8e0eb;--success:#2f6b49;
+      --success-soft:#eaf4ee;--warning:#8d6a17;--warning-soft:#fff6dd;
+      --danger:#a34545;--danger-soft:#faecec
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    button,input,select,textarea{font:inherit}
+    .shell{max-width:880px;margin:auto;padding:18px 16px 100px}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+    .brand{font-weight:900;color:var(--primary);font-size:22px}
+    .pill{border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;background:var(--warning-soft);color:var(--warning)}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:20px;box-shadow:0 8px 30px rgba(56,34,65,.06)}
+    .hero{background:var(--primary);color:#fff}
+    .muted{color:var(--muted)}
+    h1,h2,h3,p{margin-top:0}
+    h1{font-size:30px;line-height:1.05;margin-bottom:8px}
+    h2{font-size:21px}
+    .grid{display:grid;gap:12px}
+    .stats{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:14px}
+    .stat{background:rgba(255,255,255,.10);border-radius:18px;padding:14px}
+    .label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;font-weight:900;opacity:.62}
+    .value{font-size:24px;font-weight:900;margin-top:5px}
+    .toolbar{display:flex;gap:10px;margin:18px 0}
+    .input,.select,.textarea{width:100%;min-height:48px;border:1px solid var(--border);border-radius:14px;background:#fff;padding:12px 14px;color:var(--ink);font-size:16px}
+    .textarea{min-height:90px;resize:vertical}
+    .btn{min-height:46px;border:0;border-radius:999px;padding:11px 18px;font-weight:900;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+    .btn-primary{background:var(--primary);color:white}
+    .btn-secondary{background:var(--primary-soft);color:var(--primary)}
+    .btn:disabled{opacity:.45;cursor:not-allowed}
+    .member{display:flex;gap:14px;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .member-name{font-weight:900}
+    .small{font-size:12px}
+    .status{border-radius:999px;padding:6px 10px;font-size:11px;font-weight:900;white-space:nowrap}
+    .success{background:var(--success-soft);color:var(--success)}
+    .warning{background:var(--warning-soft);color:var(--warning)}
+    .danger{background:var(--danger-soft);color:var(--danger)}
+    .hidden{display:none!important}
+    .section{margin-top:18px}
+    .back{color:var(--primary);font-weight:900;text-decoration:none;font-size:14px}
+    .receipt{background:var(--primary);color:#fff;border-radius:22px;padding:20px}
+    .receipt-ref{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;opacity:.75;font-weight:900}
+    .amount{font-size:36px;font-weight:900;margin:18px 0 5px}
+    .notice{padding:14px;border-radius:16px;font-size:13px;line-height:1.5}
+    .empty{text-align:center;padding:36px 18px;color:var(--muted)}
+    @media(min-width:700px){
+      .shell{padding:28px 24px 80px}
+      .stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+      .member{padding:2px 0}
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="top">
+      <div>
+        <div class="brand">Threeple</div>
+        <div class="small muted">Offline Collector</div>
+      </div>
+      <div id="networkPill" class="pill">Checkingâ€¦</div>
+    </div>
+
+    <section id="loading" class="card">Loading prepared collectionâ€¦</section>
+
+    <section id="missing" class="card hidden">
+      <h2>No offline copy found</h2>
+      <p class="muted">Prepare this collection while online before going into a low-connectivity area.</p>
+      <a class="btn btn-primary" href="/collector">Back to Collector Mode</a>
+    </section>
+
+    <div id="workspace" class="hidden">
+      <section class="card hero">
+        <div class="label" id="orgName"></div>
+        <h1 id="collectionTitle"></h1>
+        <div class="small" id="preparedAt"></div>
+        <div class="grid stats">
+          <div class="stat"><div class="label">Members</div><div class="value" id="memberCount">0</div></div>
+          <div class="stat"><div class="label">Queue</div><div class="value" id="queueCount">0</div></div>
+        </div>
+      </section>
+
+      <div class="toolbar">
+        <input id="search" class="input" type="search" placeholder="Search member name or phone" autocomplete="off" />
+      </div>
+
+      <section id="members"></section>
+
+      <section id="recordPanel" class="card section hidden">
+        <button id="closeRecord" class="btn btn-secondary" type="button">Back to members</button>
+        <div class="section">
+          <div class="label">Recording for</div>
+          <h2 id="recordName"></h2>
+          <div class="small muted" id="recordPhone"></div>
+        </div>
+
+        <div class="section">
+          <label class="small"><strong>Amount collected</strong></label>
+          <input id="amount" class="input" type="number" min="0.01" step="0.01" inputmode="decimal" />
+        </div>
+
+        <div class="section">
+          <label class="small"><strong>Collection method</strong></label>
+          <select id="method" class="select">
+            <option value="cash">Cash</option>
+            <option value="bank_transfer_manual">Bank transfer â€” manually confirmed</option>
+            <option value="pos_manual">POS â€” manually confirmed</option>
+            <option value="other_manual">Other manual method</option>
+          </select>
+        </div>
+
+        <div class="section">
+          <label class="small"><strong>Note</strong></label>
+          <textarea id="note" class="textarea" maxlength="500" placeholder="e.g. Week 4 contribution."></textarea>
+        </div>
+
+        <div id="recordError" class="notice danger section hidden"></div>
+
+        <button id="saveRecord" class="btn btn-primary section" type="button">Save offline & issue receipt</button>
+      </section>
+
+      <section id="receiptPanel" class="card section hidden">
+        <div class="receipt">
+          <div class="label">Offline receipt</div>
+          <div id="receiptRef" class="receipt-ref"></div>
+          <div id="receiptAmount" class="amount"></div>
+          <div id="receiptMember" class="small"></div>
+        </div>
+
+        <div class="notice warning section">
+          Saved on this device as <strong>Recorded offline</strong>. Sync it when connectivity returns.
+        </div>
+
+        <div class="grid section">
+          <button id="recordAnother" class="btn btn-primary" type="button">Back to members</button>
+          <a class="btn btn-secondary" href="/collector/offline-queue">Open Offline Queue</a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+<script>
+(() => {
+  const DB_NAME = "threeple-field-collector";
+  const DB_VERSION = 2;
+  const EVENT_STORE = "offline-field-events";
+  const SNAPSHOT_STORE = "offline-collection-snapshots";
+
+  const params = new URLSearchParams(location.search);
+  const collectionId = params.get("collectionId") || "";
+
+  const $ = (id) => document.getElementById(id);
+  let snapshot = null;
+  let selectedParticipant = null;
+
+  function openDb() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+      request.onupgradeneeded = () => {
+        const db = request.result;
+
+        if (!db.objectStoreNames.contains(EVENT_STORE)) {
+          const eventStore = db.createObjectStore(EVENT_STORE, { keyPath: "device_event_id" });
+          eventStore.createIndex("lifecycle_status", "lifecycle_status", { unique: false });
+          eventStore.createIndex("created_at", "created_at", { unique: false });
+        }
+
+        if (!db.objectStoreNames.contains(SNAPSHOT_STORE)) {
+          const snapshotStore = db.createObjectStore(SNAPSHOT_STORE, { keyPath: "collection_id" });
+          snapshotStore.createIndex("prepared_at", "prepared_at", { unique: false });
+        }
+      };
+
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async function getSnapshot(id) {
+    const db = await openDb();
+
+    const result = await new Promise((resolve, reject) => {
+      const request = db.transaction(SNAPSHOT_STORE, "readonly").objectStore(SNAPSHOT_STORE).get(id);
+      request.onsuccess = () => resolve(request.result || null);
+      request.onerror = () => reject(request.error);
+    });
+
+    db.close();
+    return result;
+  }
+
+  async function saveEvent(event) {
+    const db = await openDb();
+
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(EVENT_STORE, "readwrite");
+      tx.objectStore(EVENT_STORE).put(event);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+
+    db.close();
+  }
+
+  async function countPending() {
+    const db = await openDb();
+
+    const events = await new Promise((resolve, reject) => {
+      const request = db.transaction(EVENT_STORE, "readonly").objectStore(EVENT_STORE).getAll();
+      request.onsuccess = () => resolve(request.result || []);
+      request.onerror = () => reject(request.error);
+    });
+
+    db.close();
+
+    return events.filter(
+      (event) =>
+        event.collection_id === collectionId &&
+        event.lifecycle_status !== "synced"
+    ).length;
+  }
+
+  function money(value, currency) {
+    if (value === null || value === undefined || value === "") return "â€”";
+
+    return new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 2,
+    }).format(Number(value));
+  }
+
+  function receiptReference() {
+    const stamp = new Date().toISOString().slice(0, 10).replaceAll("-", "");
+    const suffix = crypto.randomUUID().replaceAll("-", "").slice(0, 10).toUpperCase();
+    return `TP-OFF-${stamp}-${suffix}`;
+  }
+
+  function updateNetwork() {
+    const online = navigator.onLine;
+    $("networkPill").textContent = online ? "Online" : "Offline";
+    $("networkPill").className = "pill " + (online ? "success" : "warning");
+  }
+
+  function renderMembers() {
+    const query = $("search").value.trim().toLowerCase();
+
+    const participants = snapshot.participants.filter((participant) => {
+      const haystack = `${participant.full_name || ""} ${participant.phone || ""}`.toLowerCase();
+      return haystack.includes(query);
+    });
+
+    if (!participants.length) {
+      $("members").innerHTML = '<div class="card empty">No matching members.</div>';
+      return;
+    }
+
+    $("members").innerHTML = participants.map((participant) => {
+      const paid = participant.payment_status === "paid";
+      const expected = participant.expected_amount ?? snapshot.default_amount;
+
+      return `
+        <article class="card member">
+          <div>
+            <div class="member-name">${escapeHtml(participant.full_name || "Unnamed member")}</div>
+            <div class="small muted">${escapeHtml(participant.phone || "No phone number")}</div>
+            <div class="small" style="margin-top:6px"><strong>${escapeHtml(money(expected, snapshot.currency))}</strong> expected</div>
+          </div>
+          <div style="text-align:right">
+            <div class="status ${paid ? "success" : "warning"}">${paid ? "Paid" : "Outstanding"}</div>
+            <button class="btn btn-primary" style="margin-top:10px" data-participant="${participant.id}" type="button">Record</button>
+          </div>
+        </article>
+      `;
+    }).join("");
+
+    document.querySelectorAll("[data-participant]").forEach((button) => {
+      button.addEventListener("click", () => openRecord(button.dataset.participant));
+    });
+  }
+
+  function openRecord(participantId) {
+    selectedParticipant = snapshot.participants.find((p) => p.id === participantId);
+
+    if (!selectedParticipant) return;
+
+    $("members").classList.add("hidden");
+    $("recordPanel").classList.remove("hidden");
+    $("receiptPanel").classList.add("hidden");
+
+    $("recordName").textContent = selectedParticipant.full_name || "Unnamed member";
+    $("recordPhone").textContent = selectedParticipant.phone || "No phone number";
+
+    const suggested = selectedParticipant.expected_amount ?? snapshot.default_amount;
+    $("amount").value = suggested ?? "";
+    $("method").value = "cash";
+    $("note").value = "";
+    $("recordError").classList.add("hidden");
+  }
+
+  function closeRecord() {
+    selectedParticipant = null;
+    $("recordPanel").classList.add("hidden");
+    $("receiptPanel").classList.add("hidden");
+    $("members").classList.remove("hidden");
+  }
+
+  async function saveRecord() {
+    if (!selectedParticipant) return;
+
+    const amount = Number($("amount").value);
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      $("recordError").textContent = "Enter a valid amount greater than zero.";
+      $("recordError").classList.remove("hidden");
+      return;
+    }
+
+    const now = new Date().toISOString();
+    const reference = receiptReference();
+
+    const event = {
+      device_event_id: crypto.randomUUID(),
+      receipt_reference: reference,
+      collection_id: snapshot.collection_id,
+      collection_title: snapshot.title,
+      participant_id: selectedParticipant.id,
+      participant_name: selectedParticipant.full_name || "Unnamed member",
+      amount: Math.round(amount * 100) / 100,
+      currency: snapshot.currency,
+      payment_method: $("method").value,
+      local_recorded_at: now,
+      note: $("note").value.trim() || null,
+      lifecycle_status: "recorded_offline",
+      created_at: now,
+      synced_at: null,
+      sync_error: null,
+    };
+
+    await saveEvent(event);
+
+    $("recordPanel").classList.add("hidden");
+    $("receiptPanel").classList.remove("hidden");
+
+    $("receiptRef").textContent = reference;
+    $("receiptAmount").textContent = money(event.amount, event.currency);
+    $("receiptMember").textContent = `Recorded for ${event.participant_name}`;
+
+    $("queueCount").textContent = String(await countPending());
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  async function boot() {
+    updateNetwork();
+
+    if (!collectionId) {
+      $("loading").classList.add("hidden");
+      $("missing").classList.remove("hidden");
+      return;
+    }
+
+    snapshot = await getSnapshot(collectionId);
+
+    $("loading").classList.add("hidden");
+
+    if (!snapshot) {
+      $("missing").classList.remove("hidden");
+      return;
+    }
+
+    $("workspace").classList.remove("hidden");
+    $("orgName").textContent = snapshot.organization_name || "Organizer workspace";
+    $("collectionTitle").textContent = snapshot.title;
+    $("memberCount").textContent = String(snapshot.participants.length);
+    $("queueCount").textContent = String(await countPending());
+
+    $("preparedAt").textContent =
+      "Prepared " +
+      new Intl.DateTimeFormat("en-NG", {
+        dateStyle: "medium",
+        timeStyle: "short",
+        timeZone: "Africa/Lagos",
+      }).format(new Date(snapshot.prepared_at));
+
+    renderMembers();
+  }
+
+  $("search").addEventListener("input", renderMembers);
+  $("closeRecord").addEventListener("click", closeRecord);
+  $("recordAnother").addEventListener("click", closeRecord);
+  $("saveRecord").addEventListener("click", saveRecord);
+
+  window.addEventListener("online", updateNetwork);
+  window.addEventListener("offline", updateNetwork);
+
+  boot().catch((error) => {
+    console.error(error);
+    $("loading").classList.add("hidden");
+    $("missing").classList.remove("hidden");
+  });
+})();
+</script>
+</body>
+</html>
+

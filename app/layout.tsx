@@ -1,3 +1,4 @@
+﻿import ServiceWorkerRegister from "@/components/threeple/service-worker-register";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 
@@ -32,10 +33,18 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
     >
+      <head>
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <meta name="theme-color" content="#5a2b70" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      </head>
       <body
         suppressHydrationWarning
         className={`${geistSans.className} antialiased`}
       >
+        <ServiceWorkerRegister />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

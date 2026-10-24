@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   useCallback,
@@ -206,7 +206,7 @@ export default function OfflineQueueClient() {
   if (loading) {
     return (
       <div className="tp-card p-6">
-        Loading offline queue…
+        Loading offline queueâ€¦
       </div>
     );
   }
@@ -273,7 +273,7 @@ export default function OfflineQueueClient() {
         className="tp-btn tp-btn-primary mt-5 min-h-12 w-full disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
       >
         {syncing
-          ? "Syncing…"
+          ? "Syncingâ€¦"
           : `Sync now${
               pendingCount >
               0
@@ -398,3 +398,4 @@ export default function OfflineQueueClient() {
     </div>
   );
 }
+

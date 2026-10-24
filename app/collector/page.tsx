@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import {
   redirect,
 } from "next/navigation";
@@ -46,7 +46,7 @@ function money(
     amount === null ||
     amount === undefined
   ) {
-    return "—";
+    return "â€”";
   }
 
   return new Intl.NumberFormat(
@@ -393,6 +393,13 @@ export default async function CollectorHomePage() {
                 )}
 
                 <Link
+                  href="/collector/offline-queue"
+                  className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 text-sm font-black text-white"
+                >
+                  Offline Queue
+                </Link>
+
+                <Link
                   href="/dashboard"
                   className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 text-sm font-black text-white"
                 >
@@ -613,7 +620,7 @@ export default async function CollectorHomePage() {
 
                           <p className="mt-1 truncate font-mono text-sm font-black tracking-wider text-[var(--tp-primary)]">
                             {collection.join_code ??
-                              "—"}
+                              "â€”"}
                           </p>
                         </div>
                       </div>
@@ -624,7 +631,7 @@ export default async function CollectorHomePage() {
                         </span>
 
                         <span className="text-lg text-[var(--tp-primary)]">
-                          →
+                          â†’
                         </span>
                       </div>
                     </Link>
@@ -682,3 +689,4 @@ export default async function CollectorHomePage() {
     </ThreepleAppShell>
   );
 }
+

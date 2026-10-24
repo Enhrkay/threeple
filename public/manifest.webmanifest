@@ -1,0 +1,37 @@
+﻿{
+  "name": "Threeple",
+  "short_name": "Threeple",
+  "description": "Transparent contribution and field collection management.",
+  "start_url": "/collector",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f5fa",
+  "theme_color": "#5a2b70",
+  "orientation": "portrait-primary",
+  "categories": ["finance", "business", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Collector Mode",
+      "short_name": "Collector",
+      "url": "/collector"
+    },
+    {
+      "name": "Offline Queue",
+      "short_name": "Queue",
+      "url": "/collector/offline-queue"
+    }
+  ]
+}
+
