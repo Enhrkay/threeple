@@ -411,11 +411,10 @@ export default async function CollectionPage({
     )
     .select(`
       verified_payment_count,
-      gross_processed,
-      refunded_amount,
-      platform_revenue,
-      processor_fees,
-      organizer_net
+      effective_gross_amount,
+      platform_fee_amount,
+      processor_fee_amount,
+      organizer_net_amount
     `)
     .eq(
       "collection_id",
@@ -434,31 +433,25 @@ export default async function CollectionPage({
 
   const grossProcessed =
     Number(
-      financialSummary?.gross_processed ??
-        0
-    );
-
-  const refundedAmount =
-    Number(
-      financialSummary?.refunded_amount ??
+      financialSummary?.effective_gross_amount ??
         0
     );
 
   const platformRevenue =
     Number(
-      financialSummary?.platform_revenue ??
+      financialSummary?.platform_fee_amount ??
         0
     );
 
   const processorFees =
     Number(
-      financialSummary?.processor_fees ??
+      financialSummary?.processor_fee_amount ??
         0
     );
 
   const organizerNet =
     Number(
-      financialSummary?.organizer_net ??
+      financialSummary?.organizer_net_amount ??
         0
     );
 
@@ -471,8 +464,7 @@ export default async function CollectionPage({
   const amountRaised =
     Math.max(
       0,
-      grossProcessed -
-        refundedAmount
+      grossProcessed
     );
 
   const targetAmount =
@@ -791,6 +783,16 @@ export default async function CollectionPage({
               Reports
             </Link>
 
+            {organization.owner_id === userId &&
+              !isArchived && (
+                <Link
+                  href={`/dashboard/collections/${collection.id}/settlement`}
+                  className="tp-btn tp-btn-secondary shrink-0"
+                >
+                  Settlement
+                </Link>
+              )}
+
             {!isArchived && (
               <Link
                 href={`/dashboard/collections/${collection.id}/edit`}
@@ -944,14 +946,14 @@ export default async function CollectionPage({
             </h2>
 
             <p className="mt-2 text-sm text-[var(--tp-muted)]">
-              Contribution volume, refunds and fees recorded for this collection.
+              Verified contribution value and recorded fees for this collection.
             </p>
           </div>
 
           <div className="grid divide-y divide-[var(--tp-border)] sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
             <div className="p-6">
               <p className="text-xs font-bold uppercase tracking-[0.1em] text-[var(--tp-muted)]">
-                Gross processed
+                Net collected
               </p>
 
               <p className="mt-3 text-xl font-black text-[var(--tp-ink)]">
@@ -964,14 +966,11 @@ export default async function CollectionPage({
 
             <div className="p-6">
               <p className="text-xs font-bold uppercase tracking-[0.1em] text-[var(--tp-muted)]">
-                Refunded
+                Verified payments
               </p>
 
               <p className="mt-3 text-xl font-black text-[var(--tp-ink)]">
-                {formatMoney(
-                  refundedAmount,
-                  collection.currency
-                )}
+                {verifiedPaymentCount}
               </p>
             </div>
 
