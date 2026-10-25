@@ -1,4 +1,5 @@
-﻿import { hasCollectorOrganizationAccess } from "@/lib/collector/access";
+﻿import { OfflineSnapshotFreshnessPanel } from "@/components/threeple/offline-snapshot-freshness-panel";
+import { hasCollectorOrganizationAccess } from "@/lib/collector/access";
 import Link from "next/link";
 import {
   notFound,
@@ -270,6 +271,12 @@ export default async function CollectorCollectionPage({
       }
     >
       <div className="mx-auto max-w-6xl">
+        <div className="mb-6">
+          <OfflineSnapshotFreshnessPanel
+            collectionId={collection.id}
+          />
+        </div>
+
         <Link
           href="/collector"
           className="text-sm font-black text-[var(--tp-primary)]"
@@ -460,6 +467,7 @@ export default async function CollectorCollectionPage({
     </ThreepleAppShell>
   );
 }
+
 
 
 
