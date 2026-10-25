@@ -49,7 +49,7 @@ function formatMoney(
   );
 }
 
-function dateKey(
+function lagosDateKey(
   value:
     | string
     | null
@@ -261,15 +261,22 @@ export default async function CollectorTodayPage() {
             "is_active",
             true
           )
-          .order(
-            "full_name",
-            {
-              ascending: true,
-            }
-          )
       : {
           data: [],
         };
+
+  const participantMap =
+    new Map(
+      (
+        participants ??
+        []
+      ).map(
+        (participant) => [
+          participant.id,
+          participant,
+        ]
+      )
+    );
 
   const collectionMap =
     new Map(
@@ -281,27 +288,157 @@ export default async function CollectorTodayPage() {
       )
     );
 
-  const outstanding =
+  const recurringCollectionIds =
+    activeCollections
+      .filter(
+        (collection) =>
+          collection.collection_mode ===
+          "recurring_dues"
+      )
+      .map(
+        (collection) =>
+          collection.id
+      );
+
+  const {
+    data: recurringDueItems,
+  } =
+    recurringCollectionIds.length >
+    0
+      ? await supabaseAdmin
+          .from(
+            "recurring_due_items"
+          )
+          .select(`
+            obligation_id,
+            collection_id,
+            participant_id,
+            expected_amount,
+            obligation_status,
+            paid_amount,
+            cycle_id,
+            cycle_number,
+            starts_on,
+            due_on,
+            ends_on,
+            cycle_status
+          `)
+          .in(
+            "collection_id",
+            recurringCollectionIds
+          )
+          .order(
+            "due_on",
+            {
+              ascending: true,
+            }
+          )
+      : {
+          data: [],
+        };
+
+  const today =
+    lagosDateKey(
+      new Date().toISOString()
+    );
+
+  const recurringItems =
+    (
+      recurringDueItems ??
+      []
+    )
+      .map(
+        (item) => ({
+          ...item,
+          participant:
+            participantMap.get(
+              item.participant_id
+            ),
+          collection:
+            collectionMap.get(
+              item.collection_id
+            ),
+        })
+      )
+      .filter(
+        (item) =>
+          item.participant &&
+          item.collection
+      );
+
+  const recurringDueToday =
+    recurringItems.filter(
+      (item) =>
+        lagosDateKey(
+          item.due_on
+        ) ===
+        today
+    );
+
+  const recurringOverdue =
+    recurringItems.filter(
+      (item) => {
+        const due =
+          lagosDateKey(
+            item.due_on
+          );
+
+        return Boolean(
+          due &&
+            today &&
+            due < today
+        );
+      }
+    );
+
+  const recurringUpcoming =
+    recurringItems.filter(
+      (item) => {
+        const due =
+          lagosDateKey(
+            item.due_on
+          );
+
+        return Boolean(
+          due &&
+            today &&
+            due > today
+        );
+      }
+    );
+
+  const standardOutstanding =
     (
       participants ??
       []
     ).filter(
-      (participant) =>
-        participant.payment_status !==
-          "paid" &&
-        participant.payment_status !==
-          "verified" &&
-        participant.participation_status !==
-          "cancelled"
+      (participant) => {
+        const collection =
+          collectionMap.get(
+            participant.collection_id
+          );
+
+        if (
+          !collection ||
+          collection.collection_mode ===
+            "recurring_dues"
+        ) {
+          return false;
+        }
+
+        return (
+          participant.payment_status !==
+            "paid" &&
+          participant.payment_status !==
+            "verified" &&
+          participant.participation_status !==
+            "cancelled"
+        );
+      }
     );
 
-  const today =
-    dateKey(
-      new Date().toISOString()
-    );
-
-  const dueToday =
-    outstanding.filter(
+  const standardDueToday =
+    standardOutstanding.filter(
       (participant) => {
         const collection =
           collectionMap.get(
@@ -310,7 +447,7 @@ export default async function CollectorTodayPage() {
 
         return (
           collection &&
-          dateKey(
+          lagosDateKey(
             collection.deadline
           ) ===
             today
@@ -318,8 +455,8 @@ export default async function CollectorTodayPage() {
       }
     );
 
-  const overdue =
-    outstanding.filter(
+  const standardOverdue =
+    standardOutstanding.filter(
       (participant) => {
         const collection =
           collectionMap.get(
@@ -327,7 +464,7 @@ export default async function CollectorTodayPage() {
           );
 
         const deadline =
-          dateKey(
+          lagosDateKey(
             collection?.deadline ??
               null
           );
@@ -335,26 +472,25 @@ export default async function CollectorTodayPage() {
         return Boolean(
           deadline &&
             today &&
-            deadline <
-              today
+            deadline < today
         );
       }
     );
 
-  const noDate =
-    outstanding.filter(
-      (participant) => {
-        const collection =
-          collectionMap.get(
-            participant.collection_id
-          );
+  const combinedDueToday =
+    recurringDueToday.length +
+    standardDueToday.length;
 
-        return !collection?.deadline;
-      }
-    );
+  const combinedOverdue =
+    recurringOverdue.length +
+    standardOverdue.length;
 
-  const totalExpected =
-    outstanding.reduce(
+  const outstandingCount =
+    standardOutstanding.length +
+    recurringItems.length;
+
+  const expectedOutstanding =
+    standardOutstanding.reduce(
       (
         total,
         participant
@@ -368,15 +504,39 @@ export default async function CollectorTodayPage() {
             0
         ),
       0
+    ) +
+    recurringItems.reduce(
+      (
+        total,
+        item
+      ) =>
+        total +
+        Math.max(
+          0,
+          Number(
+            item.expected_amount ??
+              0
+          ) -
+            Number(
+              item.paid_amount ??
+                0
+            )
+        ),
+      0
     );
 
-  const grouped =
+  const groupedStandard =
     activeCollections
+      .filter(
+        (collection) =>
+          collection.collection_mode !==
+          "recurring_dues"
+      )
       .map(
         (collection) => ({
           collection,
           participants:
-            outstanding.filter(
+            standardOutstanding.filter(
               (participant) =>
                 participant.collection_id ===
                 collection.id
@@ -387,63 +547,6 @@ export default async function CollectorTodayPage() {
         (group) =>
           group.participants
             .length > 0
-      )
-      .sort(
-        (
-          left,
-          right
-        ) => {
-          const leftDate =
-            dateKey(
-              left.collection
-                .deadline
-            );
-
-          const rightDate =
-            dateKey(
-              right.collection
-                .deadline
-            );
-
-          if (
-            leftDate ===
-            today &&
-            rightDate !==
-              today
-          ) {
-            return -1;
-          }
-
-          if (
-            rightDate ===
-            today &&
-            leftDate !==
-              today
-          ) {
-            return 1;
-          }
-
-          if (
-            leftDate &&
-            rightDate
-          ) {
-            return leftDate.localeCompare(
-              rightDate
-            );
-          }
-
-          if (leftDate) {
-            return -1;
-          }
-
-          if (rightDate) {
-            return 1;
-          }
-
-          return left.collection.title.localeCompare(
-            right.collection.title
-          );
-        }
       );
 
   return (
@@ -484,73 +587,202 @@ export default async function CollectorTodayPage() {
 
         <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <ThreepleStat
-            label="Outstanding members"
+            label="Outstanding items"
             value={
-              outstanding.length
+              outstandingCount
             }
-            helper="Active members without a verified/paid status."
+            helper="Standard members plus recurring cycle obligations."
             tone="primary"
           />
 
           <ThreepleStat
             label="Due today"
             value={
-              dueToday.length
+              combinedDueToday
             }
-            helper="Members whose collection deadline is today."
+            helper="Collection deadlines and recurring cycle dues."
             tone="warning"
           />
 
           <ThreepleStat
             label="Overdue"
             value={
-              overdue.length
+              combinedOverdue
             }
-            helper="Outstanding members past the collection deadline."
+            helper="Outstanding items past their due date."
             tone="warning"
           />
 
           <ThreepleStat
             label="Expected outstanding"
             value={formatMoney(
-              totalExpected,
+              expectedOutstanding,
               activeCollections[0]?.currency ??
                 "NGN"
             )}
-            helper={`${noDate.length} member(s) are in collections without a deadline.`}
+            helper={`${recurringUpcoming.length} recurring obligation(s) are upcoming.`}
+            tone="success"
           />
         </section>
 
+        {(recurringDueToday.length >
+          0 ||
+          recurringOverdue.length >
+            0) && (
+          <section className="mt-8">
+            <p className="tp-kicker">
+              Recurring dues
+            </p>
+
+            <h1 className="tp-heading mt-2 text-2xl">
+              Cycle obligations needing attention.
+            </h1>
+
+            <div className="mt-6 space-y-3">
+              {[
+                ...recurringOverdue,
+                ...recurringDueToday,
+              ].map(
+                (item) => {
+                  const participant =
+                    item.participant!;
+
+                  const collection =
+                    item.collection!;
+
+                  const dueKey =
+                    lagosDateKey(
+                      item.due_on
+                    );
+
+                  const isOverdue =
+                    Boolean(
+                      dueKey &&
+                        today &&
+                        dueKey <
+                          today
+                    );
+
+                  return (
+                    <article
+                      key={
+                        item.obligation_id
+                      }
+                      className="tp-card p-5 sm:p-6"
+                    >
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="font-black">
+                              {
+                                participant.full_name
+                              }
+                            </p>
+
+                            <ThreepleBadge
+                              tone={
+                                isOverdue
+                                  ? "danger"
+                                  : "warning"
+                              }
+                            >
+                              {isOverdue
+                                ? "Overdue"
+                                : "Due today"}
+                            </ThreepleBadge>
+                          </div>
+
+                          <p className="mt-1 text-sm text-[var(--tp-muted)]">
+                            {
+                              collection.title
+                            }
+                            {" Â· "}
+                            Cycle{" "}
+                            {
+                              item.cycle_number
+                            }
+                          </p>
+
+                          <p className="mt-2 text-sm font-bold text-[var(--tp-ink-soft)]">
+                            Due:{" "}
+                            {
+                              item.due_on
+                            }
+                            {" Â· "}
+                            Outstanding:{" "}
+                            {formatMoney(
+                              Math.max(
+                                0,
+                                Number(
+                                  item.expected_amount ??
+                                    0
+                                ) -
+                                  Number(
+                                    item.paid_amount ??
+                                      0
+                                  )
+                              ),
+                              collection.currency ??
+                                "NGN"
+                            )}
+                          </p>
+
+                          <p className="mt-1 text-sm text-[var(--tp-muted)]">
+                            {participant.phone ??
+                              "No phone number"}
+                          </p>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2">
+                          <Link
+                            href={`/collector/${collection.id}/record/${participant.id}`}
+                            className="tp-btn tp-btn-primary"
+                          >
+                            Record
+                          </Link>
+
+                          <Link
+                            href={`/collector/${collection.id}/offline-record/${participant.id}`}
+                            className="tp-btn tp-btn-secondary"
+                          >
+                            Record offline
+                          </Link>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                }
+              )}
+            </div>
+          </section>
+        )}
+
         <section className="mt-8">
           <p className="tp-kicker">
-            Route priorities
+            Other collections
           </p>
 
           <h1 className="tp-heading mt-2 text-2xl">
-            Members needing attention.
+            Standard collection route.
           </h1>
 
-          <p className="tp-body mt-2 max-w-3xl text-sm">
-            This route is based on the current participant ledger and collection deadlines. Ajo cycle-specific due dates will be handled separately from this general collection route.
-          </p>
-
-          {grouped.length ===
+          {groupedStandard.length ===
           0 ? (
             <ThreepleEmptyState
               className="mt-6"
-              title="Nothing outstanding"
-              description="There are no active outstanding participants across the collections you manage."
+              title="No standard collection items"
+              description="No non-recurring outstanding participants currently need attention."
             />
           ) : (
             <div className="mt-6 space-y-6">
-              {grouped.map(
+              {groupedStandard.map(
                 ({
                   collection,
                   participants:
                     collectionParticipants,
                 }) => {
                   const deadlineKey =
-                    dateKey(
+                    lagosDateKey(
                       collection.deadline
                     );
 
@@ -590,14 +822,8 @@ export default async function CollectorTodayPage() {
                               )}
 
                               {isOverdue && (
-                                <ThreepleBadge tone="warning">
+                                <ThreepleBadge tone="danger">
                                   Overdue
-                                </ThreepleBadge>
-                              )}
-
-                              {!collection.deadline && (
-                                <ThreepleBadge tone="neutral">
-                                  No deadline
                                 </ThreepleBadge>
                               )}
                             </div>
@@ -627,58 +853,53 @@ export default async function CollectorTodayPage() {
                         {collectionParticipants.map(
                           (
                             participant
-                          ) => {
-                            const expected =
-                              participant.expected_amount ??
-                              collection.default_amount;
+                          ) => (
+                            <article
+                              key={
+                                participant.id
+                              }
+                              className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6"
+                            >
+                              <div>
+                                <p className="font-black">
+                                  {
+                                    participant.full_name
+                                  }
+                                </p>
 
-                            return (
-                              <article
-                                key={
-                                  participant.id
-                                }
-                                className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6"
-                              >
-                                <div className="min-w-0">
-                                  <p className="font-black">
-                                    {
-                                      participant.full_name
-                                    }
-                                  </p>
+                                <p className="mt-1 text-sm text-[var(--tp-muted)]">
+                                  {participant.phone ??
+                                    "No phone number"}
+                                </p>
 
-                                  <p className="mt-1 text-sm text-[var(--tp-muted)]">
-                                    {participant.phone ??
-                                      "No phone number"}
-                                  </p>
+                                <p className="mt-2 text-sm font-bold text-[var(--tp-ink-soft)]">
+                                  Expected:{" "}
+                                  {formatMoney(
+                                    participant.expected_amount ??
+                                      collection.default_amount,
+                                    collection.currency ??
+                                      "NGN"
+                                  )}
+                                </p>
+                              </div>
 
-                                  <p className="mt-2 text-sm font-bold text-[var(--tp-ink-soft)]">
-                                    Expected:{" "}
-                                    {formatMoney(
-                                      expected,
-                                      collection.currency ??
-                                        "NGN"
-                                    )}
-                                  </p>
-                                </div>
+                              <div className="flex flex-wrap gap-2">
+                                <Link
+                                  href={`/collector/${collection.id}/record/${participant.id}`}
+                                  className="tp-btn tp-btn-primary"
+                                >
+                                  Record
+                                </Link>
 
-                                <div className="flex flex-wrap gap-2">
-                                  <Link
-                                    href={`/collector/${collection.id}/record/${participant.id}`}
-                                    className="tp-btn tp-btn-primary"
-                                  >
-                                    Record
-                                  </Link>
-
-                                  <Link
-                                    href={`/collector/${collection.id}/offline-record/${participant.id}`}
-                                    className="tp-btn tp-btn-secondary"
-                                  >
-                                    Record offline
-                                  </Link>
-                                </div>
-                              </article>
-                            );
-                          }
+                                <Link
+                                  href={`/collector/${collection.id}/offline-record/${participant.id}`}
+                                  className="tp-btn tp-btn-secondary"
+                                >
+                                  Record offline
+                                </Link>
+                              </div>
+                            </article>
+                          )
                         )}
                       </div>
                     </section>
@@ -692,5 +913,4 @@ export default async function CollectorTodayPage() {
     </ThreepleAppShell>
   );
 }
-
 
