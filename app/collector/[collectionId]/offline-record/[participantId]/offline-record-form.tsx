@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import {
   useState,
@@ -18,6 +18,16 @@ type Props = {
   currency: string;
   suggestedAmount:
     | number
+    | string
+    | null;
+  obligationType:
+    | "recurring"
+    | "rotation"
+    | null;
+  obligationId:
+    | string
+    | null;
+  cycleId:
     | string
     | null;
 };
@@ -55,6 +65,9 @@ export default function OfflineRecordForm({
   participantName,
   currency,
   suggestedAmount,
+  obligationType,
+  obligationId,
+  cycleId,
 }: Props) {
   const [
     amount,
@@ -136,6 +149,12 @@ export default function OfflineRecordForm({
         participantId,
       participant_name:
         participantName,
+      obligation_type:
+        obligationType,
+      obligation_id:
+        obligationId,
+      cycle_id:
+        cycleId,
       amount:
         Math.round(
           numericAmount *

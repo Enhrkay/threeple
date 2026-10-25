@@ -1,4 +1,4 @@
-﻿"use server";
+"use server";
 
 import { hasCollectorOrganizationAccess } from "@/lib/collector/access";
 import {
@@ -26,16 +26,178 @@ function field(
   ).trim();
 }
 
+type FieldObligationType =
+  | "recurring"
+  | "rotation";
+
+type FieldObligationContext = {
+  obligationType:
+    FieldObligationType;
+  obligationId: string;
+  cycleId: string;
+};
+
 function collectorReturn(
   collectionId: string,
   participantId: string,
-  result: string
+  result: string,
+  obligationContext?: {
+    obligationType?: string;
+    obligationId?: string;
+    cycleId?: string;
+  }
 ): never {
+  const query =
+    new URLSearchParams({
+      result,
+    });
+
+  if (
+    obligationContext?.obligationType &&
+    obligationContext.obligationId &&
+    obligationContext.cycleId
+  ) {
+    query.set(
+      "obligation_type",
+      obligationContext.obligationType
+    );
+
+    query.set(
+      "obligation_id",
+      obligationContext.obligationId
+    );
+
+    query.set(
+      "cycle_id",
+      obligationContext.cycleId
+    );
+  }
+
   redirect(
-    `/collector/${collectionId}/record/${participantId}?result=${encodeURIComponent(
-      result
-    )}`
+    `/collector/${collectionId}/record/${participantId}?${query.toString()}`
   );
+}
+
+async function resolveFieldObligationContext({
+  collectionId,
+  participantId,
+  obligationType,
+  obligationId,
+  cycleId,
+}: {
+  collectionId: string;
+  participantId: string;
+  obligationType: string;
+  obligationId: string;
+  cycleId: string;
+}): Promise<
+  FieldObligationContext |
+  null |
+  undefined
+> {
+  const hasAnyContext =
+    Boolean(
+      obligationType ||
+      obligationId ||
+      cycleId
+    );
+
+  if (!hasAnyContext) {
+    return undefined;
+  }
+
+  if (
+    (
+      obligationType !==
+        "recurring" &&
+      obligationType !==
+        "rotation"
+    ) ||
+    !obligationId ||
+    !cycleId
+  ) {
+    return null;
+  }
+
+  if (
+    obligationType ===
+    "recurring"
+  ) {
+    const {
+      data: obligation,
+    } = await supabaseAdmin
+      .from(
+        "recurring_cycle_obligations"
+      )
+      .select(`
+        id,
+        cycle_id,
+        collection_id,
+        participant_id
+      `)
+      .eq(
+        "id",
+        obligationId
+      )
+      .eq(
+        "cycle_id",
+        cycleId
+      )
+      .eq(
+        "collection_id",
+        collectionId
+      )
+      .eq(
+        "participant_id",
+        participantId
+      )
+      .maybeSingle();
+
+    if (!obligation) {
+      return null;
+    }
+  }
+  else {
+    const {
+      data: obligation,
+    } = await supabaseAdmin
+      .from(
+        "collector_ajo_due_items"
+      )
+      .select(`
+        obligation_id,
+        cycle_id,
+        collection_id,
+        participant_id
+      `)
+      .eq(
+        "obligation_id",
+        obligationId
+      )
+      .eq(
+        "cycle_id",
+        cycleId
+      )
+      .eq(
+        "collection_id",
+        collectionId
+      )
+      .eq(
+        "participant_id",
+        participantId
+      )
+      .maybeSingle();
+
+    if (!obligation) {
+      return null;
+    }
+  }
+
+  return {
+    obligationType,
+    obligationId,
+    cycleId,
+  };
 }
 
 async function getCollectorAccess(
@@ -235,6 +397,33 @@ export async function recordFieldContribution(
       "local_recorded_at"
     );
 
+  const rawObligationType =
+    field(
+      formData,
+      "obligation_type"
+    );
+
+  const rawObligationId =
+    field(
+      formData,
+      "obligation_id"
+    );
+
+  const rawCycleId =
+    field(
+      formData,
+      "cycle_id"
+    );
+
+  const submittedObligationContext = {
+    obligationType:
+      rawObligationType,
+    obligationId:
+      rawObligationId,
+    cycleId:
+      rawCycleId,
+  };
+
   if (
     !collectionId ||
     !participantId
@@ -258,7 +447,8 @@ export async function recordFieldContribution(
     collectorReturn(
       collectionId,
       participantId,
-      "invalid_amount"
+      "invalid_amount",
+      submittedObligationContext
     );
   }
 
@@ -278,7 +468,8 @@ export async function recordFieldContribution(
     collectorReturn(
       collectionId,
       participantId,
-      "invalid_method"
+      "invalid_method",
+      submittedObligationContext
     );
   }
 
@@ -318,7 +509,31 @@ export async function recordFieldContribution(
     collectorReturn(
       collectionId,
       participantId,
-      "participant_unavailable"
+      "participant_unavailable",
+      submittedObligationContext
+    );
+  }
+
+  const obligationContext =
+    await resolveFieldObligationContext({
+      collectionId,
+      participantId,
+      obligationType:
+        rawObligationType,
+      obligationId:
+        rawObligationId,
+      cycleId:
+        rawCycleId,
+    });
+
+  if (
+    obligationContext === null
+  ) {
+    collectorReturn(
+      collectionId,
+      participantId,
+      "obligation_unavailable",
+      submittedObligationContext
     );
   }
 
@@ -365,7 +580,8 @@ export async function recordFieldContribution(
     collectorReturn(
       collectionId,
       participantId,
-      "record_failed"
+      "record_failed",
+      submittedObligationContext
     );
   }
 
@@ -388,6 +604,15 @@ export async function recordFieldContribution(
         collectionId,
       participant_id:
         participantId,
+      obligation_type:
+        obligationContext?.obligationType ??
+        null,
+      obligation_id:
+        obligationContext?.obligationId ??
+        null,
+      cycle_id:
+        obligationContext?.cycleId ??
+        null,
       collector_user_id:
         userId,
       amount:
@@ -429,7 +654,8 @@ export async function recordFieldContribution(
     collectorReturn(
       collectionId,
       participantId,
-      "record_failed"
+      "record_failed",
+      submittedObligationContext
     );
   }
 

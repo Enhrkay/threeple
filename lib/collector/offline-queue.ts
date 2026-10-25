@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 export type OfflineFieldEvent = {
   device_event_id: string;
@@ -7,6 +7,12 @@ export type OfflineFieldEvent = {
   collection_title: string;
   participant_id: string;
   participant_name: string;
+  obligation_type?:
+    | "recurring"
+    | "rotation"
+    | null;
+  obligation_id?: string | null;
+  cycle_id?: string | null;
   amount: number;
   currency: string;
   payment_method:

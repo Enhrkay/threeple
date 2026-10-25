@@ -1,5 +1,8 @@
-"use server";
+﻿"use server";
 
+import { assertOrganizationOrganizerActionsAllowed } from "@/lib/restrictions/organization-server";
+import { assertUserOrganizerActionsAllowed } from "@/lib/restrictions/user-server";
+import { assertCollectionOrganizerChangesAllowed } from "@/lib/restrictions/server";
 import {
   revalidatePath,
 } from "next/cache";
@@ -155,9 +158,46 @@ async function getCollectionManager(
     );
   }
 
+  // -------------------------------------------------------
+
+
+  // ORGANIZER RESTRICTION ENFORCEMENT
+
+
+  // -------------------------------------------------------
+
+
+  await assertUserOrganizerActionsAllowed(userId);
+
+
+  await assertOrganizationOrganizerActionsAllowed(
+
+
+    collection.organization_id
+
+
+  );
+
+
+  await assertCollectionOrganizerChangesAllowed(
+
+
+    collection.id
+
+
+  );
+
+
+
   return {
+
+
     userId,
+
+
     collection,
+
+
   };
 }
 
@@ -557,3 +597,4 @@ export async function deleteCollectionSafely(
       : "deleted"
   );
 }
+

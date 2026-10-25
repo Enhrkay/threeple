@@ -1,4 +1,4 @@
-﻿import { getCollectorOrganizationIds } from "@/lib/collector/access";
+import { getCollectorOrganizationIds } from "@/lib/collector/access";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -492,6 +492,24 @@ if (organizationIds.length === 0) {
                           Number(item.paid_amount ?? 0)
                       );
 
+                const obligationQuery =
+                  new URLSearchParams({
+                    obligation_type:
+                      kind === "ajo"
+                        ? "rotation"
+                        : "recurring",
+                    obligation_id:
+                      String(
+                        item.obligation_id ??
+                          ""
+                      ),
+                    cycle_id:
+                      String(
+                        item.cycle_id ??
+                          ""
+                      ),
+                  }).toString();
+
                 return (
                   <article
                     key={`${kind}-${item.obligation_id}`}
@@ -549,14 +567,14 @@ if (organizationIds.length === 0) {
 
                       <div className="flex flex-wrap gap-2">
                         <Link
-                          href={`/collector/${collection.id}/record/${participant.id}`}
+                          href={`/collector/${collection.id}/record/${participant.id}?${obligationQuery}`}
                           className="tp-btn tp-btn-primary"
                         >
                           Record
                         </Link>
 
                         <Link
-                          href={`/collector/${collection.id}/offline-record/${participant.id}`}
+                          href={`/collector/${collection.id}/offline-record/${participant.id}?${obligationQuery}`}
                           className="tp-btn tp-btn-secondary"
                         >
                           Record offline

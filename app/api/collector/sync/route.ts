@@ -1,4 +1,4 @@
-﻿import { hasCollectorOrganizationAccess } from "@/lib/collector/access";
+import { hasCollectorOrganizationAccess } from "@/lib/collector/access";
 import {
   NextResponse,
 } from "next/server";
@@ -16,6 +16,12 @@ type SyncPayload = {
   receipt_reference?: string;
   collection_id?: string;
   participant_id?: string;
+  obligation_type?:
+    | "recurring"
+    | "rotation"
+    | null;
+  obligation_id?: string | null;
+  cycle_id?: string | null;
   amount?: number;
   currency?: string;
   payment_method?: string;
@@ -104,6 +110,24 @@ export async function POST(
   const paymentMethod =
     String(
       body?.payment_method ??
+        ""
+    ).trim();
+
+  const obligationType =
+    String(
+      body?.obligation_type ??
+        ""
+    ).trim();
+
+  const obligationId =
+    String(
+      body?.obligation_id ??
+        ""
+    ).trim();
+
+  const cycleId =
+    String(
+      body?.cycle_id ??
         ""
     ).trim();
 
@@ -306,6 +330,142 @@ export async function POST(
     );
   }
 
+  const hasObligationContext =
+    Boolean(
+      obligationType ||
+      obligationId ||
+      cycleId
+    );
+
+  let validatedObligation:
+    | {
+        obligationType:
+          "recurring" |
+          "rotation";
+        obligationId: string;
+        cycleId: string;
+      }
+    | null = null;
+
+  if (hasObligationContext) {
+    if (
+      (
+        obligationType !==
+          "recurring" &&
+        obligationType !==
+          "rotation"
+      ) ||
+      !obligationId ||
+      !cycleId
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Cycle obligation context is incomplete.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    if (
+      obligationType ===
+      "recurring"
+    ) {
+      const {
+        data: obligation,
+      } = await supabaseAdmin
+        .from(
+          "recurring_cycle_obligations"
+        )
+        .select(`
+          id,
+          cycle_id,
+          collection_id,
+          participant_id
+        `)
+        .eq(
+          "id",
+          obligationId
+        )
+        .eq(
+          "cycle_id",
+          cycleId
+        )
+        .eq(
+          "collection_id",
+          collectionId
+        )
+        .eq(
+          "participant_id",
+          participantId
+        )
+        .maybeSingle();
+
+      if (!obligation) {
+        return NextResponse.json(
+          {
+            error:
+              "Cycle obligation is unavailable.",
+          },
+          {
+            status: 409,
+          }
+        );
+      }
+    }
+    else {
+      const {
+        data: obligation,
+      } = await supabaseAdmin
+        .from(
+          "collector_ajo_due_items"
+        )
+        .select(`
+          obligation_id,
+          cycle_id,
+          collection_id,
+          participant_id
+        `)
+        .eq(
+          "obligation_id",
+          obligationId
+        )
+        .eq(
+          "cycle_id",
+          cycleId
+        )
+        .eq(
+          "collection_id",
+          collectionId
+        )
+        .eq(
+          "participant_id",
+          participantId
+        )
+        .maybeSingle();
+
+      if (!obligation) {
+        return NextResponse.json(
+          {
+            error:
+              "Cycle obligation is unavailable.",
+          },
+          {
+            status: 409,
+          }
+        );
+      }
+    }
+
+    validatedObligation = {
+      obligationType,
+      obligationId,
+      cycleId,
+    };
+  }
+
   const {
     data: existing,
   } = await supabaseAdmin
@@ -376,6 +536,18 @@ export async function POST(
         collectionId,
       participant_id:
         participantId,
+      obligation_type:
+        validatedObligation
+          ?.obligationType ??
+        null,
+      obligation_id:
+        validatedObligation
+          ?.obligationId ??
+        null,
+      cycle_id:
+        validatedObligation
+          ?.cycleId ??
+        null,
       collector_user_id:
         userId,
       amount:

@@ -1,4 +1,4 @@
-﻿import { hasCollectorOrganizationAccess } from "@/lib/collector/access";
+import { hasCollectorOrganizationAccess } from "@/lib/collector/access";
 import Link from "next/link";
 import {
   notFound,
@@ -31,15 +31,53 @@ type PageProps = {
     collectionId: string;
     participantId: string;
   }>;
+
+  searchParams?: Promise<{
+    obligation_type?: string;
+    obligation_id?: string;
+    cycle_id?: string;
+  }>;
 };
 
 export default async function OfflineRecordPage({
   params,
+  searchParams,
 }: PageProps) {
   const {
     collectionId,
     participantId,
   } = await params;
+
+  const query =
+    await searchParams;
+
+  const obligationType =
+    query?.obligation_type === "recurring" ||
+    query?.obligation_type === "rotation"
+      ? query.obligation_type
+      : null;
+
+  const obligationId =
+    query?.obligation_id?.trim() ||
+    null;
+
+  const cycleId =
+    query?.cycle_id?.trim() ||
+    null;
+
+  const obligationQuery =
+    obligationType &&
+    obligationId &&
+    cycleId
+      ? `?${new URLSearchParams({
+          obligation_type:
+            obligationType,
+          obligation_id:
+            obligationId,
+          cycle_id:
+            cycleId,
+        }).toString()}`
+      : "";
 
   const supabase =
     await createClient();
@@ -55,7 +93,7 @@ export default async function OfflineRecordPage({
   if (!userId) {
     redirect(
       `/auth/login?next=${encodeURIComponent(
-        `/collector/${collectionId}/offline-record/${participantId}`
+        `/collector/${collectionId}/offline-record/${participantId}${obligationQuery}`
       )}`
     );
   }
@@ -248,6 +286,15 @@ export default async function OfflineRecordPage({
             suggestedAmount={
               participant.expected_amount ??
               collection.default_amount
+            }
+            obligationType={
+              obligationType
+            }
+            obligationId={
+              obligationId
+            }
+            cycleId={
+              cycleId
             }
           />
         </div>

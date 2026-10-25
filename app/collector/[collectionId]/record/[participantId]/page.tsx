@@ -1,4 +1,4 @@
-﻿import { hasCollectorOrganizationAccess } from "@/lib/collector/access";
+import { hasCollectorOrganizationAccess } from "@/lib/collector/access";
 import Link from "next/link";
 import {
   notFound,
@@ -36,6 +36,9 @@ type PageProps = {
 
   searchParams?: Promise<{
     result?: string;
+    obligation_type?: string;
+    obligation_id?: string;
+    cycle_id?: string;
   }>;
 };
 
@@ -78,6 +81,9 @@ function messageFor(
     case "participant_unavailable":
       return "This participant is no longer available for field collection.";
 
+    case "obligation_unavailable":
+      return "This cycle obligation is no longer available for collection. Return to Today’s Route and reopen the item.";
+
     case "record_failed":
       return "Threeple could not save this field contribution. Please check connectivity before trying again.";
 
@@ -98,6 +104,34 @@ export default async function RecordContributionPage({
   const query =
     await searchParams;
 
+  const obligationType =
+    query?.obligation_type === "recurring" ||
+    query?.obligation_type === "rotation"
+      ? query.obligation_type
+      : null;
+
+  const obligationId =
+    query?.obligation_id?.trim() ||
+    null;
+
+  const cycleId =
+    query?.cycle_id?.trim() ||
+    null;
+
+  const obligationQuery =
+    obligationType &&
+    obligationId &&
+    cycleId
+      ? `?${new URLSearchParams({
+          obligation_type:
+            obligationType,
+          obligation_id:
+            obligationId,
+          cycle_id:
+            cycleId,
+        }).toString()}`
+      : "";
+
   const supabase =
     await createClient();
 
@@ -112,7 +146,7 @@ export default async function RecordContributionPage({
   if (!userId) {
     redirect(
       `/auth/login?next=${encodeURIComponent(
-        `/collector/${collectionId}/record/${participantId}`
+        `/collector/${collectionId}/record/${participantId}${obligationQuery}`
       )}`
     );
   }
@@ -335,7 +369,7 @@ export default async function RecordContributionPage({
         </section>
 
                 <Link
-          href={`/collector/${collectionId}/offline-record/${participantId}`}
+          href={`/collector/${collectionId}/offline-record/${participantId}${obligationQuery}`}
           className="tp-btn tp-btn-secondary mt-5 w-full sm:w-auto"
         >
           Save offline instead
@@ -377,6 +411,24 @@ export default async function RecordContributionPage({
               value={
                 participantId
               }
+            />
+
+            <input
+              type="hidden"
+              name="obligation_type"
+              value={obligationType ?? ""}
+            />
+
+            <input
+              type="hidden"
+              name="obligation_id"
+              value={obligationId ?? ""}
+            />
+
+            <input
+              type="hidden"
+              name="cycle_id"
+              value={cycleId ?? ""}
             />
 
             <input
