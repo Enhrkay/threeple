@@ -93,20 +93,20 @@ body {
    ========================================================= */
 
 :root {
-  --tp-bg: #f8faf9;
+  --tp-bg: #f7f9f8;
   --tp-bg-soft: #f4f8f6;
   --tp-surface: #ffffff;
   --tp-surface-soft: #eef6f2;
   --tp-surface-warm: #fffaf0;
 
-  --tp-ink: #17231e;
+  --tp-ink: #15221d;
   --tp-ink-soft: #46574f;
-  --tp-muted: #5e6d66;
+  --tp-muted: #64716b;
   --tp-faint: #8b9892;
 
-  --tp-primary: #2f7d65;
-  --tp-primary-hover: #24634f;
-  --tp-primary-soft: #eef6f2;
+  --tp-primary: #246b57;
+  --tp-primary-hover: #1d5747;
+  --tp-primary-soft: #e7f1ed;
   --tp-primary-border: #d5e8df;
 
   --tp-success: #347c63;
@@ -142,20 +142,20 @@ body {
 }
 
 .dark {
-  --tp-bg: #f8faf9;
+  --tp-bg: #f7f9f8;
   --tp-bg-soft: #f4f8f6;
   --tp-surface: #ffffff;
   --tp-surface-soft: #eef6f2;
   --tp-surface-warm: #2d291d;
 
-  --tp-ink: #17231e;
+  --tp-ink: #15221d;
   --tp-ink-soft: #46574f;
-  --tp-muted: #5e6d66;
+  --tp-muted: #64716b;
   --tp-faint: #8b9892;
 
-  --tp-primary: #2f7d65;
-  --tp-primary-hover: #24634f;
-  --tp-primary-soft: #eef6f2;
+  --tp-primary: #246b57;
+  --tp-primary-hover: #1d5747;
+  --tp-primary-soft: #e7f1ed;
   --tp-primary-border: #d5e8df;
 
   --tp-success: #347c63;

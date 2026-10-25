@@ -1,11 +1,13 @@
 ﻿import Link from "next/link";
-
 import {
   notFound,
   redirect,
 } from "next/navigation";
-
 import QRCode from "qrcode";
+
+import {
+  ThreepleAppShell,
+} from "@/components/threeple/app-shell";
 
 import {
   createClient,
@@ -30,10 +32,6 @@ export default async function InvitePage({
   const supabase =
     await createClient();
 
-  // =======================================================
-  // AUTH
-  // =======================================================
-
   const {
     data: claimsData,
     error: claimsError,
@@ -51,10 +49,6 @@ export default async function InvitePage({
       "/auth/login"
     );
   }
-
-  // =======================================================
-  // COLLECTION
-  // =======================================================
 
   const {
     data: collection,
@@ -82,10 +76,6 @@ export default async function InvitePage({
     notFound();
   }
 
-  // =======================================================
-  // COLLECTION MUST BE ACTIVE
-  // =======================================================
-
   if (
     collection.status !==
     "active"
@@ -94,10 +84,6 @@ export default async function InvitePage({
       `/dashboard/collections/${collection.id}`
     );
   }
-
-  // =======================================================
-  // ACCESS
-  // =======================================================
 
   const {
     data: organization,
@@ -154,10 +140,6 @@ export default async function InvitePage({
     notFound();
   }
 
-  // =======================================================
-  // PUBLIC APP URL
-  // =======================================================
-
   const configuredUrl =
     process.env.APP_URL
       ?.trim()
@@ -182,18 +164,10 @@ export default async function InvitePage({
     );
   }
 
-  // =======================================================
-  // JOIN URL
-  // =======================================================
-
   const joinUrl =
     `${appUrl}/join?code=${encodeURIComponent(
       collection.join_code
     )}`;
-
-  // =======================================================
-  // GENERATE QR INSIDE THREEPLE
-  // =======================================================
 
   const qrDataUrl =
     await QRCode.toDataURL(
@@ -201,16 +175,10 @@ export default async function InvitePage({
       {
         errorCorrectionLevel:
           "M",
-
         margin: 2,
-
         width: 500,
       }
     );
-
-  // =======================================================
-  // INVITATION MESSAGE
-  // =======================================================
 
   const invitationMessage =
     `You're invited to join "${collection.title}" on Threeple.
@@ -222,107 +190,61 @@ ${joinUrl}
 
 Open the link or enter the Threeple Code to join the Collection.`;
 
-  // =======================================================
-  // UI
-  // =======================================================
-
   return (
-    <main className="min-h-screen bg-neutral-50 text-neutral-900">
-
-      <header className="border-b bg-white">
-
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-5">
-
-          <div>
-            <Link
-              href="/dashboard"
-              className="text-2xl font-bold tracking-tight"
-            >
-              Threeple
-            </Link>
-
-            <p className="text-sm text-neutral-500">
-              Collect. Coordinate.
-              Track.
-            </p>
-          </div>
-
+    <ThreepleAppShell
+      title="Invite people"
+      subtitle={collection.title}
+    >
+      <div className="mx-auto max-w-5xl">
+        <section className="pb-7">
           <Link
             href={`/dashboard/collections/${collection.id}`}
-            className="text-sm font-medium text-neutral-600 hover:text-black"
+            className="text-sm font-bold text-[var(--tp-primary)] transition hover:text-[var(--tp-primary-hover)]"
           >
-            ← Collection
+            Back to collection
           </Link>
 
-        </div>
-
-      </header>
-
-      <div className="mx-auto max-w-4xl px-6 py-10">
-
-        <section>
-
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-            Invite & Share
+          <p className="mt-6 text-xs font-bold uppercase tracking-[0.14em] text-[var(--tp-primary)]">
+            Invite & share
           </p>
 
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-            Invite people to{" "}
-            {collection.title}
+          <h1 className="mt-3 max-w-3xl text-3xl font-black tracking-[-0.04em] text-[var(--tp-ink)] sm:text-4xl">
+            Bring people into the collection
           </h1>
 
-          <p className="mt-3 max-w-2xl leading-7 text-neutral-600">
-            Share the Threeple Code,
-            direct join link or QR
-            code with the people you
-            want to participate in
-            this Collection.
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--tp-muted)]">
+            Share the Threeple Code, direct join link or QR code with the people you want to participate.
           </p>
-
         </section>
 
-        <div className="mt-8">
+        <ShareTools
+          collectionTitle={
+            collection.title
+          }
+          joinCode={
+            collection.join_code
+          }
+          joinUrl={
+            joinUrl
+          }
+          qrDataUrl={
+            qrDataUrl
+          }
+          invitationMessage={
+            invitationMessage
+          }
+        />
 
-          <ShareTools
-            collectionTitle={
-              collection.title
-            }
-            joinCode={
-              collection.join_code
-            }
-            joinUrl={
-              joinUrl
-            }
-            qrDataUrl={
-              qrDataUrl
-            }
-            invitationMessage={
-              invitationMessage
-            }
-          />
-
-        </div>
-
-        <section className="mt-6 rounded-2xl bg-neutral-100 p-5">
-
-          <p className="text-sm font-medium">
-            Sharing does not add a
-            participant automatically.
+        <section className="mt-7 border-t border-[var(--tp-border)] pt-6">
+          <p className="text-sm font-bold text-[var(--tp-ink)]">
+            Sharing does not add a participant automatically
           </p>
 
-          <p className="mt-2 text-sm leading-6 text-neutral-500">
-            A person becomes a
-            participant only after
-            completing the Threeple
-            Join flow or being added
-            directly by an authorized
-            organizer.
+          <p className="mt-1 max-w-2xl text-xs leading-5 text-[var(--tp-muted)]">
+            A person becomes a participant only after completing the Threeple join flow or being added by an authorized organizer.
           </p>
-
         </section>
-
       </div>
-
-    </main>
+    </ThreepleAppShell>
   );
 }

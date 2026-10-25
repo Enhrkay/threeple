@@ -23,10 +23,10 @@ export default function ShareTools({
     copied,
     setCopied,
   ] = useState<
-    "code" |
-    "link" |
-    "message" |
-    null
+    | "code"
+    | "link"
+    | "message"
+    | null
   >(null);
 
   async function copyText(
@@ -82,208 +82,174 @@ export default function ShareTools({
       await navigator.share({
         title:
           collectionTitle,
-
         text:
           invitationMessage,
-
         url:
           joinUrl,
       });
     } catch {
-      // User may cancel the
-      // native share dialog.
+      // The user may cancel
+      // the native share dialog.
     }
   }
 
   return (
     <div className="space-y-6">
+      {/* PRIMARY INVITE PANEL */}
+      <section className="tp-card overflow-hidden">
+        <div className="p-6 sm:p-8">
+          <p className="tp-kicker">
+            Threeple Code
+          </p>
 
-      {/* THREEPLE CODE */}
+          <div className="mt-5 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="font-mono text-4xl font-black tracking-[0.16em] text-[var(--tp-primary)] sm:text-5xl">
+                {joinCode}
+              </p>
 
-      <section className="rounded-3xl border bg-white p-6 md:p-8">
+              <p className="mt-3 text-sm leading-6 text-[var(--tp-muted)]">
+                People can enter this code directly on the Threeple join page.
+              </p>
+            </div>
 
-        <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-          Threeple Code
-        </p>
-
-        <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
-          <div className="font-mono text-3xl font-bold tracking-[0.18em]">
-            {joinCode}
+            <button
+              type="button"
+              onClick={() =>
+                copyText(
+                  joinCode,
+                  "code"
+                )
+              }
+              className="tp-btn tp-btn-secondary shrink-0"
+            >
+              {copied === "code"
+                ? "Copied"
+                : "Copy code"}
+            </button>
           </div>
-
-          <button
-            type="button"
-            onClick={() =>
-              copyText(
-                joinCode,
-                "code"
-              )
-            }
-            className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-300 px-5 text-sm font-semibold hover:bg-neutral-50"
-          >
-            {copied === "code"
-              ? "Copied ✓"
-              : "Copy Code"}
-          </button>
-
         </div>
 
-        <p className="mt-4 text-sm leading-6 text-neutral-500">
-          Participants can enter
-          this code on the Threeple
-          Join page.
-        </p>
+        <div className="border-t border-[var(--tp-border)] bg-[var(--tp-bg-soft)] p-5 sm:p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--tp-muted)]">
+            Join link
+          </p>
 
-      </section>
-
-      {/* JOIN LINK */}
-
-      <section className="rounded-3xl border bg-white p-6 md:p-8">
-
-        <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-          Join Link
-        </p>
-
-        <div className="mt-4 rounded-xl bg-neutral-50 p-4">
-          <p className="break-all text-sm font-medium">
+          <p className="mt-2 break-all text-sm font-semibold text-[var(--tp-ink-soft)]">
             {joinUrl}
           </p>
+
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+            <button
+              type="button"
+              onClick={() =>
+                copyText(
+                  joinUrl,
+                  "link"
+                )
+              }
+              className="tp-btn tp-btn-primary"
+            >
+              {copied === "link"
+                ? "Link copied"
+                : "Copy join link"}
+            </button>
+
+            <a
+              href={joinUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="tp-btn tp-btn-secondary"
+            >
+              Preview join page
+            </a>
+          </div>
         </div>
-
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-
-          <button
-            type="button"
-            onClick={() =>
-              copyText(
-                joinUrl,
-                "link"
-              )
-            }
-            className="inline-flex h-11 items-center justify-center rounded-xl bg-black px-5 text-sm font-semibold text-white hover:bg-neutral-800"
-          >
-            {copied === "link"
-              ? "Link Copied ✓"
-              : "Copy Join Link"}
-          </button>
-
-          <a
-            href={joinUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-300 px-5 text-sm font-semibold hover:bg-neutral-50"
-          >
-            Preview Join Page
-          </a>
-
-        </div>
-
       </section>
 
-      {/* QR CODE */}
+      {/* SHARE MESSAGE + QR */}
+      <section className="grid gap-6 lg:grid-cols-[1.15fr_.85fr]">
+        <div className="tp-card p-6 sm:p-7">
+          <p className="tp-kicker">
+            Ready to send
+          </p>
 
-      <section className="rounded-3xl border bg-white p-6 md:p-8">
+          <h2 className="tp-heading mt-2 text-xl">
+            Invitation message
+          </h2>
 
-        <div className="grid gap-7 md:grid-cols-[220px_1fr] md:items-center">
+          <div className="mt-5 whitespace-pre-wrap rounded-2xl border border-[var(--tp-border)] bg-[var(--tp-bg-soft)] p-5 text-sm leading-7 text-[var(--tp-ink-soft)]">
+            {invitationMessage}
+          </div>
 
-          <div className="rounded-2xl border bg-white p-4">
+          <div className="mt-5 grid gap-2 sm:grid-cols-3">
+            <button
+              type="button"
+              onClick={
+                openWhatsApp
+              }
+              className="tp-btn tp-btn-primary"
+            >
+              WhatsApp
+            </button>
+
+            <button
+              type="button"
+              onClick={
+                nativeShare
+              }
+              className="tp-btn tp-btn-secondary"
+            >
+              Share
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                copyText(
+                  invitationMessage,
+                  "message"
+                )
+              }
+              className="tp-btn tp-btn-secondary"
+            >
+              {copied === "message"
+                ? "Copied"
+                : "Copy message"}
+            </button>
+          </div>
+        </div>
+
+        <div className="tp-card p-6 sm:p-7">
+          <p className="tp-kicker">
+            QR code
+          </p>
+
+          <h2 className="tp-heading mt-2 text-xl">
+            Scan to join
+          </h2>
+
+          <p className="mt-2 text-sm leading-6 text-[var(--tp-muted)]">
+            Ideal for presentations, physical events and printed materials.
+          </p>
+
+          <div className="mx-auto mt-6 max-w-[220px] rounded-2xl border border-[var(--tp-border)] bg-white p-4">
             <img
               src={qrDataUrl}
               alt={`QR code for ${collectionTitle}`}
-              className="mx-auto h-auto w-full"
+              className="h-auto w-full"
             />
           </div>
 
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-              QR Code
-            </p>
-
-            <h2 className="mt-2 text-xl font-semibold">
-              Scan to join
-            </h2>
-
-            <p className="mt-3 text-sm leading-6 text-neutral-500">
-              Participants can scan
-              this QR code with
-              their phone to open
-              the Collection join
-              page immediately.
-            </p>
-
-            <a
-              href={qrDataUrl}
-              download={`threeple-${joinCode}-qr.png`}
-              className="mt-5 inline-flex h-11 items-center justify-center rounded-xl border border-neutral-300 px-5 text-sm font-semibold hover:bg-neutral-50"
-            >
-              Download QR Code
-            </a>
-
-          </div>
-
+          <a
+            href={qrDataUrl}
+            download={`threeple-${joinCode}-qr.png`}
+            className="tp-btn tp-btn-secondary mt-5 w-full"
+          >
+            Download QR code
+          </a>
         </div>
-
       </section>
-
-      {/* INVITATION MESSAGE */}
-
-      <section className="rounded-3xl border bg-white p-6 md:p-8">
-
-        <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-          Invitation Message
-        </p>
-
-        <h2 className="mt-2 text-xl font-semibold">
-          Ready to send
-        </h2>
-
-        <div className="mt-5 whitespace-pre-wrap rounded-2xl bg-neutral-50 p-5 text-sm leading-7 text-neutral-700">
-          {invitationMessage}
-        </div>
-
-        <div className="mt-5 grid gap-3 sm:grid-cols-3">
-
-          <button
-            type="button"
-            onClick={() =>
-              copyText(
-                invitationMessage,
-                "message"
-              )
-            }
-            className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-300 px-5 text-sm font-semibold hover:bg-neutral-50"
-          >
-            {copied ===
-            "message"
-              ? "Copied ✓"
-              : "Copy Message"}
-          </button>
-
-          <button
-            type="button"
-            onClick={
-              openWhatsApp
-            }
-            className="inline-flex h-11 items-center justify-center rounded-xl bg-black px-5 text-sm font-semibold text-white hover:bg-neutral-800"
-          >
-            Share on WhatsApp
-          </button>
-
-          <button
-            type="button"
-            onClick={
-              nativeShare
-            }
-            className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-300 px-5 text-sm font-semibold hover:bg-neutral-50"
-          >
-            Share
-          </button>
-
-        </div>
-
-      </section>
-
     </div>
   );
 }
