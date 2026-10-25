@@ -1,35 +1,46 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    --background: 140 33% 98%;
+    --foreground: 145 22% 11%;
+
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 145 22% 11%;
+
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    --popover-foreground: 145 22% 11%;
+
+    --primary: 153 78% 27%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 145 30% 95%;
+    --secondary-foreground: 150 46% 23%;
+
+    --muted: 145 22% 96%;
+    --muted-foreground: 145 10% 42%;
+
+    --accent: 145 45% 93%;
+    --accent-foreground: 153 78% 23%;
+
+    --destructive: 0 66% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 145 18% 88%;
+    --input: 145 18% 88%;
+    --ring: 153 78% 27%;
+
+    --chart-1: 153 78% 27%;
+    --chart-2: 160 58% 38%;
+    --chart-3: 141 40% 35%;
+    --chart-4: 86 55% 43%;
+    --chart-5: 43 78% 54%;
+
+    --radius: 0.75rem;
   }
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -71,8 +82,8 @@
 html,
 body {
   min-height: 100%;
-  background: #f7f7f5;
-  color: #171717;
+  background: #f7faf8;
+  color: #16231c;
 }
 
 
@@ -82,25 +93,25 @@ body {
    ========================================================= */
 
 :root {
-  --tp-bg: #f7f5fa;
-  --tp-bg-soft: #fbf9fc;
+  --tp-bg: #f7faf8;
+  --tp-bg-soft: #fbfdfc;
   --tp-surface: #ffffff;
-  --tp-surface-soft: #f4eef7;
-  --tp-surface-warm: #fff9e9;
+  --tp-surface-soft: #eef8f2;
+  --tp-surface-warm: #fffaf0;
 
-  --tp-ink: #24172c;
-  --tp-ink-soft: #5f4c69;
-  --tp-muted: #8a7893;
-  --tp-faint: #aa99b2;
+  --tp-ink: #16231c;
+  --tp-ink-soft: #405248;
+  --tp-muted: #66756d;
+  --tp-faint: #8a9a91;
 
-  --tp-primary: #5a2b70;
-  --tp-primary-hover: #47225a;
-  --tp-primary-soft: #eee4f3;
-  --tp-primary-border: #dfd0e8;
+  --tp-primary: #0f7a4a;
+  --tp-primary-hover: #0a5c38;
+  --tp-primary-soft: #eaf7f0;
+  --tp-primary-border: #cce9d9;
 
-  --tp-success: #2f6b49;
-  --tp-success-soft: #edf8f1;
-  --tp-success-border: #cfe8d8;
+  --tp-success: #159957;
+  --tp-success-soft: #edf9f2;
+  --tp-success-border: #ccebd8;
 
   --tp-warning: #8d6a17;
   --tp-warning-soft: #fff8df;
@@ -115,37 +126,37 @@ body {
   --tp-info-soft: #eef5fb;
   --tp-info-border: #cfdfec;
 
-  --tp-border: #e8dfee;
-  --tp-border-strong: #d8cadf;
+  --tp-border: #dde7e1;
+  --tp-border-strong: #ccd9d1;
 
   --tp-radius-sm: 0.9rem;
   --tp-radius-md: 1.25rem;
   --tp-radius-lg: 1.75rem;
   --tp-radius-xl: 2.25rem;
 
-  --tp-shadow-sm: 0 8px 24px rgba(63, 36, 80, 0.05);
-  --tp-shadow-md: 0 18px 50px rgba(63, 36, 80, 0.08);
-  --tp-shadow-lg: 0 28px 80px rgba(63, 36, 80, 0.12);
+  --tp-shadow-sm: 0 8px 24px rgba(22, 35, 28, 0.05);
+  --tp-shadow-md: 0 18px 50px rgba(22, 35, 28, 0.08);
+  --tp-shadow-lg: 0 28px 80px rgba(22, 35, 28, 0.12);
 
-  --tp-focus: 0 0 0 4px rgba(90, 43, 112, 0.12);
+  --tp-focus: 0 0 0 4px rgba(15, 122, 74, 0.14);
 }
 
 .dark {
-  --tp-bg: #1d1721;
-  --tp-bg-soft: #251d2a;
-  --tp-surface: #2c2232;
-  --tp-surface-soft: #34273b;
-  --tp-surface-warm: #332c1f;
+  --tp-bg: #0e1712;
+  --tp-bg-soft: #131f18;
+  --tp-surface: #17251c;
+  --tp-surface-soft: #1e3125;
+  --tp-surface-warm: #2d291d;
 
-  --tp-ink: #f7f1fa;
-  --tp-ink-soft: #d8cbdc;
-  --tp-muted: #b8a9bf;
-  --tp-faint: #95879c;
+  --tp-ink: #f2f8f4;
+  --tp-ink-soft: #c7d6cd;
+  --tp-muted: #9caea3;
+  --tp-faint: #7d9084;
 
-  --tp-primary: #c59ad7;
-  --tp-primary-hover: #d4afe2;
-  --tp-primary-soft: #3c2a45;
-  --tp-primary-border: #51365d;
+  --tp-primary: #54c98a;
+  --tp-primary-hover: #6dd89b;
+  --tp-primary-soft: #173a28;
+  --tp-primary-border: #28553b;
 
   --tp-success: #83c99d;
   --tp-success-soft: #25392c;
@@ -164,8 +175,8 @@ body {
   --tp-info-soft: #26333e;
   --tp-info-border: #374c5d;
 
-  --tp-border: #45374d;
-  --tp-border-strong: #594663;
+  --tp-border: #2b4033;
+  --tp-border-strong: #3a5443;
 }
 
 html {
