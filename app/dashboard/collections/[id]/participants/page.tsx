@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 
 import {
   notFound,
@@ -8,6 +8,16 @@ import {
 import {
   createClient,
 } from "@/lib/supabase/server";
+
+import {
+  ThreepleAppShell,
+} from "@/components/threeple/app-shell";
+
+import {
+  ThreepleBadge,
+  ThreepleEmptyState,
+  ThreepleStat,
+} from "@/components/threeple/design-system";
 
 import {
   approveParticipant,
@@ -68,38 +78,37 @@ function formatMoney(
   }
 }
 
-function participationStyle(
+function participationTone(
   status: string,
   active: boolean
-) {
+):
+  | "primary"
+  | "success"
+  | "warning"
+  | "danger"
+  | "neutral" {
   if (!active) {
-    return "bg-neutral-200 text-neutral-600";
+    return "neutral";
   }
 
   switch (status) {
     case "approved":
-      return "bg-green-100 text-green-700";
+      return "success";
 
     case "approval_pending":
-      return "bg-amber-100 text-amber-700";
-
-    case "joined":
-      return "bg-blue-100 text-blue-700";
-
-    case "invited":
-      return "bg-purple-100 text-purple-700";
+      return "warning";
 
     case "declined":
-      return "bg-red-100 text-red-700";
+      return "danger";
 
-    case "cancelled":
-      return "bg-neutral-200 text-neutral-600";
+    case "joined":
+    case "invited":
+      return "primary";
 
     default:
-      return "bg-neutral-100 text-neutral-600";
+      return "neutral";
   }
 }
-
 function resultMessage(
   result?: string
 ) {
@@ -347,251 +356,200 @@ export default async function ParticipantsPage({
   // =======================================================
 
   return (
-    <main className="min-h-screen bg-neutral-50 text-neutral-900">
-
-      {/* HEADER */}
-
-      <header className="border-b bg-white">
-
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-
-          <div>
-            <Link
-              href="/dashboard"
-              className="text-2xl font-bold tracking-tight"
-            >
-              Threeple
-            </Link>
-
-            <p className="text-sm text-neutral-500">
-              Collect. Coordinate.
-              Track.
-            </p>
-          </div>
-
+    <ThreepleAppShell
+      title="Participants"
+      subtitle={collection.title}
+      actions={
+        collection.status === "active" ? (
+          <Link
+            href={`/dashboard/collections/${collection.id}/invite`}
+            className="tp-btn tp-btn-primary hidden sm:inline-flex"
+          >
+            Invite people
+          </Link>
+        ) : undefined
+      }
+    >
+      <div className="mx-auto max-w-6xl">
+        <section className="pb-7">
           <Link
             href={`/dashboard/collections/${collection.id}`}
-            className="text-sm font-medium text-neutral-600 hover:text-black"
+            className="text-sm font-bold text-[var(--tp-primary)] transition hover:text-[var(--tp-primary-hover)]"
           >
-            ← Collection
+            Back to collection
           </Link>
 
-        </div>
-
-      </header>
-
-      <div className="mx-auto max-w-6xl px-6 py-10">
-
-        {/* TITLE */}
-
-        <section>
-
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+          <p className="mt-6 text-xs font-bold uppercase tracking-[0.14em] text-[var(--tp-primary)]">
             Participants
           </p>
 
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-            {collection.title}
+          <h1 className="mt-3 text-3xl font-black tracking-[-0.04em] text-[var(--tp-ink)] sm:text-4xl">
+            Manage your people
           </h1>
 
-          <p className="mt-3 max-w-2xl leading-7 text-neutral-600">
-            Review participants,
-            approve join requests
-            and manage access to
-            this Collection.
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--tp-muted)]">
+            Review who has joined, handle approvals and manage participant access.
           </p>
-
         </section>
-
-        {/* MESSAGE */}
 
         {message && (
           <div
-            className={`mt-6 rounded-2xl border p-4 text-sm ${
-              message.type ===
-              "success"
-                ? "border-green-200 bg-green-50 text-green-800"
-                : "border-red-200 bg-red-50 text-red-700"
-            }`}
+            className={[
+              "mb-6 rounded-2xl border px-4 py-3 text-sm",
+              message.type === "success"
+                ? "border-[var(--tp-success-border)] bg-[var(--tp-success-soft)] text-[var(--tp-success)]"
+                : "border-[var(--tp-danger-border)] bg-[var(--tp-danger-soft)] text-[var(--tp-danger)]",
+            ].join(" ")}
           >
             {message.text}
           </div>
         )}
 
-        {/* SUMMARY */}
+        <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <ThreepleStat
+            label="Active"
+            value={activeCount}
+            helper="Currently active participants."
+          />
 
-        <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <ThreepleStat
+            label="Awaiting approval"
+            value={pendingCount}
+            helper="Needs organizer attention."
+            tone={
+              pendingCount > 0
+                ? "primary"
+                : "neutral"
+            }
+          />
 
-          <div className="rounded-2xl border bg-white p-5">
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
-              Active
-            </p>
+          <ThreepleStat
+            label="Approved"
+            value={approvedCount}
+            helper="Approved active participants."
+            tone="success"
+          />
 
-            <p className="mt-2 text-3xl font-semibold">
-              {activeCount}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border bg-white p-5">
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
-              Awaiting approval
-            </p>
-
-            <p className="mt-2 text-3xl font-semibold">
-              {pendingCount}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border bg-white p-5">
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
-              Approved
-            </p>
-
-            <p className="mt-2 text-3xl font-semibold">
-              {approvedCount}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border bg-white p-5">
-            <p className="text-xs uppercase tracking-wide text-neutral-400">
-              Inactive
-            </p>
-
-            <p className="mt-2 text-3xl font-semibold">
-              {inactiveCount}
-            </p>
-          </div>
-
+          <ThreepleStat
+            label="Inactive"
+            value={inactiveCount}
+            helper="History remains preserved."
+          />
         </section>
 
-        {/* APPROVAL NOTICE */}
+        {collection.requires_approval &&
+          pendingCount > 0 && (
+            <section className="mt-6 rounded-[1.5rem] border border-[var(--tp-primary-border)] bg-[var(--tp-primary-soft)] p-5 sm:p-6">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="font-bold text-[var(--tp-ink)]">
+                    {pendingCount}{" "}
+                    {pendingCount === 1
+                      ? "person is"
+                      : "people are"}{" "}
+                    waiting for approval
+                  </p>
 
-        {collection.requires_approval && (
-          <section className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+                  <p className="mt-1 text-sm leading-6 text-[var(--tp-muted)]">
+                    Review the pending participant cards below before they begin contributing.
+                  </p>
+                </div>
 
-            <p className="font-semibold text-amber-900">
-              Approval is enabled
-            </p>
-
-            <p className="mt-2 text-sm leading-6 text-amber-800">
-              People joining this
-              Collection remain
-              pending until an
-              organizer approves
-              them.
-            </p>
-
-          </section>
-        )}
-
-        {/* PARTICIPANTS */}
+                <ThreepleBadge tone="warning">
+                  Action needed
+                </ThreepleBadge>
+              </div>
+            </section>
+          )}
 
         <section className="mt-8">
-
-          <div className="mb-4 flex items-center justify-between">
-
-            <h2 className="text-xl font-semibold">
-              All participants
-            </h2>
-
-            <span className="text-sm text-neutral-500">
-              {
-                allParticipants.length
-              }{" "}
-              total
-            </span>
-
-          </div>
-
-          {allParticipants.length ===
-          0 ? (
-            <div className="rounded-3xl border border-dashed bg-white p-10 text-center">
-
-              <h3 className="font-semibold">
-                No participants yet
-              </h3>
-
-              <p className="mt-2 text-sm text-neutral-500">
-                Share the Threeple
-                Code or add
-                participants to
-                begin.
+          <div className="mb-4 flex items-end justify-between gap-4">
+            <div>
+              <p className="tp-kicker">
+                Directory
               </p>
 
-              <Link
-                href={`/dashboard/collections/${collection.id}/invite`}
-                className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-black px-5 text-sm font-semibold text-white"
-              >
-                Invite People
-              </Link>
-
+              <h2 className="tp-heading mt-1 text-xl">
+                All participants
+              </h2>
             </div>
+
+            <span className="text-sm text-[var(--tp-muted)]">
+              {allParticipants.length} total
+            </span>
+          </div>
+
+          {allParticipants.length === 0 ? (
+            <ThreepleEmptyState
+              title="No participants yet"
+              description="Invite people to join this collection using the Threeple Code or invite link."
+              action={
+                <Link
+                  href={`/dashboard/collections/${collection.id}/invite`}
+                  className="tp-btn tp-btn-primary"
+                >
+                  Invite people
+                </Link>
+              }
+            />
           ) : (
-            <div className="space-y-4">
-
+            <div className="overflow-hidden rounded-[1.75rem] border border-[var(--tp-border)] bg-[var(--tp-surface)]">
               {allParticipants.map(
-                (participant) => (
+                (
+                  participant,
+                  index
+                ) => (
                   <article
-                    key={
-                      participant.id
-                    }
-                    className="rounded-2xl border bg-white p-5 md:p-6"
+                    key={participant.id}
+                    className={[
+                      "p-5 sm:p-6",
+                      index !== 0
+                        ? "border-t border-[var(--tp-border)]"
+                        : "",
+                    ].join(" ")}
                   >
-
                     <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-
-                      {/* PERSON */}
-
                       <div className="min-w-0">
-
                         <div className="flex flex-wrap items-center gap-2">
-
-                          <h3 className="text-lg font-semibold">
-                            {
-                              participant.full_name
-                            }
+                          <h3 className="truncate text-base font-bold text-[var(--tp-ink)] sm:text-lg">
+                            {participant.full_name}
                           </h3>
 
-                          <span
-                            className={`rounded-full px-2.5 py-1 text-xs font-medium ${participationStyle(
+                          <ThreepleBadge
+                            tone={participationTone(
                               participant.participation_status,
                               participant.is_active
-                            )}`}
+                            )}
                           >
                             {participant.is_active
                               ? friendlyText(
                                   participant.participation_status
                                 )
                               : "Inactive"}
-                          </span>
-
+                          </ThreepleBadge>
                         </div>
 
-                        <div className="mt-2 space-y-1 text-sm text-neutral-500">
+                        {(participant.email ||
+                          participant.phone) && (
+                          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-[var(--tp-muted)]">
+                            {participant.email && (
+                              <span>
+                                {participant.email}
+                              </span>
+                            )}
 
-                          {participant.email && (
-                            <p>
-                              {
-                                participant.email
-                              }
-                            </p>
-                          )}
+                            {participant.phone && (
+                              <span>
+                                {participant.phone}
+                              </span>
+                            )}
+                          </div>
+                        )}
 
-                          {participant.phone && (
-                            <p>
-                              {
-                                participant.phone
-                              }
-                            </p>
-                          )}
-
-                        </div>
-
-                        <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs text-neutral-500">
-
+                        <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-[var(--tp-muted)]">
                           <span>
-                            Joined via:{" "}
-                            <strong className="font-medium text-neutral-700">
+                            Joined via{" "}
+                            <strong className="font-bold text-[var(--tp-ink-soft)]">
                               {friendlyText(
                                 participant.join_method
                               )}
@@ -599,11 +557,10 @@ export default async function ParticipantsPage({
                           </span>
 
                           <span>
-                            Expected:{" "}
-                            <strong className="font-medium text-neutral-700">
+                            Expected{" "}
+                            <strong className="font-bold text-[var(--tp-ink-soft)]">
                               {formatMoney(
-                                participant.expected_amount !==
-                                  null
+                                participant.expected_amount !== null
                                   ? Number(
                                       participant.expected_amount
                                     )
@@ -614,79 +571,58 @@ export default async function ParticipantsPage({
                           </span>
 
                           <span>
-                            Payment:{" "}
-                            <strong className="font-medium text-neutral-700">
+                            Payment{" "}
+                            <strong className="font-bold text-[var(--tp-ink-soft)]">
                               {friendlyText(
                                 participant.payment_status
                               )}
                             </strong>
                           </span>
-
                         </div>
-
                       </div>
 
-                      {/* ACTIONS */}
-
-                      <div className="flex flex-wrap gap-2">
-
+                      <div className="flex shrink-0 flex-wrap gap-2">
                         {participant.is_active &&
                           participant.participation_status ===
                             "approval_pending" && (
                             <>
-                              <form
-                                action={
-                                  approveParticipant
-                                }
-                              >
+                              <form action={approveParticipant}>
                                 <input
                                   type="hidden"
                                   name="collection_id"
-                                  value={
-                                    collection.id
-                                  }
+                                  value={collection.id}
                                 />
 
                                 <input
                                   type="hidden"
                                   name="participant_id"
-                                  value={
-                                    participant.id
-                                  }
+                                  value={participant.id}
                                 />
 
                                 <button
                                   type="submit"
-                                  className="inline-flex h-10 items-center justify-center rounded-lg bg-black px-4 text-sm font-semibold text-white hover:bg-neutral-800"
+                                  className="tp-btn tp-btn-primary min-h-10"
                                 >
                                   Approve
                                 </button>
                               </form>
 
-                              <form
-                                action={
-                                  declineParticipant
-                                }
-                              >
+                              <form action={declineParticipant}>
                                 <input
                                   type="hidden"
                                   name="collection_id"
-                                  value={
-                                    collection.id
-                                  }
+                                  value={collection.id}
                                 />
 
                                 <input
                                   type="hidden"
                                   name="participant_id"
-                                  value={
-                                    participant.id
-                                  }
+                                  value={participant.id}
                                 />
 
                                 <button
                                   type="submit"
-                                  className="inline-flex h-10 items-center justify-center rounded-lg border border-red-200 px-4 text-sm font-semibold text-red-700 hover:bg-red-50"
+                                  className="inline-flex min-h-10 items-center justify-center rounded-xl border border-[var(--tp-danger-border)] bg-white px-4 text-sm font-bold text-[var(--tp-danger)] transition hover:bg-[var(--tp-danger-soft)]"
                                 >
                                   Decline
                                 </button>
@@ -699,30 +635,22 @@ export default async function ParticipantsPage({
                             "approval_pending" &&
                           participant.participation_status !==
                             "declined" && (
-                            <form
-                              action={
-                                deactivateParticipant
-                              }
-                            >
+                            <form action={deactivateParticipant}>
                               <input
                                 type="hidden"
                                 name="collection_id"
-                                value={
-                                  collection.id
-                                }
+                                value={collection.id}
                               />
 
                               <input
                                 type="hidden"
                                 name="participant_id"
-                                value={
-                                  participant.id
-                                }
+                                value={participant.id}
                               />
 
                               <button
                                 type="submit"
-                                className="inline-flex h-10 items-center justify-center rounded-lg border border-neutral-300 px-4 text-sm font-medium hover:bg-neutral-50"
+                                className="tp-btn tp-btn-secondary min-h-10"
                               >
                                 Deactivate
                               </button>
@@ -732,103 +660,69 @@ export default async function ParticipantsPage({
                         {participant.is_active &&
                           participant.participation_status ===
                             "declined" && (
-                            <form
-                              action={
-                                reactivateParticipant
-                              }
-                            >
+                            <form action={reactivateParticipant}>
                               <input
                                 type="hidden"
                                 name="collection_id"
-                                value={
-                                  collection.id
-                                }
+                                value={collection.id}
                               />
 
                               <input
                                 type="hidden"
                                 name="participant_id"
-                                value={
-                                  participant.id
-                                }
+                                value={participant.id}
                               />
 
                               <button
                                 type="submit"
-                                className="inline-flex h-10 items-center justify-center rounded-lg border border-neutral-300 px-4 text-sm font-semibold hover:bg-neutral-50"
+                                className="tp-btn tp-btn-secondary min-h-10"
                               >
-                                Approve Instead
+                                Approve instead
                               </button>
                             </form>
                           )}
 
                         {!participant.is_active && (
-                          <form
-                            action={
-                              reactivateParticipant
-                            }
-                          >
+                          <form action={reactivateParticipant}>
                             <input
                               type="hidden"
                               name="collection_id"
-                              value={
-                                collection.id
-                              }
+                              value={collection.id}
                             />
 
                             <input
                               type="hidden"
                               name="participant_id"
-                              value={
-                                participant.id
-                              }
+                              value={participant.id}
                             />
 
                             <button
                               type="submit"
-                              className="inline-flex h-10 items-center justify-center rounded-lg bg-black px-4 text-sm font-semibold text-white hover:bg-neutral-800"
+                              className="tp-btn tp-btn-primary min-h-10"
                             >
                               Reactivate
                             </button>
                           </form>
                         )}
-
                       </div>
-
                     </div>
-
                   </article>
                 )
               )}
-
             </div>
           )}
-
         </section>
 
-        {/* DATA SAFETY */}
-
-        <section className="mt-8 rounded-2xl bg-neutral-100 p-5">
-
-          <p className="text-sm font-medium">
-            Participant records are
-            preserved.
+        <section className="mt-8 border-t border-[var(--tp-border)] pt-6">
+          <p className="text-sm font-bold text-[var(--tp-ink)]">
+            Participant history is preserved
           </p>
 
-          <p className="mt-2 text-sm leading-6 text-neutral-500">
-            Deactivating someone
-            does not delete their
-            Collection history.
-            This protects future
-            contribution,
-            obligation and audit
-            records.
+          <p className="mt-1 max-w-2xl text-xs leading-5 text-[var(--tp-muted)]">
+            Deactivating a participant does not delete their contribution, obligation or audit history.
           </p>
-
         </section>
-
       </div>
-
-    </main>
+    </ThreepleAppShell>
   );
 }

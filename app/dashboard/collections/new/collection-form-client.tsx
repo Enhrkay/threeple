@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import {
@@ -208,25 +208,25 @@ export default function NewCollectionPage() {
       subtitle="Set the contribution rules"
     >
       <div className="mx-auto max-w-5xl">
-        <section className="overflow-hidden rounded-[2rem] border border-[var(--tp-primary-border)] bg-[var(--tp-primary)] p-6 text-white shadow-[var(--tp-shadow-md)] sm:p-8 lg:p-10">
+        <section className="pb-2">
           <Link
             href="/dashboard"
-            className="text-sm font-black text-white/65 transition hover:text-white"
+            className="text-sm font-bold text-[var(--tp-primary)] transition hover:text-[var(--tp-primary-hover)]"
           >
             Back to dashboard
           </Link>
 
-          <p className="mt-7 text-xs font-black uppercase tracking-[0.16em] text-white/45">
+          <p className="mt-7 text-xs font-bold uppercase tracking-[0.14em] text-[var(--tp-primary)]">
             New collection
           </p>
 
-          <h1 className="mt-3 max-w-3xl text-3xl font-black tracking-[-0.04em] sm:text-4xl lg:text-5xl">
+          <h1 className="mt-3 max-w-3xl text-3xl font-black tracking-[-0.04em] text-[var(--tp-ink)] sm:text-4xl">
             Set the rules once.
             <br />
             Keep everyone aligned.
           </h1>
 
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-white/70 sm:text-base">
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--tp-muted)] sm:text-base">
             Choose how people will contribute, define the amount or goal, and decide how transparent the collection should be.
           </p>
         </section>
@@ -410,11 +410,10 @@ export default function NewCollectionPage() {
                         )
                       }
                       className={[
-                        "min-h-[150px] rounded-[1.5rem] border p-5 text-left transition",
-                        option.tone,
+                        "min-h-[150px] rounded-[1.35rem] border p-5 text-left transition-all duration-200",
                         selected
-                          ? "ring-2 ring-[var(--tp-primary)] ring-offset-2 ring-offset-[var(--tp-surface)]"
-                          : "hover:-translate-y-0.5 hover:shadow-[var(--tp-shadow-sm)]",
+                          ? "border-[var(--tp-primary)] bg-[var(--tp-primary-soft)] shadow-[var(--tp-shadow-sm)]"
+                          : "border-[var(--tp-border)] bg-[var(--tp-surface)] hover:border-[var(--tp-primary-border)] hover:shadow-[var(--tp-shadow-sm)]",
                       ].join(
                         " "
                       )}
@@ -467,7 +466,7 @@ export default function NewCollectionPage() {
 
             {mode ===
               "target" && (
-              <div className="mt-6 rounded-[1.75rem] border border-[var(--tp-primary-border)] bg-[var(--tp-primary-soft)] p-5 sm:p-6">
+              <div className="mt-6 rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-bg-soft)] p-5 sm:p-6">
                 <p className="font-black text-[var(--tp-primary)]">
                   Shared target Â· equal contribution
                 </p>
@@ -542,19 +541,19 @@ export default function NewCollectionPage() {
                   </div>
                 </div>
 
-                <div className="mt-5 rounded-2xl bg-[var(--tp-primary)] p-5 text-white">
-                  <p className="text-xs font-black uppercase tracking-[0.14em] text-white/45">
+                <div className="mt-5 rounded-2xl border border-[var(--tp-primary-border)] bg-[var(--tp-surface)] p-5">
+                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--tp-muted)]">
                     Required from each person
                   </p>
 
-                  <p className="mt-2 text-3xl font-black tracking-tight">
+                  <p className="mt-2 text-3xl font-black tracking-[-0.04em] text-[var(--tp-primary)]">
                     {money(
                       calculatedShare,
                       currency
                     )}
                   </p>
 
-                  <p className="mt-2 text-sm text-white/60">
+                  <p className="mt-2 text-sm text-[var(--tp-muted)]">
                     This share is based on the planned group size, not how many have joined so far.
                   </p>
                 </div>
@@ -569,7 +568,7 @@ export default function NewCollectionPage() {
               "fixed_per_person" ||
               mode ===
                 "event_fee") && (
-              <div className="mt-6 rounded-[1.75rem] border border-[var(--tp-success-border)] bg-[var(--tp-success-soft)] p-5 sm:p-6">
+              <div className="mt-6 rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-bg-soft)] p-5 sm:p-6">
                 <p className="font-black text-[var(--tp-success)]">
                   {mode ===
                   "event_fee"
@@ -617,7 +616,7 @@ export default function NewCollectionPage() {
 
             {mode ===
               "flexible" && (
-              <div className="mt-6 rounded-[1.75rem] border border-[var(--tp-info-border)] bg-[var(--tp-info-soft)] p-5 sm:p-6">
+              <div className="mt-6 rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-bg-soft)] p-5 sm:p-6">
                 <p className="font-black text-[var(--tp-info)]">
                   Flexible goal
                 </p>
@@ -664,7 +663,7 @@ export default function NewCollectionPage() {
               "recurring_dues" ||
               mode ===
                 "rotating_pool") && (
-              <div className="mt-6 rounded-[1.75rem] border border-[var(--tp-warning-border)] bg-[var(--tp-warning-soft)] p-5 sm:p-6">
+              <div className="mt-6 rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-bg-soft)] p-5 sm:p-6">
                 <p className="font-black text-[var(--tp-warning)]">
                   {mode ===
                   "rotating_pool"
@@ -834,7 +833,7 @@ export default function NewCollectionPage() {
             </h2>
 
             <div className="mt-6 grid gap-3 md:grid-cols-2">
-              <label className="flex cursor-pointer items-start gap-3 rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-bg-soft)] p-5 transition hover:border-[var(--tp-border-strong)]">
+              <label className="flex cursor-pointer items-start gap-3 rounded-[1.35rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] p-5 transition hover:border-[var(--tp-primary-border)]">
                 <input
                   type="checkbox"
                   name="allow_partial_payments"
@@ -852,7 +851,7 @@ export default function NewCollectionPage() {
                 </span>
               </label>
 
-              <label className="flex cursor-pointer items-start gap-3 rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-bg-soft)] p-5 transition hover:border-[var(--tp-border-strong)]">
+              <label className="flex cursor-pointer items-start gap-3 rounded-[1.35rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] p-5 transition hover:border-[var(--tp-primary-border)]">
                 <input
                   type="checkbox"
                   name="requires_approval"
@@ -872,17 +871,11 @@ export default function NewCollectionPage() {
             </div>
           </section>
 
-          <section className="rounded-[1.75rem] border border-[var(--tp-primary-border)] bg-[var(--tp-primary-soft)] p-5 sm:p-6">
+          <section className="border-t border-[var(--tp-border)] pt-6">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm font-black text-[var(--tp-primary)]">
-                  Ready to create?
-                </p>
-
-                <p className="mt-1 max-w-xl text-xs leading-5 text-[var(--tp-ink-soft)]">
-                  Your collection starts as a draft. You can review it before activating and sharing the Threeple Code.
-                </p>
-              </div>
+              <p className="max-w-xl text-xs leading-5 text-[var(--tp-muted)]">
+                Your collection starts as a draft. You can review everything before activating it and sharing the Threeple Code.
+              </p>
 
               <button
                 type="submit"

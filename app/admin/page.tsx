@@ -248,248 +248,136 @@ export default async function AdminHomePage() {
         </ThreepleBadge>
       }
     >
-      <section className="overflow-hidden rounded-[2rem] border border-[var(--tp-primary-border)] bg-[var(--tp-primary)] text-white shadow-[var(--tp-shadow-md)]">
-        <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.25fr_.75fr] lg:p-10">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-white/50">
-              Threeple Operations
-            </p>
+      {/* INTRO */}
+      <section className="mb-8">
+        <p className="text-sm font-semibold text-[var(--tp-primary)]">
+          Operations
+        </p>
 
-            <h1 className="mt-3 max-w-3xl text-3xl font-black tracking-[-0.04em] sm:text-4xl lg:text-5xl">
-              See the platform clearly.
-              Act carefully.
-            </h1>
+        <h1 className="mt-2 max-w-3xl text-3xl font-black tracking-[-0.04em] text-[var(--tp-ink)] sm:text-4xl">
+          Platform overview
+        </h1>
 
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-white/70 sm:text-base">
-              Monitor people, organizations, collections and trust activity from one operational workspace.
-            </p>
-
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/admin/users"
-                className="inline-flex min-h-12 items-center justify-center rounded-full bg-white px-6 text-sm font-black text-[var(--tp-primary)]"
-              >
-                Review users
-              </Link>
-
-              <Link
-                href="/admin/trust-safety"
-                className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 text-sm font-black text-white"
-              >
-                Trust & Safety
-              </Link>
-            </div>
-          </div>
-
-          <div className="rounded-[1.75rem] bg-white/10 p-6">
-            <p className="text-xs font-black uppercase tracking-[0.14em] text-white/50">
-              Attention
-            </p>
-
-            <div className="mt-5 flex items-end justify-between gap-4">
-              <div>
-                <p className="text-4xl font-black">
-                  {openCases}
-                </p>
-
-                <p className="mt-1 text-sm text-white/65">
-                  active safety cases
-                </p>
-              </div>
-
-              {urgentCases >
-                0 && (
-                <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-[var(--tp-danger)]">
-                  {urgentCases} urgent
-                </span>
-              )}
-            </div>
-
-            <p className="mt-5 text-xs leading-5 text-white/55">
-              Administrative actions should remain traceable and proportionate to the issue being reviewed.
-            </p>
-          </div>
-        </div>
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--tp-muted)] sm:text-base">
+          Monitor platform activity,
+          growth and issues that need
+          administrative attention.
+        </p>
       </section>
 
-      <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {/* PLATFORM METRICS */}
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <ThreepleStat
           label="Users"
-          value={
-            totalUsers
-          }
-          helper="Registered Threeple profiles."
+          value={totalUsers}
+          helper="Registered profiles."
           tone="primary"
         />
 
         <ThreepleStat
           label="Organizations"
-          value={
-            totalOrganizations
-          }
-          helper="Organizer workspaces on the platform."
+          value={totalOrganizations}
+          helper="Organizer workspaces."
+          tone="neutral"
         />
 
         <ThreepleStat
           label="Collections"
-          value={
-            totalCollections
-          }
-          helper={`${activeCollections} active right now.`}
+          value={totalCollections}
+          helper={`${activeCollections} currently active.`}
           tone="success"
         />
 
         <ThreepleStat
           label="Participants"
-          value={
-            totalParticipants
-          }
-          helper="Participant records across collections."
-          tone="warning"
+          value={totalParticipants}
+          helper="Across all collections."
+          tone="neutral"
         />
       </section>
 
-      <section className="mt-8">
-        <div>
-          <p className="tp-kicker">
-            Operations
-          </p>
-
-          <h2 className="tp-heading mt-2 text-2xl">
-            Platform controls.
-          </h2>
-
-          <p className="tp-body mt-2 max-w-2xl text-sm">
-            Use focused operational areas instead of managing everything from one overloaded screen.
-          </p>
-        </div>
-
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <Link
-            href="/admin/users"
-            className="tp-card tp-hover-card p-6"
-          >
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--tp-primary-soft)] font-black text-[var(--tp-primary)]">
-              U
-            </div>
-
-            <h3 className="tp-heading mt-5 text-lg">
-              Users
-            </h3>
-
-            <p className="tp-body mt-2 text-sm">
-              Review profiles, participation and account-level administrative state.
-            </p>
-
-            <p className="mt-5 text-sm font-black text-[var(--tp-primary)]">
-              Open user directory
-            </p>
-          </Link>
-
-          <Link
-            href="/admin/organizations"
-            className="tp-card tp-hover-card p-6"
-          >
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--tp-info-soft)] font-black text-[var(--tp-info)]">
-              O
-            </div>
-
-            <h3 className="tp-heading mt-5 text-lg">
-              Organizations
-            </h3>
-
-            <p className="tp-body mt-2 text-sm">
-              Inspect organizer workspaces, ownership, members and settlement state.
-            </p>
-
-            <p className="mt-5 text-sm font-black text-[var(--tp-primary)]">
-              Open organizations
-            </p>
-          </Link>
-
-          <Link
-            href="/admin/collections"
-            className="tp-card tp-hover-card p-6"
-          >
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--tp-success-soft)] font-black text-[var(--tp-success)]">
-              C
-            </div>
-
-            <h3 className="tp-heading mt-5 text-lg">
-              Collections
-            </h3>
-
-            <p className="tp-body mt-2 text-sm">
-              Review contribution models, organizers, status and collection-level controls.
-            </p>
-
-            <p className="mt-5 text-sm font-black text-[var(--tp-primary)]">
-              Open collection directory
-            </p>
-          </Link>
-
-          <Link
-            href="/admin/trust-safety"
-            className="tp-card tp-hover-card p-6"
-          >
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--tp-warning-soft)] font-black text-[var(--tp-warning)]">
-              T
-            </div>
-
-            <h3 className="tp-heading mt-5 text-lg">
-              Trust & Safety
-            </h3>
-
-            <p className="tp-body mt-2 text-sm">
-              Review reports, investigations, restrictions and resolution history.
-            </p>
-
-            <p className="mt-5 text-sm font-black text-[var(--tp-primary)]">
-              Review cases
-            </p>
-          </Link>
-        </div>
-      </section>
-
-      <section className="mt-8 grid gap-6 xl:grid-cols-[1.4fr_.6fr]">
-        <div className="tp-card p-5 sm:p-6">
-          <div className="flex items-end justify-between gap-4">
+      {/* ATTENTION */}
+      <section className="mt-10 grid gap-6 xl:grid-cols-[0.72fr_1.28fr]">
+        <div className="tp-card p-6 sm:p-7">
+          <div className="flex items-start justify-between gap-5">
             <div>
               <p className="tp-kicker">
-                Trust & Safety
+                Attention
               </p>
 
-              <h2 className="tp-heading mt-2 text-xl">
-                Recent cases
+              <h2 className="tp-heading mt-2 text-2xl">
+                Cases requiring review
               </h2>
             </div>
 
-            <Link
-              href="/admin/trust-safety"
-              className="text-sm font-black text-[var(--tp-primary)]"
-            >
-              View all
-            </Link>
+            {urgentCases > 0 && (
+              <ThreepleBadge tone="danger">
+                {urgentCases} urgent
+              </ThreepleBadge>
+            )}
           </div>
 
-          {recentCases.length ===
-          0 ? (
-            <div className="mt-6 rounded-2xl bg-[var(--tp-bg-soft)] p-6 text-sm text-[var(--tp-muted)]">
-              No Trust & Safety cases are currently available.
+          <div className="mt-8">
+            <p className="text-5xl font-black tracking-[-0.05em] text-[var(--tp-ink)]">
+              {openCases}
+            </p>
+
+            <p className="mt-2 text-sm text-[var(--tp-muted)]">
+              Open or active Trust & Safety cases
+            </p>
+          </div>
+
+          <div className="mt-7 border-t border-[var(--tp-border)] pt-5">
+            <Link
+              href="/admin/trust-safety"
+              className="text-sm font-bold text-[var(--tp-primary)] transition hover:text-[var(--tp-primary-hover)]"
+            >
+              Review outstanding cases →
+            </Link>
+          </div>
+        </div>
+
+        {/* RECENT CASES */}
+        <div className="tp-card p-6 sm:p-7">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="tp-kicker">
+                Recent activity
+              </p>
+
+              <h2 className="tp-heading mt-2 text-2xl">
+                Latest safety cases
+              </h2>
+            </div>
+
+            {recentCases.length > 0 && (
+              <Link
+                href="/admin/trust-safety"
+                className="hidden text-sm font-bold text-[var(--tp-primary)] sm:block"
+              >
+                View all
+              </Link>
+            )}
+          </div>
+
+          {recentCases.length === 0 ? (
+            <div className="mt-6 rounded-2xl border border-[var(--tp-border)] bg-[var(--tp-bg-soft)] p-6">
+              <p className="text-sm text-[var(--tp-muted)]">
+                No Trust & Safety cases
+                are currently available.
+              </p>
             </div>
           ) : (
-            <div className="mt-5 divide-y divide-[var(--tp-border)]">
+            <div className="mt-6 divide-y divide-[var(--tp-border)]">
               {recentCases.map(
                 (item) => (
                   <Link
-                    key={
-                      item.id
-                    }
+                    key={item.id}
                     href={`/admin/trust-safety/${item.id}`}
-                    className="flex flex-col gap-3 py-4 transition first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"
+                    className="group flex flex-col gap-3 py-4 transition first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"
                   >
                     <div className="min-w-0">
-                      <p className="truncate font-black text-[var(--tp-ink)]">
+                      <p className="truncate font-bold text-[var(--tp-ink)] transition group-hover:text-[var(--tp-primary)]">
                         {item.report_reference}
                       </p>
 
@@ -534,24 +422,18 @@ export default async function AdminHomePage() {
             </div>
           )}
         </div>
+      </section>
 
-        <div className="tp-card p-6">
-          <p className="tp-kicker">
-            Admin principle
-          </p>
-
-          <h2 className="tp-heading mt-2 text-xl">
-            Protect history.
-          </h2>
-
-          <p className="tp-body mt-3 text-sm">
-            Collection and user deletion should preserve financial and audit records where required. Normal operations should prefer archive, deactivate or anonymize over destructive removal.
-          </p>
-
-          <div className="mt-5 rounded-2xl bg-[var(--tp-danger-soft)] p-4 text-sm leading-6 text-[var(--tp-danger)]">
-            Permanent destructive actions should remain restricted and explicitly confirmed.
-          </div>
-        </div>
+      {/* ADMIN NOTE */}
+      <section className="mt-6 border-t border-[var(--tp-border)] pt-6">
+        <p className="max-w-3xl text-xs leading-6 text-[var(--tp-muted)]">
+          Administrative actions should
+          preserve financial history and
+          remain traceable. Archive,
+          deactivate or anonymize records
+          where appropriate instead of
+          destructive removal.
+        </p>
       </section>
     </ThreepleAppShell>
   );

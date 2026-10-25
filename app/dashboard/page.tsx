@@ -333,102 +333,46 @@ export default async function DashboardPage() {
         </ThreepleLinkButton>
       }
     >
-      <section className="overflow-hidden rounded-[2rem] border border-[var(--tp-primary-border)] bg-[var(--tp-primary)] text-white shadow-[var(--tp-shadow-md)]">
-        <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.25fr_.75fr] lg:p-10">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-white/55">
-              Threeple home
-            </p>
+      <section className="mb-8">
+        <p className="text-sm font-semibold text-[var(--tp-primary)]">
+          Welcome back,{" "}
+          <span className="capitalize">
+            {firstName}
+          </span>
+        </p>
 
-            <h1 className="mt-3 max-w-2xl text-3xl font-black tracking-[-0.04em] sm:text-4xl lg:text-5xl">
-              Welcome back,{" "}
-              <span className="capitalize">
-                {firstName}
-              </span>
-              .
-            </h1>
+        <h1 className="mt-2 max-w-3xl text-3xl font-black tracking-[-0.04em] text-[var(--tp-ink)] sm:text-4xl">
+          Your collections,
+          clearly organized.
+        </h1>
 
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-white/70 sm:text-base">
-              Create a contribution, join one with a code, or see everything you are already managing in one place.
-            </p>
-
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/dashboard/collections/new"
-                className="inline-flex min-h-12 items-center justify-center rounded-full bg-white px-6 text-sm font-black text-[var(--tp-primary)] transition hover:bg-white/90"
-              >
-                Create a collection
-              </Link>
-
-              <Link
-                href="/join"
-                className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 text-sm font-black text-white transition hover:bg-white/15"
-              >
-                Join with a code
-              </Link>
-            </div>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-            <Link
-              href="/my-collections"
-              className="rounded-2xl bg-white/10 p-5 transition hover:bg-white/15"
-            >
-              <p className="text-xs font-black uppercase tracking-wide text-white/45">
-                Participant workspace
-              </p>
-
-              <p className="mt-2 text-lg font-black">
-                My Collections
-              </p>
-
-              <p className="mt-2 text-sm leading-6 text-white/60">
-                Open collections you have joined and check your contribution status.
-              </p>
-            </Link>
-
-            <div className="rounded-2xl bg-white/10 p-5">
-              <p className="text-xs font-black uppercase tracking-wide text-white/45">
-                Field ready
-              </p>
-
-              <p className="mt-2 text-lg font-black">
-                Phone · Tablet · Desktop
-              </p>
-
-              <p className="mt-2 text-sm leading-6 text-white/60">
-                Collector Mode and offline sync will connect here in a later phase.
-              </p>
-            </div>
-          </div>
-        </div>
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--tp-muted)] sm:text-base">
+          Track what is active,
+          what needs attention,
+          and the collections you are
+          currently managing.
+        </p>
       </section>
 
-      <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <ThreepleStat
           label="Active"
-          value={
-            activeCollections.length
-          }
+          value={activeCollections.length}
           helper="Collections currently running."
           tone="success"
         />
 
         <ThreepleStat
           label="Drafts"
-          value={
-            draftCollections.length
-          }
+          value={draftCollections.length}
           helper="Collections still being prepared."
-          tone="warning"
+          tone="neutral"
         />
 
         <ThreepleStat
           label="Ajo groups"
-          value={
-            ajoCollections.length
-          }
-          helper="Rotational contribution collections."
+          value={ajoCollections.length}
+          helper="Rotational contribution groups."
           tone="primary"
         />
 
@@ -441,8 +385,8 @@ export default async function DashboardPage() {
           }
           helper={
             settlementReady
-              ? "At least one organizer workspace is settlement-ready."
-              : "Connect settlement before accepting electronic payments."
+              ? "Settlement is ready."
+              : "Settlement is not yet connected."
           }
           tone={
             settlementReady
@@ -452,36 +396,36 @@ export default async function DashboardPage() {
         />
       </section>
 
-      <section className="mt-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <section className="mt-10">
+        <div className="flex items-end justify-between gap-6 border-b border-[var(--tp-border)] pb-5">
           <div>
             <p className="tp-kicker">
-              Your collections
+              Collections
             </p>
 
             <h2 className="tp-heading mt-2 text-2xl sm:text-3xl">
-              Keep everyone aligned.
+              Your workspace
             </h2>
 
             <p className="tp-body mt-2 max-w-2xl text-sm">
-              Open a collection to manage people, progress, transparency, Ajo rounds and contribution activity.
+              Open a collection to manage
+              participants, contributions,
+              cycles and activity.
             </p>
           </div>
 
-          <ThreepleLinkButton
-            href="/dashboard/collections/new"
-            variant="secondary"
-          >
-            New collection
-          </ThreepleLinkButton>
+          {recentCollections.length > 0 && (
+            <span className="hidden text-sm font-semibold text-[var(--tp-muted)] sm:block">
+              {recentCollections.length} recent
+            </span>
+          )}
         </div>
 
-        {recentCollections.length ===
-        0 ? (
+        {recentCollections.length === 0 ? (
           <ThreepleEmptyState
             className="mt-6"
-            title="No organizer collections yet"
-            description="Create your first contribution collection, Ajo group or shared goal. Threeple will keep the people, rules and progress together."
+            title="No collections yet"
+            description="Create your first collection and Threeple will keep the people, contribution rules and progress together."
             action={
               <ThreepleLinkButton href="/dashboard/collections/new">
                 Create your first collection
@@ -503,16 +447,14 @@ export default async function DashboardPage() {
                     "flexible";
 
                 const target =
-                  collection.target_amount !==
-                  null
+                  collection.target_amount !== null
                     ? Number(
                         collection.target_amount
                       )
                     : 0;
 
                 const raised =
-                  collection.amount_raised !==
-                  null
+                  collection.amount_raised !== null
                     ? Number(
                         collection.amount_raised
                       )
@@ -523,11 +465,7 @@ export default async function DashboardPage() {
                     ? Math.min(
                         100,
                         Math.round(
-                          (
-                            raised /
-                            target
-                          ) *
-                            100
+                          (raised / target) * 100
                         )
                       )
                     : 0;
@@ -539,66 +477,51 @@ export default async function DashboardPage() {
 
                 return (
                   <Link
-                    key={
-                      collection.id
-                    }
+                    key={collection.id}
                     href={href}
-                    className="tp-card tp-hover-card block overflow-hidden"
+                    className="group tp-card block overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--tp-primary-border)] hover:shadow-[var(--tp-shadow-md)]"
                   >
-                    <div
-                      className={[
-                        "h-2",
-                        isAjo
-                          ? "bg-[var(--tp-warning)]"
-                          : isGoal
-                            ? "bg-[var(--tp-primary)]"
-                            : "bg-[var(--tp-success)]",
-                      ].join(" ")}
-                    />
-
                     <div className="p-5 sm:p-6">
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <ThreepleBadge
-                          tone={
-                            badgeTone(
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                          <ThreepleBadge
+                            tone={
+                              badgeTone(
+                                collection.status
+                              )
+                            }
+                          >
+                            {friendlyText(
                               collection.status
-                            )
-                          }
-                        >
-                          {friendlyText(
-                            collection.status
-                          )}
-                        </ThreepleBadge>
+                            )}
+                          </ThreepleBadge>
 
-                        <span className="text-xs font-bold text-[var(--tp-muted)]">
-                          {isAjo
-                            ? "Ajo"
-                            : isGoal
-                              ? "Goal"
-                              : "Fixed"}
+                          <h3 className="tp-heading mt-4 truncate text-xl">
+                            {collection.title}
+                          </h3>
+
+                          <p className="tp-muted mt-1.5 text-sm">
+                            {isAjo
+                              ? "Ajo"
+                              : isGoal
+                                ? "Goal"
+                                : "Fixed"}
+                            {" · "}
+                            {dateLabel(
+                              collection.deadline
+                            )}
+                          </p>
+                        </div>
+
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--tp-primary-soft)] text-sm font-black text-[var(--tp-primary)] transition group-hover:bg-[var(--tp-primary)] group-hover:text-white">
+                          →
                         </span>
                       </div>
-
-                      <h3 className="tp-heading mt-5 text-xl">
-                        {collection.title}
-                      </h3>
-
-                      <p className="tp-muted mt-2 text-sm">
-                        {friendlyText(
-                          collection.collection_type
-                        )}
-                        {" · "}
-                        {dateLabel(
-                          collection.deadline
-                        )}
-                      </p>
 
                       {isGoal ? (
                         <div className="mt-6">
                           <ThreepleProgress
-                            value={
-                              progress
-                            }
+                            value={progress}
                             label={`${money(
                               raised,
                               collection.currency
@@ -615,7 +538,7 @@ export default async function DashboardPage() {
                           </p>
                         </div>
                       ) : (
-                        <div className="mt-6 rounded-2xl bg-[var(--tp-bg-soft)] p-4">
+                        <div className="mt-6 border-t border-[var(--tp-border)] pt-5">
                           <p className="tp-kicker">
                             {isAjo
                               ? "Per cycle"
@@ -631,17 +554,11 @@ export default async function DashboardPage() {
                         </div>
                       )}
 
-                      <div className="mt-5 flex items-center justify-between border-t border-[var(--tp-border)] pt-4">
-                        <span className="text-xs font-bold text-[var(--tp-muted)]">
-                          {collection.join_code
-                            ? `Code ${collection.join_code}`
-                            : "Collection"}
-                        </span>
-
-                        <span className="text-sm font-black text-[var(--tp-primary)]">
-                          Open
-                        </span>
-                      </div>
+                      {collection.join_code && (
+                        <p className="mt-5 text-xs font-semibold text-[var(--tp-muted)]">
+                          Code {collection.join_code}
+                        </p>
+                      )}
                     </div>
                   </Link>
                 );
@@ -649,59 +566,6 @@ export default async function DashboardPage() {
             )}
           </div>
         )}
-      </section>
-
-      <section className="mt-8 grid gap-4 md:grid-cols-3">
-        <Link
-          href="/join"
-          className="tp-card tp-hover-card p-6"
-        >
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--tp-primary-soft)] font-black text-[var(--tp-primary)]">
-            J
-          </div>
-
-          <h3 className="tp-heading mt-5 text-lg">
-            Join a collection
-          </h3>
-
-          <p className="tp-body mt-2 text-sm">
-            Enter a Threeple Code and join a contribution in a few steps.
-          </p>
-        </Link>
-
-        <Link
-          href="/my-collections"
-          className="tp-card tp-hover-card p-6"
-        >
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--tp-success-soft)] font-black text-[var(--tp-success)]">
-            M
-          </div>
-
-          <h3 className="tp-heading mt-5 text-lg">
-            My Collections
-          </h3>
-
-          <p className="tp-body mt-2 text-sm">
-            See every collection you joined and return to your participant workspace.
-          </p>
-        </Link>
-
-        <Link
-          href="/dashboard/settlement"
-          className="tp-card tp-hover-card p-6"
-        >
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--tp-warning-soft)] font-black text-[var(--tp-warning)]">
-            S
-          </div>
-
-          <h3 className="tp-heading mt-5 text-lg">
-            Settlement
-          </h3>
-
-          <p className="tp-body mt-2 text-sm">
-            Manage the account used for organizer settlement on supported payments.
-          </p>
-        </Link>
       </section>
     </ThreepleAppShell>
   );
