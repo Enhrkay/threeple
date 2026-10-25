@@ -1,4 +1,5 @@
-﻿import Link from "next/link";
+﻿import { getCollectorOrganizationIds } from "@/lib/collector/access";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
@@ -47,31 +48,9 @@ export default async function CollectorAjoPage() {
       `/auth/login?next=${encodeURIComponent("/collector/ajo")}`
     );
   }
-
-  const { data: ownedOrganizations } =
-    await supabaseAdmin
-      .from("organizations")
-      .select("id")
-      .eq("owner_id", userId);
-
-  const { data: memberships } =
-    await supabaseAdmin
-      .from("organization_members")
-      .select(`
-        organization_id,
-        role
-      `)
-      .eq("user_id", userId)
-      .in("role", ["admin", "treasurer"]);
-
-  const organizationIds = Array.from(
-    new Set([
-      ...(ownedOrganizations ?? []).map((row) => row.id),
-      ...(memberships ?? []).map((row) => row.organization_id),
-    ])
-  );
-
-  const { data: collections } =
+  const organizationIds =
+    await getCollectorOrganizationIds(userId);
+const { data: collections } =
     organizationIds.length > 0
       ? await supabaseAdmin
           .from("collections")
@@ -380,4 +359,6 @@ export default async function CollectorAjoPage() {
     </ThreepleAppShell>
   );
 }
+
+
 

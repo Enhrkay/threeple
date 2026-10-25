@@ -2,7 +2,7 @@
   createClient,
 } from "@/lib/supabase/server";
 
-import OfflineSessionGuard from "@/components/threeple/offline-session-guard";
+import { OfflineSessionGuard } from "@/components/threeple/offline-session-guard";
 
 export const instant = false;
 
@@ -32,4 +32,5 @@ export default async function CollectorLayout({
     </>
   );
 }
+
 

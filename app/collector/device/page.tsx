@@ -16,7 +16,7 @@ import {
   ThreepleBadge,
 } from "@/components/threeple/design-system";
 
-import ClearOfflineDataButton from "./clear-offline-data-button";
+import { ClearOfflineDataButton } from "./clear-offline-data-button";
 
 export const instant = false;
 
@@ -95,6 +95,7 @@ export default async function CollectorPrivacyPage() {
     </ThreepleAppShell>
   );
 }
+
 
 
 

@@ -1,4 +1,5 @@
-﻿import Link from "next/link";
+﻿import { hasCollectorOrganizationAccess } from "@/lib/collector/access";
+import Link from "next/link";
 import {
   notFound,
   redirect,
@@ -92,8 +93,9 @@ export default async function OfflineRecordPage({
   } = await supabaseAdmin
     .from("organizations")
     .select(`
-      owner_id
-    `)
+        id,
+        owner_id
+      `)
     .eq(
       "id",
       collection.organization_id
@@ -107,6 +109,21 @@ export default async function OfflineRecordPage({
   let allowed =
     organization.owner_id ===
     userId;
+
+  if (!allowed) {
+
+    allowed =
+
+      await hasCollectorOrganizationAccess(
+
+        userId,
+
+        organization.id
+
+      );
+
+  }
+
 
   if (!allowed) {
     const {
@@ -138,6 +155,21 @@ export default async function OfflineRecordPage({
         membership
       );
   }
+
+  if (!allowed) {
+
+    allowed =
+
+      await hasCollectorOrganizationAccess(
+
+        userId,
+
+        organization.id
+
+      );
+
+  }
+
 
   if (!allowed) {
     notFound();
@@ -223,4 +255,9 @@ export default async function OfflineRecordPage({
     </ThreepleAppShell>
   );
 }
+
+
+
+
+
 

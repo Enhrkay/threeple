@@ -1,4 +1,5 @@
-﻿import {
+﻿import { hasCollectorOrganizationAccess } from "@/lib/collector/access";
+import {
   redirect,
 } from "next/navigation";
 
@@ -87,11 +88,16 @@ async function requireCollectorAccess(
       )
       .maybeSingle();
 
-  return (
-    membership?.role ===
-      "admin" ||
-    membership?.role ===
-      "treasurer"
+  if (
+    membership?.role === "admin" ||
+    membership?.role === "treasurer"
+  ) {
+    return true;
+  }
+
+  return hasCollectorOrganizationAccess(
+    userId,
+    collection.organization_id
   );
 }
 
@@ -434,4 +440,5 @@ export async function adjustFieldReceipt(
     `/collector/history?adjusted=corrected`
   );
 }
+
 

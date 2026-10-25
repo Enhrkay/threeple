@@ -1,4 +1,5 @@
-﻿import {
+﻿import { hasCollectorOrganizationAccess } from "@/lib/collector/access";
+import {
   NextResponse,
 } from "next/server";
 
@@ -114,6 +115,21 @@ export async function GET(
     userId;
 
   if (!allowed) {
+
+    allowed =
+
+      await hasCollectorOrganizationAccess(
+
+        userId,
+
+        organization.id
+
+      );
+
+  }
+
+
+  if (!allowed) {
     const {
       data: membership,
     } = await supabaseAdmin
@@ -143,6 +159,21 @@ export async function GET(
         membership
       );
   }
+
+  if (!allowed) {
+
+    allowed =
+
+      await hasCollectorOrganizationAccess(
+
+        userId,
+
+        organization.id
+
+      );
+
+  }
+
 
   if (!allowed) {
     return NextResponse.json(
@@ -225,4 +256,7 @@ export async function GET(
       participants ?? [],
   });
 }
+
+
+
 

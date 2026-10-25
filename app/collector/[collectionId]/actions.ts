@@ -1,5 +1,6 @@
-"use server";
+﻿"use server";
 
+import { hasCollectorOrganizationAccess } from "@/lib/collector/access";
 import {
   redirect,
 } from "next/navigation";
@@ -117,6 +118,21 @@ async function getCollectorAccess(
     userId;
 
   if (!allowed) {
+
+    allowed =
+
+      await hasCollectorOrganizationAccess(
+
+        userId,
+
+        organization.id
+
+      );
+
+  }
+
+
+  if (!allowed) {
     const {
       data: membership,
     } = await supabaseAdmin
@@ -146,6 +162,21 @@ async function getCollectorAccess(
         membership
       );
   }
+
+  if (!allowed) {
+
+    allowed =
+
+      await hasCollectorOrganizationAccess(
+
+        userId,
+
+        organization.id
+
+      );
+
+  }
+
 
   if (!allowed) {
     throw new Error(
@@ -419,3 +450,6 @@ export async function recordFieldContribution(
     `/collector/${collectionId}/receipts/${event.id}`
   );
 }
+
+
+

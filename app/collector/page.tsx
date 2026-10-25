@@ -117,8 +117,8 @@ export default async function CollectorHomePage() {
           "role",
           [
             "admin",
-            "treasurer",
-          ]
+          "treasurer",
+        ]
         ),
     ]);
 
@@ -713,6 +713,8 @@ export default async function CollectorHomePage() {
     </ThreepleAppShell>
   );
 }
+
+
 
 
 

@@ -1,81 +1,154 @@
 ﻿"use client";
 
 import {
+  useEffect,
   useState,
 } from "react";
 
-const DB_NAME =
-  "threeple-field-collector";
+import {
+  countUnsyncedCollectorEvents,
+  forceClearCollectorDatabase,
+} from "@/lib/collector/offline-device-safety";
 
-const OWNER_KEY =
-  "threeple:collector-owner";
-
-export default function ClearOfflineDataButton() {
+export function ClearOfflineDataButton() {
   const [
-    clearing,
-    setClearing,
-  ] = useState(false);
+    unsynced,
+    setUnsynced,
+  ] =
+    useState(0);
 
   const [
-    cleared,
-    setCleared,
-  ] = useState(false);
+    busy,
+    setBusy,
+  ] =
+    useState(false);
+
+  const [
+    message,
+    setMessage,
+  ] =
+    useState<string | null>(
+      null
+    );
+
+  async function refresh() {
+    try {
+      setUnsynced(
+        await countUnsyncedCollectorEvents()
+      );
+    } catch {
+      setUnsynced(0);
+    }
+  }
+
+  useEffect(() => {
+    void refresh();
+  }, []);
 
   async function clearData() {
-    setClearing(true);
+    const currentUnsynced =
+      await countUnsyncedCollectorEvents();
 
-    await new Promise<void>(
-      (resolve) => {
-        const request =
-          indexedDB.deleteDatabase(
-            DB_NAME
-          );
+    if (
+      currentUnsynced >
+      0
+    ) {
+      const confirmed =
+        window.confirm(
+          `This device still has ${currentUnsynced} unsynced contribution record(s). Clearing now will permanently remove those local records before they reach Threeple. Only continue if you have intentionally decided to discard them.`
+        );
 
-        request.onsuccess =
-          () => resolve();
-
-        request.onerror =
-          () => resolve();
-
-        request.onblocked =
-          () => resolve();
+      if (!confirmed) {
+        setMessage(
+          "Offline data was not cleared. Sync the pending records first."
+        );
+        return;
       }
-    );
 
-    localStorage.removeItem(
-      OWNER_KEY
-    );
+      const secondConfirmation =
+        window.confirm(
+          "Final confirmation: permanently delete the unsynced collector records from this device?"
+        );
 
-    setCleared(true);
-    setClearing(false);
+      if (
+        !secondConfirmation
+      ) {
+        setMessage(
+          "Offline data was not cleared."
+        );
+        return;
+      }
+    }
+
+    setBusy(true);
+    setMessage(null);
+
+    try {
+      await forceClearCollectorDatabase();
+
+      window.localStorage.removeItem(
+        "threeple:collector-owner"
+      );
+
+      window.localStorage.removeItem(
+        "threeple:collector-unsynced-preserved"
+      );
+
+      setUnsynced(0);
+
+      setMessage(
+        "Offline collector data was cleared from this device."
+      );
+    } catch (error) {
+      console.error(
+        "CLEAR_OFFLINE_DATA_FAILED",
+        error
+      );
+
+      setMessage(
+        "Threeple could not clear the offline data. Close other Threeple tabs and try again."
+      );
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
-    <div className="rounded-2xl border border-[var(--tp-danger-border)] bg-[var(--tp-danger-soft)] p-5">
-      <p className="font-black text-[var(--tp-danger)]">
-        Shared device?
-      </p>
+    <div>
+      {unsynced > 0 && (
+        <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          <strong>
+            {unsynced} unsynced contribution record
+            {unsynced === 1
+              ? ""
+              : "s"}{" "}
+            on this device.
+          </strong>
 
-      <p className="mt-2 text-sm leading-6 text-[var(--tp-danger)]">
-        Clear prepared member rosters and local field receipts before giving this browser or device to another collector.
-      </p>
+          <p className="mt-1">
+            Threeple will preserve them automatically on sign-out or account change. Sync them before intentionally clearing this device.
+          </p>
+        </div>
+      )}
 
       <button
         type="button"
-        onClick={
-          clearData
+        disabled={busy}
+        onClick={() =>
+          void clearData()
         }
-        disabled={
-          clearing
-        }
-        className="tp-btn mt-4 min-h-11 bg-[var(--tp-danger)] text-white disabled:opacity-50"
+        className="tp-btn tp-btn-secondary"
       >
-        {clearing
+        {busy
           ? "Clearingâ€¦"
-          : cleared
-            ? "Offline data cleared"
-            : "Clear offline data"}
+          : "Clear offline data"}
       </button>
+
+      {message && (
+        <p className="mt-3 text-sm text-[var(--tp-muted)]">
+          {message}
+        </p>
+      )}
     </div>
   );
 }

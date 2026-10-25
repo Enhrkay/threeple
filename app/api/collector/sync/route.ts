@@ -1,4 +1,5 @@
-﻿import {
+﻿import { hasCollectorOrganizationAccess } from "@/lib/collector/access";
+import {
   NextResponse,
 } from "next/server";
 
@@ -174,8 +175,9 @@ export async function POST(
   } = await supabaseAdmin
     .from("organizations")
     .select(`
-      owner_id
-    `)
+        id,
+        owner_id
+      `)
     .eq(
       "id",
       collection.organization_id
@@ -197,6 +199,21 @@ export async function POST(
   let allowed =
     organization.owner_id ===
     userId;
+
+  if (!allowed) {
+
+    allowed =
+
+      await hasCollectorOrganizationAccess(
+
+        userId,
+
+        organization.id
+
+      );
+
+  }
+
 
   if (!allowed) {
     const {
@@ -228,6 +245,21 @@ export async function POST(
         membership
       );
   }
+
+  if (!allowed) {
+
+    allowed =
+
+      await hasCollectorOrganizationAccess(
+
+        userId,
+
+        organization.id
+
+      );
+
+  }
+
 
   if (!allowed) {
     return NextResponse.json(
@@ -411,4 +443,9 @@ export async function POST(
       inserted.server_synced_at,
   });
 }
+
+
+
+
+
 

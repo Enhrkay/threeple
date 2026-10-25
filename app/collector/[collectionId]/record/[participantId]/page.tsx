@@ -1,4 +1,5 @@
-﻿import Link from "next/link";
+﻿import { hasCollectorOrganizationAccess } from "@/lib/collector/access";
+import Link from "next/link";
 import {
   notFound,
   redirect,
@@ -168,6 +169,21 @@ export default async function RecordContributionPage({
     userId;
 
   if (!allowed) {
+
+    allowed =
+
+      await hasCollectorOrganizationAccess(
+
+        userId,
+
+        organization.id
+
+      );
+
+  }
+
+
+  if (!allowed) {
     const {
       data: membership,
     } = await supabaseAdmin
@@ -197,6 +213,21 @@ export default async function RecordContributionPage({
         membership
       );
   }
+
+  if (!allowed) {
+
+    allowed =
+
+      await hasCollectorOrganizationAccess(
+
+        userId,
+
+        organization.id
+
+      );
+
+  }
+
 
   if (!allowed) {
     notFound();
@@ -464,4 +495,7 @@ export default async function RecordContributionPage({
     </ThreepleAppShell>
   );
 }
+
+
+
 
