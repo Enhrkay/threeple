@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import {
@@ -35,8 +35,13 @@ function safeNext(
 
 export function LoginForm({
   className,
+  defaultNext = "/dashboard",
+  adminMode = false,
   ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+}: React.ComponentPropsWithoutRef<"div"> & {
+  defaultNext?: string;
+  adminMode?: boolean;
+}) {
   const [email, setEmail] =
     useState("");
 
@@ -55,10 +60,13 @@ export function LoginForm({
   const searchParams =
     useSearchParams();
 
+  const requestedNext =
+    searchParams.get("next");
+
   const nextPath =
-    safeNext(
-      searchParams.get("next")
-    );
+    requestedNext
+      ? safeNext(requestedNext)
+      : defaultNext;
 
   const handleLogin = async (
     e: React.SubmitEvent<HTMLFormElement>
@@ -116,17 +124,17 @@ export function LoginForm({
     >
       <div className="mb-8">
         <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--tp-primary)]">
-          Welcome back
+          {adminMode ? "Threeple administration" : "Welcome back"}
         </p>
 
         <h1 className="mt-3 text-3xl font-black tracking-[-0.04em] text-[var(--tp-ink)] sm:text-4xl">
-          Sign in
+          {adminMode ? "Admin sign in" : "Sign in"}
         </h1>
 
         <p className="mt-3 max-w-sm text-sm leading-6 text-[var(--tp-muted)]">
-          Continue to your collections,
-          participants and contribution
-          activity.
+          {adminMode
+            ? "Sign in with an authorized Threeple administrator account."
+            : "Continue to your collections, participants and contribution activity."}
         </p>
       </div>
 
@@ -207,15 +215,17 @@ export function LoginForm({
         </button>
       </form>
 
-      <p className="mt-7 text-center text-sm text-[var(--tp-muted)]">
-        Don&apos;t have an account?{" "}
-        <Link
-          href={signUpHref}
-          className="font-bold text-[var(--tp-primary)] transition hover:text-[var(--tp-primary-hover)]"
-        >
-          Create one
-        </Link>
-      </p>
+      {!adminMode && (
+        <p className="mt-7 text-center text-sm text-[var(--tp-muted)]">
+          Don&apos;t have an account?{" "}
+          <Link
+            href={signUpHref}
+            className="font-bold text-[var(--tp-primary)] transition hover:text-[var(--tp-primary-hover)]"
+          >
+            Create one
+          </Link>
+        </p>
+      )}
     </div>
   );
 }

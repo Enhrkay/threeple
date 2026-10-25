@@ -1,4 +1,4 @@
-﻿import {
+import {
   createServerClient,
 } from "@supabase/ssr";
 
@@ -14,6 +14,8 @@ import {
 const PUBLIC_EXACT_ROUTES = [
   "/",
   "/join",
+  "/monitoring",
+  "/admin/login",
 ];
 
 const PUBLIC_ROUTE_PREFIXES = [
@@ -119,7 +121,10 @@ export async function updateSession(
       request.nextUrl.clone();
 
     url.pathname =
-      "/auth/login";
+      pathname === "/admin" ||
+      pathname.startsWith("/admin/")
+        ? "/admin/login"
+        : "/auth/login";
 
     url.searchParams.set(
       "next",
