@@ -231,10 +231,6 @@ export default async function MyCollectionsPage() {
       | number
       | string
       | null;
-    amount_raised:
-      | number
-      | string
-      | null;
     deadline: string | null;
     status: string;
     archived_at: string | null;
@@ -259,7 +255,6 @@ export default async function MyCollectionsPage() {
         currency,
         target_amount,
         default_amount,
-        amount_raised,
         deadline,
         status,
         archived_at
@@ -289,6 +284,50 @@ export default async function MyCollectionsPage() {
         ]
       )
     );
+
+  const raisedByCollection =
+    new Map<string, number>();
+
+  if (
+    collectionIds.length >
+    0
+  ) {
+    const {
+      data: financialRows,
+      error: financialError,
+    } = await supabaseAdmin
+      .from(
+        "collection_financial_summary"
+      )
+      .select(`
+        collection_id,
+        effective_gross_amount
+      `)
+      .in(
+        "collection_id",
+        collectionIds
+      );
+
+    if (financialError) {
+      console.error(
+        "MY_COLLECTIONS_FINANCIAL_SUMMARY_FAILED",
+        financialError
+      );
+    }
+
+    for (
+      const row
+      of financialRows ?? []
+    ) {
+      raisedByCollection.set(
+        row.collection_id,
+        Number(
+          row.effective_gross_amount ??
+          0
+        )
+      );
+    }
+  }
 
   const items =
     participantRows
@@ -492,12 +531,9 @@ export default async function MyCollectionsPage() {
                     : 0;
 
                 const raised =
-                  collection.amount_raised !==
-                  null
-                    ? Number(
-                        collection.amount_raised
-                      )
-                    : 0;
+                  raisedByCollection.get(
+                    collection.id
+                  ) ?? 0;
 
                 const progress =
                   target > 0
