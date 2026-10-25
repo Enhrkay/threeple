@@ -405,7 +405,13 @@ export default async function CollectorHomePage() {
                 >
                   Device Privacy
                 </Link>
-                                <Link
+                                                <Link
+                  href="/collector/ajo"
+                  className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 text-sm font-black text-white"
+                >
+                  Ajo Route
+                </Link>
+<Link
                   href="/collector/today"
                   className="inline-flex min-h-12 items-center justify-center rounded-full bg-white px-6 text-sm font-black text-[var(--tp-primary)]"
                 >
@@ -707,6 +713,7 @@ export default async function CollectorHomePage() {
     </ThreepleAppShell>
   );
 }
+
 
 
 
