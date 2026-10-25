@@ -319,7 +319,13 @@ export default async function CollectorHistoryPage() {
     >
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <Link
+                    <Link
+            href="/collector/ledger"
+            className="tp-btn tp-btn-secondary"
+          >
+            Effective Ledger
+          </Link>
+<Link
             href="/collector"
             className="text-sm font-black text-[var(--tp-primary)]"
           >
@@ -504,6 +510,7 @@ export default async function CollectorHistoryPage() {
     </ThreepleAppShell>
   );
 }
+
 
 
 
