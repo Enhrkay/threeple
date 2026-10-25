@@ -399,7 +399,25 @@ export default async function CollectorHomePage() {
                   Offline Queue
                 </Link>
 
-                <Link
+                                <Link
+                  href="/collector/device"
+                  className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 text-sm font-black text-white"
+                >
+                  Device Privacy
+                </Link>
+                                <Link
+                  href="/collector/today"
+                  className="inline-flex min-h-12 items-center justify-center rounded-full bg-white px-6 text-sm font-black text-[var(--tp-primary)]"
+                >
+                  Today&apos;s Route
+                </Link>
+<Link
+                  href="/collector/history"
+                  className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 text-sm font-black text-white"
+                >
+                  Receipt History
+                </Link>
+<Link
                   href="/dashboard"
                   className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 text-sm font-black text-white"
                 >
@@ -689,4 +707,7 @@ export default async function CollectorHomePage() {
     </ThreepleAppShell>
   );
 }
+
+
+
 
