@@ -47,7 +47,7 @@ function formatMoney(
     amount === null ||
     amount === undefined
   ) {
-    return "â€”";
+    return "—";
   }
 
   const numeric =
@@ -56,7 +56,7 @@ function formatMoney(
   if (
     Number.isNaN(numeric)
   ) {
-    return "â€”";
+    return "—";
   }
 
   try {

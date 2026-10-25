@@ -97,7 +97,7 @@ function money(
     !Number.isFinite(value) ||
     value <= 0
   ) {
-    return "â€”";
+    return "—";
   }
 
   return new Intl.NumberFormat(
@@ -251,7 +251,7 @@ export default function NewCollectionPage() {
 
           <section className="tp-card p-5 sm:p-6 md:p-8">
             <p className="tp-kicker">
-              01 Â· Collection
+              01 · Collection
             </p>
 
             <h2 className="tp-heading mt-2 text-2xl">
@@ -380,7 +380,7 @@ export default function NewCollectionPage() {
 
           <section className="tp-card p-5 sm:p-6 md:p-8">
             <p className="tp-kicker">
-              02 Â· Contribution model
+              02 · Contribution model
             </p>
 
             <h2 className="tp-heading mt-2 text-2xl">
@@ -443,7 +443,7 @@ export default function NewCollectionPage() {
                             " "
                           )}
                         >
-                          âœ“
+                          ✓
                         </span>
                       </div>
 
@@ -468,7 +468,7 @@ export default function NewCollectionPage() {
               "target" && (
               <div className="mt-6 rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-bg-soft)] p-5 sm:p-6">
                 <p className="font-black text-[var(--tp-primary)]">
-                  Shared target Â· equal contribution
+                  Shared target · equal contribution
                 </p>
 
                 <p className="mt-2 text-sm leading-6 text-[var(--tp-ink-soft)]">
@@ -719,7 +719,7 @@ export default function NewCollectionPage() {
 
           <section className="tp-card p-5 sm:p-6 md:p-8">
             <p className="tp-kicker">
-              03 Â· Timing & access
+              03 · Timing & access
             </p>
 
             <h2 className="tp-heading mt-2 text-2xl">
@@ -757,23 +757,23 @@ export default function NewCollectionPage() {
                   className="tp-select"
                 >
                   <option value="NGN">
-                    NGN â€” Nigerian Naira
+                    NGN — Nigerian Naira
                   </option>
 
                   <option value="GBP">
-                    GBP â€” British Pound
+                    GBP — British Pound
                   </option>
 
                   <option value="USD">
-                    USD â€” US Dollar
+                    USD — US Dollar
                   </option>
 
                   <option value="EUR">
-                    EUR â€” Euro
+                    EUR — Euro
                   </option>
 
                   <option value="CAD">
-                    CAD â€” Canadian Dollar
+                    CAD — Canadian Dollar
                   </option>
                 </select>
               </div>
@@ -812,11 +812,11 @@ export default function NewCollectionPage() {
                   className="tp-select"
                 >
                   <option value="private">
-                    Private â€” Threeple Code required
+                    Private — Threeple Code required
                   </option>
 
                   <option value="public">
-                    Public â€” discoverable collection
+                    Public — discoverable collection
                   </option>
                 </select>
               </div>
@@ -825,7 +825,7 @@ export default function NewCollectionPage() {
 
           <section className="tp-card p-5 sm:p-6 md:p-8">
             <p className="tp-kicker">
-              04 Â· Participation rules
+              04 · Participation rules
             </p>
 
             <h2 className="tp-heading mt-2 text-2xl">

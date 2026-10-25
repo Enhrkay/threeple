@@ -140,7 +140,7 @@ function eventMarker(
       "deactivated"
     )
   ) {
-    return "Ã—";
+    return "×";
   }
 
   if (
@@ -164,10 +164,10 @@ function eventMarker(
       "activated"
     )
   ) {
-    return "â–¶";
+    return "▶";
   }
 
-  return "â€¢";
+  return "•";
 }
 
 function formatDate(

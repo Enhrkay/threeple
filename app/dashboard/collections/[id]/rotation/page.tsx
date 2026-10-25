@@ -39,14 +39,14 @@ function formatMoney(
     amount === null ||
     amount === undefined
   ) {
-    return "â€”";
+    return "—";
   }
 
   const numeric =
     Number(amount);
 
   if (!Number.isFinite(numeric)) {
-    return "â€”";
+    return "—";
   }
 
   return new Intl.NumberFormat(
@@ -66,7 +66,7 @@ function friendlyText(
     | undefined
 ) {
   if (!value) {
-    return "â€”";
+    return "—";
   }
 
   return value
@@ -85,7 +85,7 @@ function formatDate(
     | undefined
 ) {
   if (!value) {
-    return "â€”";
+    return "—";
   }
 
   const date =
@@ -96,7 +96,7 @@ function formatDate(
       date.getTime()
     )
   ) {
-    return "â€”";
+    return "—";
   }
 
   return date.toLocaleDateString(
@@ -616,7 +616,7 @@ export default async function RotationPage({
               {completedCycles}
               <span className="text-base font-semibold text-black/30">
                 {" "}
-                / {cycleList.length || "â€”"}
+                / {cycleList.length || "—"}
               </span>
             </p>
           </div>
@@ -944,7 +944,7 @@ export default async function RotationPage({
                               {memberCycle
                                 ? `${formatDate(
                                     memberCycle.scheduled_date
-                                  )} Â· ${friendlyText(
+                                  )} · ${friendlyText(
                                     memberCycle.status
                                   )}`
                                 : `Recipient position ${member.recipient_position}`}
@@ -1169,7 +1169,7 @@ export default async function RotationPage({
                           settings?.coordinator_fee_mode
                         )}: ${
                           settings?.coordinator_fee_value ??
-                          "â€”"
+                          "—"
                         }`}
                   </span>
                 </div>

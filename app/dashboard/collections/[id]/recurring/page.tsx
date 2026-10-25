@@ -51,7 +51,7 @@ function money(
     amount === null ||
     amount === undefined
   ) {
-    return "â€”";
+    return "—";
   }
 
   return new Intl.NumberFormat(
@@ -304,7 +304,7 @@ export default async function RecurringCollectionPage({
             value={
               activeCycle
                 ? `#${activeCycle.cycle_number}`
-                : "â€”"
+                : "—"
             }
             helper={
               activeCycle
@@ -584,7 +584,7 @@ export default async function RecurringCollectionPage({
                       </div>
 
                       <p className="mt-2 text-sm text-[var(--tp-muted)]">
-                        {cycle.starts_on} â†’ {cycle.ends_on}
+                        {cycle.starts_on} → {cycle.ends_on}
                       </p>
                     </div>
 

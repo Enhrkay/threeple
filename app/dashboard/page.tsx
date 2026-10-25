@@ -1,4 +1,5 @@
-﻿import Link from "next/link";
+import Link from "next/link";
+import { connection } from "next/server";
 import {
   redirect,
 } from "next/navigation";
@@ -32,7 +33,7 @@ function friendlyText(
     | undefined
 ) {
   if (!value) {
-    return "â€”";
+    return "\u2014";
   }
 
   return value
@@ -56,14 +57,14 @@ function money(
     value === null ||
     value === undefined
   ) {
-    return "â€”";
+    return "\u2014";
   }
 
   const number =
     Number(value);
 
   if (!Number.isFinite(number)) {
-    return "â€”";
+    return "\u2014";
   }
 
   try {
@@ -134,6 +135,7 @@ function badgeTone(
 }
 
 export default async function DashboardPage() {
+  await connection();
   const supabase =
     await createClient();
 
@@ -170,6 +172,7 @@ export default async function DashboardPage() {
 
   const {
     data: ownedOrganizations,
+    error: ownedOrganizationsError,
   } = await supabase
     .from("organizations")
     .select(`
@@ -184,6 +187,7 @@ export default async function DashboardPage() {
 
   const {
     data: memberships,
+    error: membershipsError,
   } = await supabase
     .from("organization_members")
     .select(`
@@ -230,10 +234,6 @@ export default async function DashboardPage() {
       | number
       | string
       | null;
-    amount_raised:
-      | number
-      | string
-      | null;
     status: string;
     deadline: string | null;
     archived_at: string | null;
@@ -247,6 +247,7 @@ export default async function DashboardPage() {
   ) {
     const {
       data,
+      error: collectionsError,
     } = await supabase
       .from("collections")
       .select(`
@@ -258,7 +259,6 @@ export default async function DashboardPage() {
         currency,
         target_amount,
         default_amount,
-        amount_raised,
         status,
         deadline,
         archived_at,
@@ -276,9 +276,86 @@ export default async function DashboardPage() {
         }
       );
 
+
+    if (collectionsError) {
+      console.error(
+        "DASHBOARD_COLLECTIONS_LOOKUP_FAILED",
+        collectionsError
+      );
+    }
     collections =
       data ?? [];
   }
+
+  if (ownedOrganizationsError) {
+    console.error(
+      "DASHBOARD_OWNED_ORGANIZATIONS_LOOKUP_FAILED",
+      ownedOrganizationsError
+    );
+  }
+
+  if (membershipsError) {
+    console.error(
+      "DASHBOARD_MEMBERSHIPS_LOOKUP_FAILED",
+      membershipsError
+    );
+  }
+
+
+
+  const collectionIds =
+    collections.map(
+      (collection) =>
+        collection.id
+    );
+
+  let amountRaisedByCollection =
+    new Map<string, number>();
+
+  if (
+    collectionIds.length >
+    0
+  ) {
+    const {
+      data: financialSummaries,
+      error: financialSummaryError,
+    } = await supabaseAdmin
+      .from(
+        "collection_financial_summary"
+      )
+      .select(`
+        collection_id,
+        effective_gross_amount
+      `)
+      .in(
+        "collection_id",
+        collectionIds
+      );
+
+    if (financialSummaryError) {
+      console.error(
+        "DASHBOARD_FINANCIAL_SUMMARY_LOOKUP_FAILED",
+        financialSummaryError
+      );
+    }
+
+    amountRaisedByCollection =
+      new Map(
+        (
+          financialSummaries ??
+          []
+        ).map(
+          (summary) => [
+            summary.collection_id,
+            Number(
+              summary.effective_gross_amount ??
+                0
+            ),
+          ]
+        )
+      );
+  }
+
 
   const activeCollections =
     collections.filter(
@@ -565,11 +642,9 @@ export default async function DashboardPage() {
                     : 0;
 
                 const raised =
-                  collection.amount_raised !== null
-                    ? Number(
-                        collection.amount_raised
-                      )
-                    : 0;
+                  amountRaisedByCollection.get(
+                    collection.id
+                  ) ?? 0;
 
                 const progress =
                   target > 0
@@ -617,7 +692,7 @@ export default async function DashboardPage() {
                               : isGoal
                                 ? "Goal"
                                 : "Fixed"}
-                            {" Â· "}
+                            {" \u00B7 "}
                             {dateLabel(
                               collection.deadline
                             )}
@@ -625,7 +700,7 @@ export default async function DashboardPage() {
                         </div>
 
                         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--tp-primary-soft)] text-sm font-black text-[var(--tp-primary)] transition group-hover:bg-[var(--tp-primary)] group-hover:text-white">
-                          â†’
+                          {"\u2192"}
                         </span>
                       </div>
 

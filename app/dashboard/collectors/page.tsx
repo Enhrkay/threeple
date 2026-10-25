@@ -43,7 +43,7 @@ function resultMessage(result?: string) {
     case "missing_fields":
       return {
         tone: "danger" as const,
-        text: "Choose an organization and enter the collectorâ€™s email.",
+        text: "Choose an organization and enter the collector’s email.",
       };
     case "lookup_failed":
     case "assign_failed":
@@ -321,7 +321,7 @@ export default async function CollectorsPage({
                     </p>
 
                     <p className="mt-1 text-xs text-[var(--tp-muted)]">
-                      Collector Â· field access only
+                      Collector · field access only
                     </p>
                   </div>
 
