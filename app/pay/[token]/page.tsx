@@ -249,60 +249,176 @@ export default async function PayPage({
   // CYCLE BASED COLLECTIONS
   // =======================================================
 
-  const cycleBased =
+  const recurringMode =
     collection.collection_mode ===
-      "recurring_dues" ||
+      "recurring_dues";
+
+  const rotatingMode =
     collection.collection_mode ===
       "rotating_pool";
 
-  let recurringAmountDue = 0;
+  const cycleBased =
+    rotatingMode;
 
-  if (cycleBased) {
+  if (recurringMode) {
+    const today =
+      new Date()
+        .toISOString()
+        .slice(0, 10);
+
     const {
-      data: obligations,
+      data: recurringCycles,
     } = await supabaseAdmin
-      .from(
-        "participant_obligations"
-      )
+      .from("recurring_cycles")
       .select(`
-        amount_due,
-        amount_paid,
+        id,
+        cycle_number,
+        due_on,
         status
       `)
       .eq(
-        "participant_id",
-        participant.id
+        "collection_id",
+        collection.id
       )
       .in(
         "status",
         [
-          "unpaid",
-          "pending",
-          "partial",
-          "overdue",
+          "collecting",
+          "closed",
         ]
+      )
+      .lte(
+        "due_on",
+        today
+      )
+      .order(
+        "due_on",
+        {
+          ascending: true,
+        }
+      )
+      .order(
+        "cycle_number",
+        {
+          ascending: true,
+        }
       );
 
-    for (
-      const obligation
-      of obligations ?? []
-    ) {
-      recurringAmountDue +=
-        Math.max(
-          0,
-          Number(
-            obligation.amount_due ??
-              0
-          ) -
-            Number(
-              obligation.amount_paid ??
-                0
-            )
-        );
-    }
+    const cycleOrder =
+      new Map(
+        (recurringCycles ?? []).map(
+          (cycle, index) => [
+            cycle.id,
+            index,
+          ]
+        )
+      );
 
-    expectedAmount =
-      recurringAmountDue;
+    const cycleIds =
+      (recurringCycles ?? []).map(
+        (cycle) =>
+          cycle.id
+      );
+
+    if (cycleIds.length > 0) {
+      const {
+        data: recurringObligations,
+      } = await supabaseAdmin
+        .from(
+          "recurring_cycle_obligations"
+        )
+        .select(`
+          id,
+          cycle_id,
+          expected_amount,
+          paid_amount,
+          status
+        `)
+        .eq(
+          "collection_id",
+          collection.id
+        )
+        .eq(
+          "participant_id",
+          participant.id
+        )
+        .in(
+          "cycle_id",
+          cycleIds
+        )
+        .in(
+          "status",
+          [
+            "pending",
+            "partially_paid",
+          ]
+        );
+
+      const outstandingObligations =
+        (recurringObligations ?? [])
+          .map(
+            (obligation) => ({
+              ...obligation,
+              outstanding:
+                Math.max(
+                  0,
+                  Number(
+                    obligation.expected_amount ??
+                      0
+                  ) -
+                    Number(
+                      obligation.paid_amount ??
+                        0
+                    )
+                ),
+            })
+          )
+          .filter(
+            (obligation) =>
+              obligation.outstanding >
+              0
+          )
+          .sort(
+            (a, b) =>
+              (
+                cycleOrder.get(
+                  a.cycle_id
+                ) ??
+                Number.MAX_SAFE_INTEGER
+              ) -
+              (
+                cycleOrder.get(
+                  b.cycle_id
+                ) ??
+                Number.MAX_SAFE_INTEGER
+              )
+          );
+
+      const recurringObligation =
+        outstandingObligations[0];
+
+      if (recurringObligation) {
+        expectedAmount =
+          Number(
+            recurringObligation
+              .expected_amount ??
+              0
+          );
+
+        amountPaid =
+          Number(
+            recurringObligation
+              .paid_amount ??
+              0
+          );
+      } else {
+        expectedAmount = 0;
+        amountPaid = 0;
+      }
+    } else {
+      expectedAmount = 0;
+      amountPaid = 0;
+    }
   }
 
   // =======================================================
@@ -418,7 +534,7 @@ export default async function PayPage({
     participantApproved &&
     settlementReady &&
     !fullyPaid &&
-    !cycleBased;
+    !rotatingMode;
 
   const requiresAmountChoice =
     expectedAmount === null &&
@@ -633,8 +749,7 @@ export default async function PayPage({
 
                 <p className="mt-2 text-sm leading-6 text-amber-800">
                   This Collection
-                  uses recurring or
-                  rotating payments.
+                  uses rotating payments.
                   Threeple will
                   process this
                   through the
@@ -652,7 +767,7 @@ export default async function PayPage({
 
           {collectionActive &&
             participantApproved &&
-            !cycleBased &&
+            !rotatingMode &&
             !settlementReady &&
             !fullyPaid && (
               <div className="mt-7 rounded-2xl border border-amber-200 bg-amber-50 p-5">

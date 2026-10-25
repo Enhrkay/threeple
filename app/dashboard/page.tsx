@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import {
   redirect,
 } from "next/navigation";
@@ -6,6 +6,10 @@ import {
 import {
   createClient,
 } from "@/lib/supabase/server";
+
+import {
+  supabaseAdmin,
+} from "@/lib/supabase/admin";
 
 import {
   ThreepleAppShell,
@@ -28,7 +32,7 @@ function friendlyText(
     | undefined
 ) {
   if (!value) {
-    return "—";
+    return "â€”";
   }
 
   return value
@@ -52,14 +56,14 @@ function money(
     value === null ||
     value === undefined
   ) {
-    return "—";
+    return "â€”";
   }
 
   const number =
     Number(value);
 
   if (!Number.isFinite(number)) {
-    return "—";
+    return "â€”";
   }
 
   try {
@@ -171,8 +175,7 @@ export default async function DashboardPage() {
     .select(`
       id,
       name,
-      owner_id,
-      settlement_status
+      owner_id
     `)
     .eq(
       "owner_id",
@@ -301,13 +304,121 @@ export default async function DashboardPage() {
         !collection.archived_at
     );
 
-  const settlementReady =
-    (ownedOrganizations ??
-      []).some(
-      (organization) =>
-        organization.settlement_status ===
-        "active"
+  const ownedOrganizationIds =
+    new Set(
+      (ownedOrganizations ?? []).map(
+        (organization) =>
+          organization.id
+      )
     );
+
+  const ownedCollectionIds =
+    collections
+      .filter(
+        (collection) =>
+          ownedOrganizationIds.has(
+            collection.organization_id
+          ) &&
+          !collection.archived_at
+      )
+      .map(
+        (collection) =>
+          collection.id
+      );
+
+  let settlementReady =
+    false;
+
+  if (
+    ownedCollectionIds.length >
+    0
+  ) {
+    const {
+      data: beneficiaries,
+    } = await supabaseAdmin
+      .from(
+        "collection_beneficiaries"
+      )
+      .select(
+        "settlement_profile_id"
+      )
+      .in(
+        "collection_id",
+        ownedCollectionIds
+      )
+      .eq(
+        "beneficiary_role",
+        "primary"
+      )
+      .eq(
+        "is_active",
+        true
+      );
+
+    const settlementProfileIds =
+      Array.from(
+        new Set(
+          (beneficiaries ?? [])
+            .map(
+              (beneficiary) =>
+                beneficiary
+                  .settlement_profile_id
+            )
+            .filter(
+              (profileId):
+                profileId is string =>
+                  Boolean(profileId)
+            )
+        )
+      );
+
+    if (
+      settlementProfileIds.length >
+      0
+    ) {
+      const {
+        data: settlementProfiles,
+      } = await supabaseAdmin
+        .from(
+          "settlement_profiles"
+        )
+        .select(`
+          id,
+          provider,
+          provider_recipient_reference,
+          verification_status,
+          is_active
+        `)
+        .in(
+          "id",
+          settlementProfileIds
+        );
+
+      settlementReady =
+        (settlementProfiles ?? [])
+          .some(
+            (profile) =>
+              profile.is_active ===
+                true &&
+              profile.provider ===
+                "paystack" &&
+              Boolean(
+                profile
+                  .provider_recipient_reference
+                  ?.startsWith(
+                    "ACCT_"
+                  )
+              ) &&
+              [
+                "provider_connected",
+                "provider_verified",
+              ].includes(
+                profile
+                  .verification_status
+              )
+          );
+    }
+  }
 
   const recentCollections =
     collections
@@ -506,7 +617,7 @@ export default async function DashboardPage() {
                               : isGoal
                                 ? "Goal"
                                 : "Fixed"}
-                            {" · "}
+                            {" Â· "}
                             {dateLabel(
                               collection.deadline
                             )}
@@ -514,7 +625,7 @@ export default async function DashboardPage() {
                         </div>
 
                         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--tp-primary-soft)] text-sm font-black text-[var(--tp-primary)] transition group-hover:bg-[var(--tp-primary)] group-hover:text-white">
-                          →
+                          â†’
                         </span>
                       </div>
 

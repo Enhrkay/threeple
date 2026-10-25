@@ -1,4 +1,4 @@
-﻿"use server";
+"use server";
 
 import {
   randomUUID,
@@ -180,6 +180,7 @@ export async function startPayment(
     .from("collections")
     .select(`
       id,
+      organization_id,
       title,
       collection_mode,
       currency,
@@ -238,21 +239,28 @@ export async function startPayment(
   }
 
   // =======================================================
-  // 5. RECURRING / ROTATING HAVE THEIR OWN ENGINE
+  // =======================================================
+  // 5. ROTATING POOL USES ITS OWN PAYMENT ENGINE
   // =======================================================
 
   if (
-    collection.collection_mode ===
-      "recurring_dues" ||
     collection.collection_mode ===
       "rotating_pool"
   ) {
     return {
       success: false,
       error:
-        "This Collection uses cycle-based payments. Its payment flow will be handled through the recurring contribution engine.",
+        "This Collection uses the rotating contribution payment flow.",
     };
   }
+
+  let recurringObligationId:
+    | string
+    | null = null;
+
+  let recurringOutstandingAmount:
+    | number
+    | null = null;
 
   // =======================================================
   // 6. EMAIL
@@ -285,6 +293,223 @@ export async function startPayment(
       error:
         "A valid email address is required to continue to payment.",
     };
+  }
+
+  // =======================================================
+  // 7. RECURRING OBLIGATION
+  //
+  // A recurring checkout is attached to exactly one
+  // recurring_cycle_obligations row.
+  //
+  // Oldest outstanding due cycle is paid first.
+  // =======================================================
+
+  if (
+    collection.collection_mode ===
+      "recurring_dues"
+  ) {
+    const today =
+      new Date()
+        .toISOString()
+        .slice(0, 10);
+
+    const {
+      data: recurringCycles,
+      error: recurringCyclesError,
+    } = await supabaseAdmin
+      .from("recurring_cycles")
+      .select(`
+        id,
+        cycle_number,
+        due_on,
+        status
+      `)
+      .eq(
+        "collection_id",
+        collection.id
+      )
+      .in(
+        "status",
+        [
+          "collecting",
+          "closed",
+        ]
+      )
+      .lte(
+        "due_on",
+        today
+      )
+      .order(
+        "due_on",
+        {
+          ascending: true,
+        }
+      )
+      .order(
+        "cycle_number",
+        {
+          ascending: true,
+        }
+      );
+
+    if (recurringCyclesError) {
+      console.error(
+        "RECURRING_CYCLES_LOAD_FAILED",
+        {
+          collectionId:
+            collection.id,
+        }
+      );
+
+      return {
+        success: false,
+        error:
+          "Threeple could not load the recurring contribution schedule.",
+      };
+    }
+
+    if (
+      !recurringCycles ||
+      recurringCycles.length === 0
+    ) {
+      return {
+        success: false,
+        error:
+          "There is no recurring contribution currently due.",
+      };
+    }
+
+    const cycleOrder =
+      new Map(
+        recurringCycles.map(
+          (cycle, index) => [
+            cycle.id,
+            index,
+          ]
+        )
+      );
+
+    const cycleIds =
+      recurringCycles.map(
+        (cycle) =>
+          cycle.id
+      );
+
+    const {
+      data: recurringObligations,
+      error: recurringObligationsError,
+    } = await supabaseAdmin
+      .from(
+        "recurring_cycle_obligations"
+      )
+      .select(`
+        id,
+        cycle_id,
+        expected_amount,
+        paid_amount,
+        status
+      `)
+      .eq(
+        "collection_id",
+        collection.id
+      )
+      .eq(
+        "participant_id",
+        participant.id
+      )
+      .in(
+        "cycle_id",
+        cycleIds
+      )
+      .in(
+        "status",
+        [
+          "pending",
+          "partially_paid",
+        ]
+      );
+
+    if (
+      recurringObligationsError
+    ) {
+      console.error(
+        "RECURRING_OBLIGATIONS_LOAD_FAILED",
+        {
+          collectionId:
+            collection.id,
+
+          participantId:
+            participant.id,
+        }
+      );
+
+      return {
+        success: false,
+        error:
+          "Threeple could not load the recurring contribution obligation.",
+      };
+    }
+
+    const outstandingObligations =
+      (recurringObligations ?? [])
+        .map(
+          (obligation) => ({
+            ...obligation,
+
+            outstanding:
+              Math.max(
+                0,
+                Number(
+                  obligation.expected_amount ??
+                    0
+                ) -
+                  Number(
+                    obligation.paid_amount ??
+                      0
+                  )
+              ),
+          })
+        )
+        .filter(
+          (obligation) =>
+            obligation.outstanding >
+            0
+        )
+        .sort(
+          (a, b) =>
+            (
+              cycleOrder.get(
+                a.cycle_id
+              ) ??
+              Number.MAX_SAFE_INTEGER
+            ) -
+            (
+              cycleOrder.get(
+                b.cycle_id
+              ) ??
+              Number.MAX_SAFE_INTEGER
+            )
+        );
+
+    const recurringObligation =
+      outstandingObligations[0];
+
+    if (!recurringObligation) {
+      return {
+        success: false,
+        error:
+          "All recurring contributions currently due have already been paid.",
+      };
+    }
+
+    recurringObligationId =
+      recurringObligation.id;
+
+    recurringOutstandingAmount =
+      Math.round(
+        recurringObligation.outstanding *
+          100
+      ) / 100;
   }
 
   // =======================================================
@@ -367,18 +592,22 @@ export async function startPayment(
     ) / 100;
 
   // =======================================================
+  // =======================================================
   // 8. CALCULATE EXPECTED AMOUNT
   // =======================================================
 
   let expectedAmount:
     | number
     | null =
-    participant.expected_amount !==
-      null
-      ? Number(
-          participant.expected_amount
-        )
-      : null;
+    collection.collection_mode ===
+      "recurring_dues"
+      ? recurringOutstandingAmount
+      : participant.expected_amount !==
+          null
+        ? Number(
+            participant.expected_amount
+          )
+        : null;
 
   if (
     expectedAmount === null &&
@@ -414,11 +643,14 @@ export async function startPayment(
     expectedAmount > 0
   ) {
     const remaining =
-      Math.max(
-        0,
-        expectedAmount -
-          verifiedPaid
-      );
+      collection.collection_mode ===
+        "recurring_dues"
+        ? expectedAmount
+        : Math.max(
+            0,
+            expectedAmount -
+              verifiedPaid
+          );
 
     if (remaining <= 0) {
       return {
@@ -651,7 +883,13 @@ export async function startPayment(
       obligation_id:
         null,
 
+      recurring_obligation_id:
+        recurringObligationId,
+
       provider:
+        "paystack",
+
+      payment_provider:
         "paystack",
 
       provider_reference:
@@ -684,6 +922,9 @@ export async function startPayment(
 
         collection_mode:
           collection.collection_mode,
+
+        recurring_obligation_id:
+          recurringObligationId,
 
         settlement_profile_id:
           settlement.id,
@@ -821,11 +1062,17 @@ export async function startPayment(
             threeple_payment_id:
               payment.id,
 
-            threeple_collection_id:
+            collection_id:
               collection.id,
 
-            threeple_participant_id:
+            participant_id:
               participant.id,
+
+            recurring_obligation_id:
+              recurringObligationId,
+
+            organization_id:
+              collection.organization_id,
 
             collection_title:
               collection.title,
@@ -852,6 +1099,9 @@ export async function startPayment(
 
           collection_mode:
             collection.collection_mode,
+
+          recurring_obligation_id:
+            recurringObligationId,
 
           settlement_profile_id:
             settlement.id,

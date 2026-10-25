@@ -1,4 +1,4 @@
-﻿import {
+import {
   createHmac,
   timingSafeEqual,
 } from "crypto";
@@ -26,6 +26,7 @@ type PaystackWebhookEvent = {
           organization_id?: string;
           rotation_cycle_id?: string | null;
           rotation_obligation_id?: string | null;
+          recurring_obligation_id?: string | null;
           gross_amount?: number;
           platform_fee_amount?: number;
           platform_fee_percentage?: number;
@@ -51,6 +52,7 @@ type PaystackVerifyResponse = {
           organization_id?: string;
           rotation_cycle_id?: string | null;
           rotation_obligation_id?: string | null;
+          recurring_obligation_id?: string | null;
           gross_amount?: number;
           platform_fee_amount?: number;
           platform_fee_percentage?: number;
@@ -119,6 +121,7 @@ function metadataObject(
         organization_id?: string;
           rotation_cycle_id?: string | null;
           rotation_obligation_id?: string | null;
+          recurring_obligation_id?: string | null;
         gross_amount?: number;
         platform_fee_amount?: number;
         platform_fee_percentage?: number;
@@ -285,6 +288,45 @@ export async function POST(
       );
     }
 
+    const {
+      data: paymentAttempt,
+      error: paymentAttemptError,
+    } = await supabaseAdmin
+      .from("payments")
+      .select(`
+        id,
+        participant_id,
+        collection_id,
+        amount,
+        currency,
+        status,
+        provider,
+        payment_provider,
+        provider_reference,
+        recurring_obligation_id
+      `)
+      .eq(
+        "provider_reference",
+        reference
+      )
+      .maybeSingle();
+
+    if (paymentAttemptError) {
+      throw new Error(
+        "Threeple could not load the payment attempt."
+      );
+    }
+
+    if (
+      paymentAttempt &&
+      paymentAttempt.provider !== "paystack" &&
+      paymentAttempt.payment_provider !== "paystack"
+    ) {
+      throw new Error(
+        "Payment provider does not match the Threeple payment attempt."
+      );
+    }
+
     const metadata =
       metadataObject(
         transaction.metadata
@@ -303,6 +345,23 @@ export async function POST(
       metadata.rotation_obligation_id
         ? metadata.rotation_obligation_id
         : null;
+
+    const recurringObligationId =
+      typeof metadata?.recurring_obligation_id ===
+        "string" &&
+      metadata.recurring_obligation_id
+        ? metadata.recurring_obligation_id
+        : null;
+
+    if (
+      paymentAttempt &&
+      paymentAttempt.recurring_obligation_id !==
+        recurringObligationId
+    ) {
+      throw new Error(
+        "Recurring obligation metadata does not match the Threeple payment attempt."
+      );
+    }
     const frozenPlatformFeeAmount =
       metadata?.platform_fee_amount !== undefined
         ? Number(metadata.platform_fee_amount)
@@ -427,18 +486,25 @@ export async function POST(
         ""
       ).toUpperCase();
 
+    const amountToVerify =
+      paymentAttempt
+        ? Number(
+            paymentAttempt.amount
+          )
+        : expectedAmountMajor;
+
     if (
       !Number.isFinite(
-        expectedAmountMajor
+        amountToVerify
       ) ||
-      expectedAmountMajor <= 0 ||
+      amountToVerify <= 0 ||
       Math.abs(
         paidAmountMajor -
-        expectedAmountMajor
+        amountToVerify
       ) > 0.001
     ) {
       throw new Error(
-        "Verified Paystack amount does not match the Threeple amount."
+        "Verified Paystack amount does not match the Threeple payment attempt."
       );
     }
 
@@ -479,6 +545,8 @@ export async function POST(
           rotationCycleId,
         p_rotation_obligation_id:
           rotationObligationId,
+        p_recurring_obligation_id:
+          recurringObligationId,
       }
     );
 
@@ -515,9 +583,3 @@ export async function POST(
     );
   }
 }
-
-
-
-
-
-

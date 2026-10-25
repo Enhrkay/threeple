@@ -1,4 +1,4 @@
-﻿"use server";
+"use server";
 
 import {
   randomUUID,
@@ -17,8 +17,8 @@ import {
 } from "@/lib/supabase/admin";
 
 import {
-  initializePaystackSplitPayment,
-} from "@/lib/payments/paystack";
+  initializePaystackTransaction,
+} from "@/lib/paystack/server";
 
 function participantUrl(
   participantId: string,
@@ -188,31 +188,71 @@ if (!participant.email) {
   }
 
   const {
-    data: organization,
-    error: organizationError,
+    data: beneficiary,
+    error: beneficiaryError,
   } = await supabaseAdmin
-    .from("organizations")
+    .from("collection_beneficiaries")
     .select(`
-      id,
-      settlement_provider,
-      settlement_subaccount_code,
-      settlement_currency,
-      settlement_status
+      settlement_profile_id
     `)
     .eq(
-      "id",
-      collection.organization_id
+      "collection_id",
+      collection.id
+    )
+    .eq(
+      "beneficiary_role",
+      "primary"
+    )
+    .eq(
+      "is_active",
+      true
     )
     .maybeSingle();
 
   if (
-    organizationError ||
-    !organization ||
-    organization.settlement_provider !==
-      "paystack" ||
-    organization.settlement_status !==
-      "active" ||
-    !organization.settlement_subaccount_code
+    beneficiaryError ||
+    !beneficiary?.settlement_profile_id
+  ) {
+    backWithError(
+      participantId,
+      "settlement_not_ready"
+    );
+  }
+
+  const {
+    data: settlementProfile,
+    error: settlementProfileError,
+  } = await supabaseAdmin
+    .from("settlement_profiles")
+    .select(`
+      id,
+      provider,
+      currency,
+      provider_recipient_reference,
+      verification_status,
+      is_active
+    `)
+    .eq(
+      "id",
+      beneficiary.settlement_profile_id
+    )
+    .maybeSingle();
+
+  if (
+    settlementProfileError ||
+    !settlementProfile ||
+    !settlementProfile.is_active ||
+    settlementProfile.provider !== "paystack" ||
+    !settlementProfile.provider_recipient_reference ||
+    !settlementProfile.provider_recipient_reference.startsWith(
+      "ACCT_"
+    ) ||
+    ![
+      "provider_connected",
+      "provider_verified",
+    ].includes(
+      settlementProfile.verification_status
+    )
   ) {
     backWithError(
       participantId,
@@ -231,6 +271,16 @@ if (!participant.email) {
       null;
 
   let rotationOutstandingAmount:
+    | number
+    | null =
+      null;
+
+  let recurringObligationId:
+    | string
+    | null =
+      null;
+
+  let recurringOutstandingAmount:
     | number
     | null =
       null;
@@ -396,14 +446,220 @@ if (!participant.email) {
         outstanding * 100
       ) / 100;
   }
-  const amount =
+
+  if (
     collection.collection_mode ===
+      "recurring_dues"
+  ) {
+    const today =
+      new Date()
+        .toISOString()
+        .slice(0, 10);
+
+    const {
+      data: recurringCycles,
+      error: recurringCyclesError,
+    } = await supabaseAdmin
+      .from("recurring_cycles")
+      .select(`
+        id,
+        cycle_number,
+        due_on,
+        status
+      `)
+      .eq(
+        "collection_id",
+        collection.id
+      )
+      .in(
+        "status",
+        [
+          "collecting",
+          "closed",
+        ]
+      )
+      .lte(
+        "due_on",
+        today
+      )
+      .order(
+        "due_on",
+        {
+          ascending: true,
+        }
+      )
+      .order(
+        "cycle_number",
+        {
+          ascending: true,
+        }
+      );
+
+    if (
+      recurringCyclesError ||
+      !recurringCycles?.length
+    ) {
+      console.error(
+        "MEMBER_RECURRING_CYCLES_LOAD_FAILED",
+        {
+          collectionId:
+            collection.id,
+          participantId:
+            participant.id,
+          error:
+            recurringCyclesError,
+        }
+      );
+
+      backWithError(
+        participantId,
+        "recurring_not_due"
+      );
+    }
+
+    const cycleOrder =
+      new Map(
+        recurringCycles.map(
+          (cycle, index) => [
+            cycle.id,
+            index,
+          ]
+        )
+      );
+
+    const cycleIds =
+      recurringCycles.map(
+        (cycle) =>
+          cycle.id
+      );
+
+    const {
+      data: recurringObligations,
+      error: recurringObligationsError,
+    } = await supabaseAdmin
+      .from(
+        "recurring_cycle_obligations"
+      )
+      .select(`
+        id,
+        cycle_id,
+        expected_amount,
+        paid_amount,
+        status
+      `)
+      .eq(
+        "collection_id",
+        collection.id
+      )
+      .eq(
+        "participant_id",
+        participant.id
+      )
+      .in(
+        "cycle_id",
+        cycleIds
+      )
+      .in(
+        "status",
+        [
+          "pending",
+          "partially_paid",
+        ]
+      );
+
+    if (recurringObligationsError) {
+      console.error(
+        "MEMBER_RECURRING_OBLIGATIONS_LOAD_FAILED",
+        {
+          collectionId:
+            collection.id,
+          participantId:
+            participant.id,
+          error:
+            recurringObligationsError,
+        }
+      );
+
+      backWithError(
+        participantId,
+        "recurring_not_ready"
+      );
+    }
+
+    const outstandingObligations =
+      (recurringObligations ?? [])
+        .map(
+          (obligation) => ({
+            ...obligation,
+
+            outstanding:
+              Math.max(
+                0,
+                Number(
+                  obligation.expected_amount ??
+                    0
+                ) -
+                  Number(
+                    obligation.paid_amount ??
+                      0
+                  )
+              ),
+          })
+        )
+        .filter(
+          (obligation) =>
+            obligation.outstanding >
+            0
+        )
+        .sort(
+          (a, b) =>
+            (
+              cycleOrder.get(
+                a.cycle_id
+              ) ??
+              Number.MAX_SAFE_INTEGER
+            ) -
+            (
+              cycleOrder.get(
+                b.cycle_id
+              ) ??
+              Number.MAX_SAFE_INTEGER
+            )
+        );
+
+    const recurringObligation =
+      outstandingObligations[0];
+
+    if (!recurringObligation) {
+      backWithError(
+        participantId,
+        "recurring_paid"
+      );
+    }
+
+    recurringObligationId =
+      recurringObligation.id;
+
+    recurringOutstandingAmount =
+      Math.round(
+        recurringObligation.outstanding *
+          100
+      ) / 100;
+  }
+  let standardOutstandingAmount:
+    | number
+    | null =
+      null;
+
+  if (
+    collection.collection_mode !==
       "rotating_pool" &&
-    rotationOutstandingAmount !==
-      null
-      ? rotationOutstandingAmount
-      : participant.expected_amount !==
-          null
+    collection.collection_mode !==
+      "recurring_dues"
+  ) {
+    const expectedStandardAmount =
+      participant.expected_amount !==
+        null
         ? Number(
             participant.expected_amount
           )
@@ -413,6 +669,131 @@ if (!participant.email) {
               collection.default_amount
             )
           : 0;
+
+    if (
+      Number.isFinite(
+        expectedStandardAmount
+      ) &&
+      expectedStandardAmount > 0
+    ) {
+      const {
+        data: verifiedPayments,
+        error: verifiedPaymentsError,
+      } = await supabaseAdmin
+        .from("payments")
+        .select(`
+          amount,
+          refunded_amount,
+          status,
+          verified_at
+        `)
+        .eq(
+          "collection_id",
+          collection.id
+        )
+        .eq(
+          "participant_id",
+          participant.id
+        )
+        .not(
+          "verified_at",
+          "is",
+          null
+        )
+        .in(
+          "status",
+          [
+            "success",
+            "partially_refunded",
+          ]
+        );
+
+      if (verifiedPaymentsError) {
+        console.error(
+          "MEMBER_VERIFIED_PAYMENTS_LOAD_FAILED",
+          {
+            collectionId:
+              collection.id,
+            participantId:
+              participant.id,
+            error:
+              verifiedPaymentsError,
+          }
+        );
+
+        backWithError(
+          participantId,
+          "balance_unavailable"
+        );
+      }
+
+      let verifiedPaid = 0;
+
+      for (
+        const payment
+        of verifiedPayments ?? []
+      ) {
+        const paymentAmount =
+          Number(
+            payment.amount ?? 0
+          );
+
+        const refundedAmount =
+          Number(
+            payment.refunded_amount ??
+              0
+          );
+
+        if (
+          payment.status ===
+          "success"
+        ) {
+          verifiedPaid +=
+            paymentAmount;
+        }
+
+        if (
+          payment.status ===
+          "partially_refunded"
+        ) {
+          verifiedPaid +=
+            Math.max(
+              0,
+              paymentAmount -
+                refundedAmount
+            );
+        }
+      }
+
+      verifiedPaid =
+        Math.round(
+          verifiedPaid * 100
+        ) / 100;
+
+      standardOutstandingAmount =
+        Math.round(
+          Math.max(
+            0,
+            expectedStandardAmount -
+              verifiedPaid
+          ) * 100
+        ) / 100;
+    }
+  }
+
+  const amount =
+    collection.collection_mode ===
+      "rotating_pool" &&
+    rotationOutstandingAmount !==
+      null
+      ? rotationOutstandingAmount
+      : collection.collection_mode ===
+            "recurring_dues" &&
+          recurringOutstandingAmount !==
+            null
+        ? recurringOutstandingAmount
+        : standardOutstandingAmount ??
+          0;
 
   if (
     !Number.isFinite(
@@ -475,54 +856,265 @@ if (!participant.email) {
       .slice(0, 24)
       .toUpperCase()}`;
 
-  const appUrl =
-    (
-      process.env
-        .NEXT_PUBLIC_APP_URL ||
-      "http://localhost:3000"
-    ).replace(
-      /\/$/,
-      ""
+  const {
+    data: paymentAttempt,
+    error: paymentAttemptError,
+  } = await supabaseAdmin
+    .from("payments")
+    .insert({
+      collection_id:
+        collection.id,
+
+      participant_id:
+        participant.id,
+
+      obligation_id:
+        null,
+
+      provider:
+        "paystack",
+
+      payment_provider:
+        "paystack",
+
+      provider_reference:
+        reference,
+
+      amount,
+
+      currency:
+        collection.currency,
+
+      status:
+        "initiated",
+
+      initiated_by:
+        userId,
+
+      paid_at:
+        null,
+
+      verified_at:
+        null,
+
+      platform_fee_percentage:
+        feePercentage,
+
+      platform_fee_amount:
+        platformFee,
+
+      rotation_cycle_id:
+        rotationCycleId,
+
+      rotation_obligation_id:
+        rotationObligationId,
+
+      recurring_obligation_id:
+        recurringObligationId,
+
+      metadata: {
+        source:
+          "authenticated_member_payment",
+
+        collection_mode:
+          collection.collection_mode,
+
+        settlement_profile_id:
+          settlementProfile.id,
+
+        recurring_obligation_id:
+          recurringObligationId,
+      },
+    })
+    .select(`
+      id,
+      provider_reference
+    `)
+    .single();
+
+  if (
+    paymentAttemptError ||
+    !paymentAttempt
+  ) {
+    console.error(
+      "MEMBER_PAYMENT_ATTEMPT_CREATE_FAILED",
+      {
+        participantId,
+        collectionId:
+          collection.id,
+        reference,
+        error:
+          paymentAttemptError,
+      }
     );
+
+    backWithError(
+      participantId,
+      "initialization_failed"
+    );
+  }
+
+  const appUrl =
+    process.env.APP_URL
+      ?.trim()
+      .replace(
+        /\/+$/,
+        ""
+      );
+
+  if (!appUrl) {
+    await supabaseAdmin
+      .from("payments")
+      .update({
+        status:
+          "failed",
+
+        metadata: {
+          source:
+            "authenticated_member_payment",
+
+          failure_stage:
+            "application_configuration",
+        },
+      })
+      .eq(
+        "id",
+        paymentAttempt.id
+      );
+
+    console.error(
+      "APP_URL_MISSING",
+      {
+        paymentId:
+          paymentAttempt.id,
+        participantId,
+      }
+    );
+
+    backWithError(
+      participantId,
+      "initialization_failed"
+    );
+  }
 
   const callbackUrl =
     `${appUrl}${participantUrl(
       participantId,
       "returned"
     )}`;
-
   try {
     const checkout =
-      await initializePaystackSplitPayment({
+      await initializePaystackTransaction({
         email:
           participant.email,
-        amountMajor:
-          amount,
+
+        amountInSubunit:
+          Math.round(
+            amount * 100
+          ),
+
         currency:
           collection.currency,
-        subaccountCode:
-          organization
-            .settlement_subaccount_code,
-        platformFeeMajor:
-          platformFee,
-        platformFeePercentage:
-          feePercentage,
+
         reference,
+
         callbackUrl,
-        participantId:
-          participant.id,
-        collectionId:
-          collection.id,
-        organizationId:
-          organization.id,
-        rotationCycleId:
-          rotationCycleId,
-        rotationObligationId:
-          rotationObligationId,
+
+        subaccountCode:
+          settlementProfile
+            .provider_recipient_reference,
+
+        transactionChargeInSubunit:
+          Math.round(
+            platformFee * 100
+          ),
+
+        bearer:
+          "subaccount",
+
+        metadata: {
+          threeple_payment_id:
+            paymentAttempt.id,
+
+          participant_id:
+            participant.id,
+
+          collection_id:
+            collection.id,
+
+          organization_id:
+            collection.organization_id,
+
+          rotation_cycle_id:
+            rotationCycleId,
+
+          rotation_obligation_id:
+            rotationObligationId,
+
+          recurring_obligation_id:
+            recurringObligationId,
+
+          platform_fee_amount:
+            platformFee,
+
+          platform_fee_percentage:
+            feePercentage,
+        },
       });
 
+    const {
+      error: pendingUpdateError,
+    } = await supabaseAdmin
+      .from("payments")
+      .update({
+        status:
+          "pending",
+
+        metadata: {
+          source:
+            "authenticated_member_payment",
+
+          collection_mode:
+            collection.collection_mode,
+
+          settlement_profile_id:
+            settlementProfile.id,
+
+          rotation_cycle_id:
+            rotationCycleId,
+
+          rotation_obligation_id:
+            rotationObligationId,
+
+          recurring_obligation_id:
+            recurringObligationId,
+
+          checkout_created:
+            true,
+        },
+      })
+      .eq(
+        "id",
+        paymentAttempt.id
+      );
+
+    if (pendingUpdateError) {
+      console.error(
+        "MEMBER_PAYMENT_PENDING_UPDATE_FAILED",
+        {
+          paymentId:
+            paymentAttempt.id,
+
+          reference,
+
+          error:
+            pendingUpdateError,
+        }
+      );
+    }
+
     redirect(
-      checkout.authorizationUrl
+      checkout.authorization_url
     );
   } catch (error) {
     if (
@@ -534,6 +1126,35 @@ if (!participant.email) {
       throw error;
     }
 
+
+    await supabaseAdmin
+      .from("payments")
+      .update({
+        status:
+          "failed",
+
+        metadata: {
+          source:
+            "authenticated_member_payment",
+
+          failure_stage:
+            "paystack_initialization",
+
+          rotation_cycle_id:
+            rotationCycleId,
+
+          rotation_obligation_id:
+            rotationObligationId,
+
+          recurring_obligation_id:
+            recurringObligationId,
+        },
+      })
+      .eq(
+        "id",
+        paymentAttempt.id
+      );
+
     console.error(
       "PARTICIPANT_PAYMENT_INITIALIZATION_FAILED",
       {
@@ -541,7 +1162,7 @@ if (!participant.email) {
         collectionId:
           collection.id,
         organizationId:
-          organization.id,
+          collection.organization_id,
         rotationCycleId:
           rotationCycleId,
         rotationObligationId:
@@ -557,5 +1178,3 @@ if (!participant.email) {
     );
   }
 }
-
-

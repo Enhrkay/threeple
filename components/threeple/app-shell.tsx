@@ -1,8 +1,12 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+
+import {
+  LogoutButton,
+} from "@/components/logout-button";
 
 type ShellMode = "member" | "admin";
 
@@ -241,24 +245,8 @@ export function ThreepleAppShell({
           ))}
         </nav>
 
-        <div className="p-4">
-          <div className="overflow-hidden rounded-[1.4rem] border border-[var(--tp-primary-border)] bg-[var(--tp-primary-soft)] p-4">
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[var(--tp-success)]" />
-
-              <p className="text-[11px] font-black uppercase tracking-[0.12em] text-[var(--tp-primary)]">
-                Threeple ready
-              </p>
-            </div>
-
-            <p className="mt-3 text-sm font-bold text-[var(--tp-ink)]">
-              Built for every screen
-            </p>
-
-            <p className="mt-1.5 text-xs leading-5 text-[var(--tp-muted)]">
-              Phone · Tablet · Desktop
-            </p>
-          </div>
+        <div className="border-t border-[var(--tp-border)] p-4">
+          <LogoutButton />
         </div>
       </aside>
 
@@ -268,11 +256,13 @@ export function ThreepleAppShell({
           <div className="flex min-h-[72px] items-center justify-between gap-4 px-4 sm:px-6">
             <Brand mode={mode} />
 
-            {actions && (
-              <div className="shrink-0">
-                {actions}
+            <div className="flex shrink-0 items-center gap-2">
+              {actions}
+
+              <div className="hidden sm:block">
+                <LogoutButton compact />
               </div>
-            )}
+            </div>
           </div>
 
           {/* TABLET NAV */}
@@ -328,15 +318,21 @@ export function ThreepleAppShell({
         className="fixed inset-x-0 bottom-0 z-50 border-t border-[var(--tp-border)] bg-[color:var(--tp-surface)]/95 px-2 pb-[max(0.45rem,env(safe-area-inset-bottom))] pt-1.5 shadow-[0_-10px_35px_rgba(22,35,28,0.06)] backdrop-blur-xl sm:hidden"
         aria-label="Primary navigation"
       >
-        <div className="mx-auto flex max-w-lg">
-          {items
-            .slice(0, 4)
-            .map((item) => (
-              <MobileNavItem
-                key={item.href}
-                item={item}
-              />
-            ))}
+        <div className="mx-auto flex max-w-lg items-center gap-1">
+          <div className="flex min-w-0 flex-1">
+            {items
+              .slice(0, 4)
+              .map((item) => (
+                <MobileNavItem
+                  key={item.href}
+                  item={item}
+                />
+              ))}
+          </div>
+
+          <div className="shrink-0 pl-1">
+            <LogoutButton compact />
+          </div>
         </div>
       </nav>
     </div>

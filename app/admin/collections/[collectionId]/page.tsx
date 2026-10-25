@@ -415,96 +415,153 @@ export default async function AdminCollectionProfilePage({
   // Read-only existence checks.
   // =======================================================
 
-  const [
-    recurringSchedulesResult,
-    cyclesResult,
-    rotationResult,
-    obligationsResult,
-  ] = await Promise.all([
+  const recurringStructure =
+    collection.collection_mode ===
+      "recurring_dues";
 
-    supabaseAdmin
-      .from(
-        "recurring_schedules"
-      )
-      .select(
-        "id",
-        {
-          count: "exact",
-          head: true,
-        }
-      )
-      .eq(
-        "collection_id",
-        collection.id
-      ),
+  const rotatingStructure =
+    collection.collection_mode ===
+      "rotating_pool";
 
-    supabaseAdmin
-      .from(
-        "collection_cycles"
-      )
-      .select(
-        "id",
-        {
-          count: "exact",
-          head: true,
-        }
-      )
-      .eq(
-        "collection_id",
-        collection.id
-      ),
+  let structureConfigLabel =
+    "Configuration";
 
-    supabaseAdmin
-      .from(
-        "rotation_order"
-      )
-      .select(
-        "id",
-        {
-          count: "exact",
-          head: true,
-        }
-      )
-      .eq(
-        "collection_id",
-        collection.id
-      ),
+  let structureConfigCount = 0;
+  let structureCycles = 0;
+  let structureObligations = 0;
 
-    supabaseAdmin
-      .from(
-        "participant_obligations"
-      )
-      .select(
-        "id",
-        {
-          count: "exact",
-          head: true,
-        }
-      )
-      .eq(
-        "collection_id",
-        collection.id
-      ),
+  if (recurringStructure) {
+    const [
+      settingsResult,
+      cyclesResult,
+      obligationsResult,
+    ] = await Promise.all([
+      supabaseAdmin
+        .from("recurring_settings")
+        .select(
+          "id",
+          {
+            count: "exact",
+            head: true,
+          }
+        )
+        .eq(
+          "collection_id",
+          collection.id
+        ),
 
-  ]);
+      supabaseAdmin
+        .from("recurring_cycles")
+        .select(
+          "id",
+          {
+            count: "exact",
+            head: true,
+          }
+        )
+        .eq(
+          "collection_id",
+          collection.id
+        ),
 
-  const recurringSchedules =
-    recurringSchedulesResult.count ??
-    0;
+      supabaseAdmin
+        .from(
+          "recurring_cycle_obligations"
+        )
+        .select(
+          "id",
+          {
+            count: "exact",
+            head: true,
+          }
+        )
+        .eq(
+          "collection_id",
+          collection.id
+        ),
+    ]);
 
-  const collectionCycles =
-    cyclesResult.count ??
-    0;
+    structureConfigLabel =
+      "Settings";
 
-  const rotationEntries =
-    rotationResult.count ??
-    0;
+    structureConfigCount =
+      settingsResult.count ?? 0;
 
-  const obligations =
-    obligationsResult.count ??
-    0;
+    structureCycles =
+      cyclesResult.count ?? 0;
 
-  // =======================================================
+    structureObligations =
+      obligationsResult.count ?? 0;
+  }
+
+  if (rotatingStructure) {
+    const [
+      membersResult,
+      cyclesResult,
+      obligationsResult,
+    ] = await Promise.all([
+      supabaseAdmin
+        .from("rotation_members")
+        .select(
+          "id",
+          {
+            count: "exact",
+            head: true,
+          }
+        )
+        .eq(
+          "collection_id",
+          collection.id
+        )
+        .eq(
+          "is_active",
+          true
+        ),
+
+      supabaseAdmin
+        .from("rotation_cycles")
+        .select(
+          "id",
+          {
+            count: "exact",
+            head: true,
+          }
+        )
+        .eq(
+          "collection_id",
+          collection.id
+        ),
+
+      supabaseAdmin
+        .from(
+          "rotation_cycle_obligations"
+        )
+        .select(
+          "id",
+          {
+            count: "exact",
+            head: true,
+          }
+        )
+        .eq(
+          "collection_id",
+          collection.id
+        ),
+    ]);
+
+    structureConfigLabel =
+      "Rotation Members";
+
+    structureConfigCount =
+      membersResult.count ?? 0;
+
+    structureCycles =
+      cyclesResult.count ?? 0;
+
+    structureObligations =
+      obligationsResult.count ?? 0;
+  }
+
   // SUMMARY
   // =======================================================
 
@@ -1044,22 +1101,22 @@ export default async function AdminCollectionProfilePage({
           <section className="mt-8 rounded-[2rem] border border-[var(--tp-border)] bg-[var(--tp-surface)] shadow-[var(--tp-shadow-sm)] p-6 md:p-8">
 
             <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--tp-faint)]">
-              Recurring Structure
+              Collection Structure
             </p>
 
             <h2 className="mt-2 text-xl font-black tracking-tight">
-              Schedule & Obligations
+              Cycles & Obligations
             </h2>
 
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
 
               <div className="rounded-2xl bg-[var(--tp-bg-soft)] p-5">
                 <p className="text-xs text-[var(--tp-faint)]">
-                  Schedules
+                  {structureConfigLabel}
                 </p>
 
                 <p className="mt-2 text-2xl font-black tracking-tight">
-                  {recurringSchedules}
+                  {structureConfigCount}
                 </p>
               </div>
 
@@ -1069,17 +1126,7 @@ export default async function AdminCollectionProfilePage({
                 </p>
 
                 <p className="mt-2 text-2xl font-black tracking-tight">
-                  {collectionCycles}
-                </p>
-              </div>
-
-              <div className="rounded-2xl bg-[var(--tp-bg-soft)] p-5">
-                <p className="text-xs text-[var(--tp-faint)]">
-                  Rotation Entries
-                </p>
-
-                <p className="mt-2 text-2xl font-black tracking-tight">
-                  {rotationEntries}
+                  {structureCycles}
                 </p>
               </div>
 
@@ -1089,7 +1136,7 @@ export default async function AdminCollectionProfilePage({
                 </p>
 
                 <p className="mt-2 text-2xl font-black tracking-tight">
-                  {obligations}
+                  {structureObligations}
                 </p>
               </div>
 

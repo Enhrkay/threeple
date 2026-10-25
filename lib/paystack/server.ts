@@ -1,4 +1,4 @@
-import "server-only";
+﻿import "server-only";
 
 const PAYSTACK_BASE_URL =
   "https://api.paystack.co";
@@ -397,6 +397,8 @@ export async function initializePaystackTransaction(
 
     subaccountCode: string;
 
+    bearer?: "subaccount";
+
     // Optional future Threeple flat fee.
     // Also expressed in the currency's
     // smallest unit.
@@ -531,6 +533,13 @@ export async function initializePaystackTransaction(
 
     subaccount:
       subaccountCode,
+
+    ...(input.bearer
+      ? {
+          bearer:
+            input.bearer,
+        }
+      : {}),
 
     metadata:
       JSON.stringify(

@@ -1,4 +1,4 @@
-﻿import ParticipantControls from "./participant-controls";
+import ParticipantControls from "./participant-controls";
 import Link from "next/link";
 
 import {
@@ -325,14 +325,72 @@ export default async function ParticipantCollectionPage({
     .select(`
       id,
       name,
-      organization_type,
-      settlement_status
+      organization_type
     `)
     .eq(
       "id",
       collection.organization_id
     )
     .maybeSingle();
+
+  const {
+    data: beneficiary,
+  } = await supabaseAdmin
+    .from("collection_beneficiaries")
+    .select(`
+      settlement_profile_id
+    `)
+    .eq(
+      "collection_id",
+      collection.id
+    )
+    .eq(
+      "beneficiary_role",
+      "primary"
+    )
+    .eq(
+      "is_active",
+      true
+    )
+    .maybeSingle();
+
+  let settlementReady = false;
+
+  if (
+    beneficiary?.settlement_profile_id
+  ) {
+    const {
+      data: settlementProfile,
+    } = await supabaseAdmin
+      .from("settlement_profiles")
+      .select(`
+        provider,
+        provider_recipient_reference,
+        verification_status,
+        is_active
+      `)
+      .eq(
+        "id",
+        beneficiary.settlement_profile_id
+      )
+      .maybeSingle();
+
+    settlementReady =
+      Boolean(
+        settlementProfile?.is_active &&
+        settlementProfile.provider ===
+          "paystack" &&
+        settlementProfile.provider_recipient_reference?.startsWith(
+          "ACCT_"
+        ) &&
+        [
+          "provider_connected",
+          "provider_verified",
+        ].includes(
+          settlementProfile.verification_status
+        )
+      );
+  }
 
   let currentRotationObligation:
     | {
@@ -571,8 +629,7 @@ export default async function ParticipantCollectionPage({
     Boolean(
       participant.email
     ) &&
-    organization?.settlement_status ===
-      "active";
+    settlementReady;
 
   const message =
     paymentMessage(
@@ -1115,8 +1172,7 @@ export default async function ParticipantCollectionPage({
               <div className="mt-5 rounded-[1.5rem] border border-[var(--tp-border)] bg-[var(--tp-bg-soft)] p-4 text-sm leading-6 text-[var(--tp-ink-soft)]">
                 {!participant.email
                   ? "Add an email address to this participant record before payment can begin."
-                  : organization?.settlement_status !==
-                      "active"
+                  : !settlementReady
                     ? "The organizer must connect a settlement account before participant payments can begin."
                     : !approvedForPayment
                       ? "Organizer approval is required before payment."
@@ -1230,11 +1286,3 @@ export default async function ParticipantCollectionPage({
     </main>
   );
 }
-
-
-
-
-
-
-
-
