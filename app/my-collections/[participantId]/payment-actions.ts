@@ -66,6 +66,23 @@ export async function startParticipantPayment(
     );
   }
 
+  const additionalAmountInput =
+    String(
+      formData.get(
+        "additional_amount"
+      ) ?? ""
+    ).trim();
+
+  const wantsAdditionalContribution =
+    additionalAmountInput.length > 0;
+
+  const requestedAdditionalAmount =
+    wantsAdditionalContribution
+      ? Number(
+          additionalAmountInput
+        )
+      : null;
+
   const supabase =
     await createClient();
 
@@ -153,6 +170,7 @@ if (!participant.email) {
       collection_mode,
       currency,
       default_amount,
+      target_amount,
       requires_approval,
       status,
       archived_at
@@ -651,6 +669,8 @@ if (!participant.email) {
     | null =
       null;
 
+  let standardVerifiedPaid = 0;
+
   if (
     collection.collection_mode !==
       "rotating_pool" &&
@@ -770,6 +790,9 @@ if (!participant.email) {
           verifiedPaid * 100
         ) / 100;
 
+      standardVerifiedPaid =
+        verifiedPaid;
+
       standardOutstandingAmount =
         Math.round(
           Math.max(
@@ -781,19 +804,177 @@ if (!participant.email) {
     }
   }
 
-  const amount =
-    collection.collection_mode ===
-      "rotating_pool" &&
-    rotationOutstandingAmount !==
-      null
-      ? rotationOutstandingAmount
-      : collection.collection_mode ===
-            "recurring_dues" &&
-          recurringOutstandingAmount !==
+  let targetAdditionalAmount:
+    | number
+    | null =
+      null;
+
+  if (wantsAdditionalContribution) {
+    if (
+      collection.collection_mode !==
+        "target"
+    ) {
+      backWithError(
+        participantId,
+        "additional_not_allowed"
+      );
+    }
+
+    if (
+      requestedAdditionalAmount ===
+        null ||
+      !Number.isFinite(
+        requestedAdditionalAmount
+      ) ||
+      requestedAdditionalAmount <= 0
+    ) {
+      backWithError(
+        participantId,
+        "additional_amount_invalid"
+      );
+    }
+
+    const expectedStandardAmount =
+      participant.expected_amount !==
+        null
+        ? Number(
+            participant.expected_amount
+          )
+        : collection.default_amount !==
             null
-        ? recurringOutstandingAmount
-        : standardOutstandingAmount ??
-          0;
+          ? Number(
+              collection.default_amount
+            )
+          : 0;
+
+    if (
+      !Number.isFinite(
+        expectedStandardAmount
+      ) ||
+      expectedStandardAmount <= 0 ||
+      standardVerifiedPaid + 0.001 <
+        expectedStandardAmount
+    ) {
+      backWithError(
+        participantId,
+        "original_balance_due"
+      );
+    }
+
+    const targetAmount =
+      collection.target_amount !==
+        null
+        ? Number(
+            collection.target_amount
+          )
+        : 0;
+
+    if (
+      !Number.isFinite(
+        targetAmount
+      ) ||
+      targetAmount <= 0
+    ) {
+      backWithError(
+        participantId,
+        "target_unavailable"
+      );
+    }
+
+    const {
+      data: financialSummary,
+      error: financialSummaryError,
+    } = await supabaseAdmin
+      .from(
+        "collection_financial_summary"
+      )
+      .select(`
+        effective_gross_amount
+      `)
+      .eq(
+        "collection_id",
+        collection.id
+      )
+      .maybeSingle();
+
+    if (financialSummaryError) {
+      console.error(
+        "TARGET_ADDITIONAL_FINANCIAL_SUMMARY_FAILED",
+        {
+          participantId,
+          collectionId:
+            collection.id,
+          error:
+            financialSummaryError,
+        }
+      );
+
+      backWithError(
+        participantId,
+        "balance_unavailable"
+      );
+    }
+
+    const collectionRaised =
+      Number(
+        financialSummary
+          ?.effective_gross_amount ??
+          0
+      );
+
+    const targetRemaining =
+      Math.round(
+        Math.max(
+          0,
+          targetAmount -
+            collectionRaised
+        ) *
+          100
+      ) / 100;
+
+    if (targetRemaining <= 0) {
+      backWithError(
+        participantId,
+        "target_reached"
+      );
+    }
+
+    const roundedAdditionalAmount =
+      Math.round(
+        requestedAdditionalAmount *
+          100
+      ) / 100;
+
+    if (
+      roundedAdditionalAmount <= 0 ||
+      roundedAdditionalAmount >
+        targetRemaining + 0.001
+    ) {
+      backWithError(
+        participantId,
+        "additional_exceeds_target"
+      );
+    }
+
+    targetAdditionalAmount =
+      roundedAdditionalAmount;
+  }
+
+  const amount =
+    targetAdditionalAmount !== null
+      ? targetAdditionalAmount
+      : collection.collection_mode ===
+            "rotating_pool" &&
+          rotationOutstandingAmount !==
+            null
+        ? rotationOutstandingAmount
+        : collection.collection_mode ===
+              "recurring_dues" &&
+            recurringOutstandingAmount !==
+              null
+          ? recurringOutstandingAmount
+          : standardOutstandingAmount ??
+            0;
 
   if (
     !Number.isFinite(

@@ -195,6 +195,55 @@ function paymentMessage(
         text:
           "Threeple could not determine a valid payment amount for this contribution.",
       };
+
+    case "additional_not_allowed":
+      return {
+        type: "error",
+        text:
+          "Additional contributions are only available for Target collections.",
+      };
+
+    case "additional_amount_invalid":
+      return {
+        type: "error",
+        text:
+          "Enter a valid additional contribution amount greater than zero.",
+      };
+
+    case "original_balance_due":
+      return {
+        type: "error",
+        text:
+          "Complete your original contribution commitment before adding more to this goal.",
+      };
+
+    case "target_unavailable":
+      return {
+        type: "error",
+        text:
+          "Threeple could not determine the target for this Collection.",
+      };
+
+    case "target_reached":
+      return {
+        type: "info",
+        text:
+          "This Collection has already reached its target.",
+      };
+
+    case "additional_exceeds_target":
+      return {
+        type: "error",
+        text:
+          "That amount is more than the remaining Collection target. Enter a smaller contribution.",
+      };
+
+    case "balance_unavailable":
+      return {
+        type: "error",
+        text:
+          "Threeple could not confirm the current contribution balance. Please try again.",
+      };
     case "initialization_failed":
       return {
         type: "error",
@@ -601,6 +650,28 @@ export default async function ParticipantCollectionPage({
       ? Number(dashboard.progress_percent)
       : null;
 
+  const targetAmount =
+    dashboard?.target_amount !== null &&
+    dashboard?.target_amount !== undefined
+      ? Number(dashboard.target_amount)
+      : collection.target_amount !== null
+        ? Number(collection.target_amount)
+        : null;
+
+  const targetRemaining =
+    collection.collection_mode === "target" &&
+    targetAmount !== null &&
+    Number.isFinite(targetAmount) &&
+    targetAmount > 0
+      ? Math.round(
+          Math.max(
+            0,
+            targetAmount -
+              collectionRaised
+          ) * 100
+        ) / 100
+      : 0;
+
 
   const {
     data: ledgerRows,
@@ -651,6 +722,22 @@ export default async function ParticipantCollectionPage({
       participant.email
     ) &&
     settlementReady;
+
+  const additionalContributionReady =
+    collection.collection_mode ===
+      "target" &&
+    collection.status ===
+      "active" &&
+    !archived &&
+    participant.is_active &&
+    approvedForPayment &&
+    participant.payment_status ===
+      "paid" &&
+    Boolean(
+      participant.email
+    ) &&
+    settlementReady &&
+    targetRemaining > 0;
 
   const message =
     paymentMessage(
@@ -1153,6 +1240,91 @@ export default async function ParticipantCollectionPage({
                     )} target
                   </span>
                 </div>
+
+                {collection.collection_mode ===
+                  "target" &&
+                  participant.payment_status ===
+                    "paid" && (
+                    <div className="mt-5 border-t border-neutral-200 pt-5">
+                      {targetRemaining > 0 ? (
+                        additionalContributionReady ? (
+                          <>
+                            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                              <div>
+                                <p className="text-sm font-black text-[var(--tp-ink)]">
+                                  Add more to this goal
+                                </p>
+
+                                <p className="mt-1 text-xs leading-5 text-[var(--tp-muted)]">
+                                  Your original commitment is already complete. You can make an additional contribution while this goal is still open.
+                                </p>
+                              </div>
+
+                              <p className="text-sm font-semibold text-[var(--tp-ink-soft)]">
+                                {formatMoney(
+                                  targetRemaining,
+                                  collection.currency
+                                )} remaining
+                              </p>
+                            </div>
+
+                            <form
+                              action={
+                                startParticipantPayment
+                              }
+                              className="mt-4 flex flex-col gap-3 sm:flex-row"
+                            >
+                              <input
+                                type="hidden"
+                                name="participant_id"
+                                value={
+                                  participant.id
+                                }
+                              />
+
+                              <div className="flex-1">
+                                <label
+                                  htmlFor="additional_amount"
+                                  className="sr-only"
+                                >
+                                  Additional contribution amount
+                                </label>
+
+                                <input
+                                  id="additional_amount"
+                                  name="additional_amount"
+                                  type="number"
+                                  min="0.01"
+                                  max={
+                                    targetRemaining
+                                  }
+                                  step="0.01"
+                                  required
+                                  placeholder="Enter amount"
+                                  className="h-12 w-full rounded-xl border border-[var(--tp-border)] bg-white px-4 text-sm font-medium outline-none transition focus:border-black"
+                                />
+                              </div>
+
+                              <button
+                                type="submit"
+                                className="inline-flex h-12 items-center justify-center rounded-xl bg-black px-6 text-sm font-semibold text-white hover:bg-neutral-800"
+                              >
+                                Add contribution
+                              </button>
+                            </form>
+                          </>
+                        ) : (
+                          <p className="text-sm text-[var(--tp-muted)]">
+                            Additional contributions are not currently available for this Collection.
+                          </p>
+                        )
+                      ) : (
+                        <div className="rounded-xl bg-[var(--tp-success-soft)] px-4 py-3 text-sm font-semibold text-[var(--tp-success)]">
+                          Target reached. No additional contribution is required.
+                        </div>
+                      )}
+                    </div>
+                  )}
               </div>
             )}
 

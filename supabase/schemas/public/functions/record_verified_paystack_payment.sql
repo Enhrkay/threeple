@@ -27,6 +27,8 @@ declare
   v_expected_amount numeric;
   v_outstanding_amount numeric;
   v_verified_paid_before numeric := 0;
+  v_collection_verified_before numeric := 0;
+  v_collection_target_remaining numeric := 0;
   v_currency text;
 
   v_fee_rate numeric;
@@ -123,6 +125,7 @@ begin
     c.id,
     c.currency,
     c.default_amount,
+    c.target_amount,
     c.collection_mode,
     c.allow_partial_payments,
     c.allow_custom_amount
@@ -464,23 +467,89 @@ begin
           0
         );
 
-      if v_outstanding_amount <= 0 then
-        if v_existing.id is null
-           or v_existing.status <> 'success' then
+      if v_collection.collection_mode = 'target' then
+        if v_collection.target_amount is null
+           or v_collection.target_amount <= 0 then
           raise exception
-            'The contribution is already fully paid.';
+            'Target amount is not configured.';
         end if;
-      end if;
 
-      if coalesce(v_collection.allow_partial_payments, false) then
-        if p_amount > v_outstanding_amount + 0.001 then
-          raise exception
-            'Verified payment amount exceeds the outstanding balance.';
+        select
+          coalesce(
+            sum(
+              case
+                when pay.status = 'success'
+                  then pay.amount
+
+                when pay.status = 'partially_refunded'
+                  then greatest(
+                    pay.amount - coalesce(pay.refunded_amount, 0),
+                    0
+                  )
+
+                else 0
+              end
+            ),
+            0
+          )
+        into v_collection_verified_before
+        from public.payments pay
+        where pay.collection_id = p_collection_id
+          and pay.verified_at is not null
+          and pay.provider_reference is distinct from trim(p_reference);
+
+        v_collection_verified_before :=
+          round(
+            coalesce(
+              v_collection_verified_before,
+              0
+            ),
+            2
+          );
+
+        v_collection_target_remaining :=
+          greatest(
+            round(
+              v_collection.target_amount
+              - v_collection_verified_before,
+              2
+            ),
+            0
+          );
+
+        if v_collection_target_remaining <= 0 then
+          if v_existing.id is null
+             or v_existing.status <> 'success' then
+            raise exception
+              'The Collection target has already been reached.';
+          end if;
         end if;
-      else
-        if abs(p_amount - v_outstanding_amount) > 0.001 then
+
+        if p_amount >
+           v_collection_target_remaining + 0.001 then
           raise exception
-            'Verified payment amount does not match the outstanding obligation.';
+            'Verified payment amount exceeds the remaining Collection target.';
+        end if;
+
+      else
+        if v_outstanding_amount <= 0 then
+          if v_existing.id is null
+             or v_existing.status <> 'success' then
+            raise exception
+              'The contribution is already fully paid.';
+          end if;
+        end if;
+
+        if coalesce(v_collection.allow_partial_payments, false) then
+          if p_amount > v_outstanding_amount + 0.001 then
+            raise exception
+              'Verified payment amount exceeds the outstanding balance.';
+          end if;
+        else
+          if abs(p_amount - v_outstanding_amount) > 0.001 then
+            raise exception
+              'Verified payment amount does not match the outstanding obligation.';
+          end if;
         end if;
       end if;
 
