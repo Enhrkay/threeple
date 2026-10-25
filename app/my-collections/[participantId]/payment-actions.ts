@@ -998,9 +998,8 @@ if (!participant.email) {
   }
 
   const callbackUrl =
-    `${appUrl}${participantUrl(
-      participantId,
-      "returned"
+    `${appUrl}/api/payments/paystack/return?participant_id=${encodeURIComponent(
+      participantId
     )}`;
   try {
     const checkout =

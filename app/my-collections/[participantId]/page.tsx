@@ -125,11 +125,32 @@ function paymentMessage(
   code?: string
 ) {
   switch (code) {
+    case "verified":
+      return {
+        type: "info",
+        text:
+          "Payment confirmed successfully. Your Threeple contribution record has been updated.",
+      };
+
+    case "pending":
+      return {
+        type: "info",
+        text:
+          "Paystack has not confirmed this payment as successful yet. Threeple will continue reconciling it.",
+      };
+
+    case "verification_failed":
+      return {
+        type: "error",
+        text:
+          "Threeple could not verify this payment automatically. Your payment record has been preserved for reconciliation.",
+      };
+
     case "returned":
       return {
         type: "info",
         text:
-          "You have returned from Paystack. Threeple will confirm the payment from Paystack before marking it as paid.",
+          "You have returned from Paystack. Threeple is checking the payment status.",
       };
     case "already_paid":
       return {

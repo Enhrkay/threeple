@@ -577,3 +577,45 @@ export async function initializePaystackTransaction(
     }
   );
 }
+
+// =========================================================
+// 5. VERIFY PAYMENT
+// =========================================================
+
+export type PaystackVerifiedTransaction = {
+  reference: string;
+  amount: number;
+  currency: string;
+  status: string;
+  fees?: number | null;
+  metadata?:
+    | Record<string, unknown>
+    | string
+    | null;
+};
+
+export async function verifyPaystackTransaction(
+  reference: string
+) {
+  const cleanReference =
+    reference.trim();
+
+  if (
+    !cleanReference ||
+    !/^[A-Za-z0-9.\-=]+$/.test(
+      cleanReference
+    )
+  ) {
+    throw new Error(
+      "Invalid Paystack transaction reference."
+    );
+  }
+
+  return paystackRequest<
+    PaystackVerifiedTransaction
+  >(
+    `/transaction/verify/${encodeURIComponent(
+      cleanReference
+    )}`
+  );
+}

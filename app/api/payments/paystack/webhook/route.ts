@@ -11,6 +11,10 @@ import {
   supabaseAdmin,
 } from "@/lib/supabase/admin";
 
+import {
+  verifyPaystackTransaction,
+} from "@/lib/paystack/server";
+
 type PaystackWebhookEvent = {
   event?: string;
   data?: {
@@ -140,43 +144,6 @@ function metadataObject(
   return value;
 }
 
-async function verifyTransaction(
-  reference: string,
-  secret: string
-) {
-  const response =
-    await fetch(
-      `https://api.paystack.co/transaction/verify/${encodeURIComponent(
-        reference
-      )}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization:
-            `Bearer ${secret}`,
-        },
-        cache: "no-store",
-      }
-    );
-
-  const result =
-    await response.json() as
-      PaystackVerifyResponse;
-
-  if (
-    !response.ok ||
-    !result.status ||
-    !result.data
-  ) {
-    throw new Error(
-      result.message ||
-      "Paystack transaction verification failed."
-    );
-  }
-
-  return result.data;
-}
-
 export async function POST(
   request: Request
 ) {
@@ -269,9 +236,8 @@ export async function POST(
     // Signature validation proves the webhook came from Paystack.
     // Verification independently confirms the current transaction state.
     const transaction =
-      await verifyTransaction(
-        reference,
-        secret
+      await verifyPaystackTransaction(
+        reference
       );
 
     if (
